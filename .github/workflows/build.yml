@@ -1,0 +1,145 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Input something to release an automated build
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONOPTIMIZE: 1
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install pip dependencies
+        run: pip install -U -r requirements.txt
+      - name: Setup UPX
+        run: |
+          if [ $RUNNER_OS == "Windows" ]; then
+            choco install upx --no-progress
+          elif [ $RUNNER_OS == "Linux" ]; then
+            sudo apt install upx-ucl
+          fi
+      - name: Build executable
+        run: |
+          PYI_SEPARATOR=
+          if [ $RUNNER_OS == "Windows" ]; then
+            PYI_SEPARATOR=";"
+          elif [ $RUNNER_OS == "Linux" ]; then
+            PYI_SEPARATOR=":"
+          fi
+
+          pip install pyinstaller
+          python -c "import time;open('build_time.py','w').write(f'BUILD_TIME={time.time():.0f}')"
+          pyinstaller \
+            --additional-hooks-dir pyi-hooks \
+            --hidden-import PIL._tkinter_finder \
+            --exclude-module _asyncio \
+            --exclude-module _bz2 \
+            --exclude-module _ctypes \
+            --exclude-module _decimal \
+            --exclude-module _hashlib \
+            --exclude-module _lzma \
+            --exclude-module _multiprocessing \
+            --exclude-module _overlapped \
+            --exclude-module _queue \
+            --exclude-module _ssl \
+            --exclude-module pyexpat \
+            --exclude-module unicodedata \
+            --add-data "theme${PYI_SEPARATOR}theme" \
+            --add-data "icon-256px.ico${PYI_SEPARATOR}." \
+            --add-data "icon-128px.webp${PYI_SEPARATOR}." \
+            --name realesrgan-gui \
+            --icon icon-256px.ico \
+            --noconsole \
+            --noconfirm \
+            --clean \
+            --onefile \
+            --log-level WARN \
+            main.py
+      - name: Upload result
+        uses: actions/upload-artifact@v2
+        with:
+          name: realesrgan-gui-${{ runner.os }}
+          path: dist
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.event.inputs.release }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: realesrgan-gui-Windows
+          path: dist-Windows
+      - uses: actions/download-artifact@v3
+        with:
+          name: realesrgan-gui-Linux
+          path: dist-Linux
+      - name: Create release assets
+        id: vars
+        run: |
+          # https://github.com/xinntao/Real-ESRGAN/releases
+          REAL_ESRGAN_VERSION=v0.2.5.0
+          REAL_ESRGAN_RELEASE_TIME=20220424
+          REAL_ESRGAN_PLATFORM=
+
+          BUILD_TIME=$(date +%Y%m%d-%H%I%S)
+          echo "::set-output name=release_name::Automated build ${BUILD_TIME}"
+          echo "::set-output name=tag_name::autobuild-${BUILD_TIME}"
+
+          mkdir release
+
+          for BUILD_OS in "Windows" "Linux"; do
+            if [ $BUILD_OS == "Windows" ]; then
+              REAL_ESRGAN_PLATFORM=windows
+            elif [ $BUILD_OS == "Linux" ]; then
+              REAL_ESRGAN_PLATFORM=ubuntu
+            fi
+            cd "dist-${BUILD_OS}"
+            zip -9 -r ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.zip .
+            wget \
+              -nv \
+              -O realesrgan-ncnn-vulkan.zip \
+              "https://github.com/xinntao/Real-ESRGAN/releases/download/${REAL_ESRGAN_VERSION}/realesrgan-ncnn-vulkan-${REAL_ESRGAN_RELEASE_TIME}-${REAL_ESRGAN_PLATFORM}.zip"
+            unzip realesrgan-ncnn-vulkan.zip
+            rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
+            cp ../README.md README_gui.md
+            zip -9 -r "../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.zip" .
+            cd ..
+          done
+
+          RELEASE_FILES=$(find release -type f)
+          RELEASE_FILES="${RELEASE_FILES//'%'/'%25'}"
+          RELEASE_FILES="${RELEASE_FILES//$'\n'/'%0A'}"
+          RELEASE_FILES="${RELEASE_FILES//$'\r'/'%0D'}"
+          echo "::set-output name=release_files::${RELEASE_FILES}"
+      - name: Release automated build
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event.inputs.release }}
+        with:
+          name: ${{ steps.vars.outputs.release_name }}
+          tag_name: ${{ steps.vars.outputs.tag_name }}
+          files: ${{ steps.vars.outputs.release_files }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
