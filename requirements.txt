@@ -1,3 +1,5 @@
-darkdetect == 0.5.*
+# Use my modified version based on 0.5.1 with additional dark mode listener
+# darkdetect == 0.5.*
+git+https://github.com/TransparentLC/darkdetect.git
 pillow == 9.*
 tkinterdnd2 == 0.3.*

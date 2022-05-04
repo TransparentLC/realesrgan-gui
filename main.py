@@ -323,6 +323,10 @@ if __name__ == '__main__':
 
     root.tk.call('source', os.path.join(BASE_PATH, 'theme/sun-valley.tcl'))
     root.tk.call('set_theme', 'dark' if darkdetect.isDark() else 'light')
+    if os.name == 'nt' and hasattr(darkdetect, 'listener'):
+        t = threading.Thread(target=darkdetect.listener, args=(lambda e: root.tk.call('set_theme', e.lower()),))
+        t.daemon = True
+        t.start()
 
     app = REGUIApp(root)
     app.drop_target_register(DND_FILES)
