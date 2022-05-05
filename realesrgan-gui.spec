@@ -47,9 +47,14 @@ a = Analysis(
     noarchive=False,
 )
 
-print('Binaries:')
-for i in a.binaries:
-    print(i)
+a.binaries = [
+    x
+    for x in a.binaries
+    if not any(x[0].startswith(y) for y in(
+        'api-ms-win-',
+        'ucrtbase.dll',
+    ))
+]
 
 a.datas = [
     x
@@ -65,6 +70,14 @@ a.datas = [
         os.path.join('tk', 'msgs'),
     ))
 ]
+
+print('Binaries:')
+for i in a.binaries:
+    print(i)
+
+print('Datas:')
+for i in a.datas:
+    print(i)
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
