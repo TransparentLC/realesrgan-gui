@@ -1,5 +1,5 @@
 # Copyright © 2021 rdbende <rdbende@gmail.com>
-# A stunning light/dark theme for ttk based on Microsoft's Sun Valley visual style 
+# A stunning light/dark theme for ttk based on Microsoft's Sun Valley visual style
 
 package require Tk 8.6
 
@@ -8,15 +8,167 @@ namespace eval ttk::theme::sun-valley-light {
     package provide ttk::theme::sun-valley-light $version
 
     ttk::style theme create sun-valley-light -parent clam -settings {
-        proc load_images {imgdir} {
-            variable images
-            foreach file [glob -directory $imgdir *.png] {
-                set images([file tail [file rootname $file]]) \
-                [image create photo -file $file -format png]
-            }
-        }
+        variable sprites [image create photo -file [file join [file dirname [info script]] sprites.png] -format png]
 
-        load_images [file join [file dirname [info script]] light]
+        variable images
+        set images(arrow-down) [image create photo -width 10 -height 5]
+        $images(arrow-down) copy $sprites -from 264 197 274 202
+        set images(arrow-right) [image create photo -width 5 -height 10]
+        $images(arrow-right) copy $sprites -from 267 92 272 102
+        set images(arrow-up) [image create photo -width 10 -height 5]
+        $images(arrow-up) copy $sprites -from 254 202 264 207
+        set images(button-accent-disabled) [image create photo -width 20 -height 20]
+        $images(button-accent-disabled) copy $sprites -from 142 256 162 276
+        set images(button-accent-hover) [image create photo -width 20 -height 20]
+        $images(button-accent-hover) copy $sprites -from 162 256 182 276
+        set images(button-accent-pressed) [image create photo -width 20 -height 20]
+        $images(button-accent-pressed) copy $sprites -from 182 256 202 276
+        set images(button-accent-rest) [image create photo -width 20 -height 20]
+        $images(button-accent-rest) copy $sprites -from 186 116 206 136
+        set images(button-close-hover) [image create photo -width 20 -height 20]
+        $images(button-close-hover) copy $sprites -from 186 136 206 156
+        set images(button-close-pressed) [image create photo -width 20 -height 20]
+        $images(button-close-pressed) copy $sprites -from 192 96 212 116
+        set images(button-disabled) [image create photo -width 20 -height 20]
+        $images(button-disabled) copy $sprites -from 194 156 214 176
+        set images(button-hover) [image create photo -width 20 -height 20]
+        $images(button-hover) copy $sprites -from 194 176 214 196
+        set images(button-pressed) [image create photo -width 20 -height 20]
+        $images(button-pressed) copy $sprites -from 194 196 214 216
+        set images(button-rest) [image create photo -width 20 -height 20]
+        $images(button-rest) copy $sprites -from 194 216 214 236
+        set images(button-titlebar-hover) [image create photo -width 20 -height 20]
+        $images(button-titlebar-hover) copy $sprites -from 194 236 214 256
+        set images(button-titlebar-pressed) [image create photo -width 20 -height 20]
+        $images(button-titlebar-pressed) copy $sprites -from 202 256 222 276
+        set images(card) [image create photo -width 50 -height 50]
+        $images(card) copy $sprites -from 50 0 100 50
+        set images(check-disabled) [image create photo -width 20 -height 20]
+        $images(check-disabled) copy $sprites -from 206 116 226 136
+        set images(check-hover) [image create photo -width 20 -height 20]
+        $images(check-hover) copy $sprites -from 206 136 226 156
+        set images(check-pressed) [image create photo -width 20 -height 20]
+        $images(check-pressed) copy $sprites -from 214 156 234 176
+        set images(check-rest) [image create photo -width 20 -height 20]
+        $images(check-rest) copy $sprites -from 214 176 234 196
+        set images(check-tri-disabled) [image create photo -width 20 -height 20]
+        $images(check-tri-disabled) copy $sprites -from 214 196 234 216
+        set images(check-tri-hover) [image create photo -width 20 -height 20]
+        $images(check-tri-hover) copy $sprites -from 214 216 234 236
+        set images(check-tri-pressed) [image create photo -width 20 -height 20]
+        $images(check-tri-pressed) copy $sprites -from 214 236 234 256
+        set images(check-tri-rest) [image create photo -width 20 -height 20]
+        $images(check-tri-rest) copy $sprites -from 222 256 242 276
+        set images(check-unsel-disabled) [image create photo -width 20 -height 20]
+        $images(check-unsel-disabled) copy $sprites -from 216 74 236 94
+        set images(check-unsel-hover) [image create photo -width 20 -height 20]
+        $images(check-unsel-hover) copy $sprites -from 217 94 237 114
+        set images(check-unsel-pressed) [image create photo -width 20 -height 20]
+        $images(check-unsel-pressed) copy $sprites -from 236 72 256 92
+        set images(check-unsel-rest) [image create photo -width 20 -height 20]
+        $images(check-unsel-rest) copy $sprites -from 256 72 276 92
+        set images(empty) [image create photo -width 10 -height 10]
+        $images(empty) copy $sprites -from 90 100 100 110
+        set images(entry-disabled) [image create photo -width 20 -height 20]
+        $images(entry-disabled) copy $sprites -from 237 92 257 112
+        set images(entry-focus) [image create photo -width 20 -height 20]
+        $images(entry-focus) copy $sprites -from 226 114 246 134
+        set images(entry-hover) [image create photo -width 20 -height 20]
+        $images(entry-hover) copy $sprites -from 226 134 246 154
+        set images(entry-invalid) [image create photo -width 20 -height 20]
+        $images(entry-invalid) copy $sprites -from 234 154 254 174
+        set images(entry-rest) [image create photo -width 20 -height 20]
+        $images(entry-rest) copy $sprites -from 234 174 254 194
+        set images(notebook-border) [image create photo -width 40 -height 40]
+        $images(notebook-border) copy $sprites -from 50 50 90 90
+        set images(notebook) [image create photo -width 40 -height 40]
+        $images(notebook) copy $sprites -from 100 0 140 40
+        set images(progress-pbar-hor) [image create photo -width 20 -height 5]
+        $images(progress-pbar-hor) copy $sprites -from 132 248 152 253
+        set images(progress-pbar-vert) [image create photo -width 5 -height 20]
+        $images(progress-pbar-vert) copy $sprites -from 257 92 262 112
+        set images(progress-trough-hor) [image create photo -width 20 -height 5]
+        $images(progress-trough-hor) copy $sprites -from 254 192 274 197
+        set images(progress-trough-vert) [image create photo -width 5 -height 20]
+        $images(progress-trough-vert) copy $sprites -from 262 92 267 112
+        set images(radio-disabled) [image create photo -width 20 -height 20]
+        $images(radio-disabled) copy $sprites -from 234 194 254 214
+        set images(radio-hover) [image create photo -width 20 -height 20]
+        $images(radio-hover) copy $sprites -from 234 214 254 234
+        set images(radio-pressed) [image create photo -width 20 -height 20]
+        $images(radio-pressed) copy $sprites -from 234 234 254 254
+        set images(radio-rest) [image create photo -width 20 -height 20]
+        $images(radio-rest) copy $sprites -from 242 254 262 274
+        set images(radio-unsel-disabled) [image create photo -width 20 -height 20]
+        $images(radio-unsel-disabled) copy $sprites -from 246 112 266 132
+        set images(radio-unsel-hover) [image create photo -width 20 -height 20]
+        $images(radio-unsel-hover) copy $sprites -from 246 132 266 152
+        set images(radio-unsel-pressed) [image create photo -width 20 -height 20]
+        $images(radio-unsel-pressed) copy $sprites -from 254 152 274 172
+        set images(radio-unsel-rest) [image create photo -width 20 -height 20]
+        $images(radio-unsel-rest) copy $sprites -from 254 172 274 192
+        set images(scale-thumb-disabled) [image create photo -width 22 -height 22]
+        $images(scale-thumb-disabled) copy $sprites -from 130 60 152 82
+        set images(scale-thumb-hover) [image create photo -width 22 -height 22]
+        $images(scale-thumb-hover) copy $sprites -from 130 82 152 104
+        set images(scale-thumb-pressed) [image create photo -width 22 -height 22]
+        $images(scale-thumb-pressed) copy $sprites -from 124 104 146 126
+        set images(scale-thumb-rest) [image create photo -width 22 -height 22]
+        $images(scale-thumb-rest) copy $sprites -from 124 126 146 148
+        set images(scale-trough-hor) [image create photo -width 22 -height 22]
+        $images(scale-trough-hor) copy $sprites -from 152 52 174 74
+        set images(scale-trough-vert) [image create photo -width 22 -height 22]
+        $images(scale-trough-vert) copy $sprites -from 152 74 174 96
+        set images(scroll-down) [image create photo -width 8 -height 6]
+        $images(scroll-down) copy $sprites -from 112 258 120 264
+        set images(scroll-hor-thumb) [image create photo -width 20 -height 12]
+        $images(scroll-hor-thumb) copy $sprites -from 82 264 102 276
+        set images(scroll-hor-trough) [image create photo -width 20 -height 12]
+        $images(scroll-hor-trough) copy $sprites -from 102 264 122 276
+        set images(scroll-left) [image create photo -width 6 -height 8]
+        $images(scroll-left) copy $sprites -from 146 52 152 60
+        set images(scroll-right) [image create photo -width 6 -height 8]
+        $images(scroll-right) copy $sprites -from 254 207 260 215
+        set images(scroll-up) [image create photo -width 8 -height 6]
+        $images(scroll-up) copy $sprites -from 264 202 272 208
+        set images(scroll-vert-thumb) [image create photo -width 12 -height 20]
+        $images(scroll-vert-thumb) copy $sprites -from 258 52 270 72
+        set images(scroll-vert-trough) [image create photo -width 12 -height 20]
+        $images(scroll-vert-trough) copy $sprites -from 82 220 94 240
+        set images(separator) [image create photo -width 1 -height 1]
+        $images(separator) copy $sprites -from 236 93 237 94
+        set images(sizegrip) [image create photo -width 10 -height 10]
+        $images(sizegrip) copy $sprites -from 72 220 82 230
+        set images(switch-off-disabled) [image create photo -width 40 -height 20]
+        $images(switch-off-disabled) copy $sprites -from 40 110 80 130
+        set images(switch-off-hover) [image create photo -width 40 -height 20]
+        $images(switch-off-hover) copy $sprites -from 90 60 130 80
+        set images(switch-off-pressed) [image create photo -width 40 -height 20]
+        $images(switch-off-pressed) copy $sprites -from 90 80 130 100
+        set images(switch-off-rest) [image create photo -width 40 -height 20]
+        $images(switch-off-rest) copy $sprites -from 40 130 80 150
+        set images(switch-on-disabled) [image create photo -width 40 -height 20]
+        $images(switch-on-disabled) copy $sprites -from 32 150 72 170
+        set images(switch-on-hover) [image create photo -width 40 -height 20]
+        $images(switch-on-hover) copy $sprites -from 32 170 72 190
+        set images(switch-on-pressed) [image create photo -width 40 -height 20]
+        $images(switch-on-pressed) copy $sprites -from 32 190 72 210
+        set images(switch-on-rest) [image create photo -width 40 -height 20]
+        $images(switch-on-rest) copy $sprites -from 32 210 72 230
+        set images(tab-hover) [image create photo -width 32 -height 32]
+        $images(tab-hover) copy $sprites -from 172 0 204 32
+        set images(tab-rest) [image create photo -width 32 -height 32]
+        $images(tab-rest) copy $sprites -from 0 204 32 236
+        set images(tab-selected) [image create photo -width 32 -height 32]
+        $images(tab-selected) copy $sprites -from 204 0 236 32
+        set images(treeheading-hover) [image create photo -width 22 -height 22]
+        $images(treeheading-hover) copy $sprites -from 174 52 196 74
+        set images(treeheading-pressed) [image create photo -width 22 -height 22]
+        $images(treeheading-pressed) copy $sprites -from 174 74 196 96
+        set images(treeheading-rest) [image create photo -width 22 -height 22]
+        $images(treeheading-rest) copy $sprites -from 196 52 218 74
+
+        unset sprites
 
         array set colors {
             -fg             "#202020"
@@ -30,7 +182,7 @@ namespace eval ttk::theme::sun-valley-light {
             Button.button -children {
                 Button.padding -children {
                     Button.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -38,7 +190,7 @@ namespace eval ttk::theme::sun-valley-light {
             Toolbutton.button -children {
                 Toolbutton.padding -children {
                     Toolbutton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -64,7 +216,7 @@ namespace eval ttk::theme::sun-valley-light {
             AccentButton.button -children {
                 AccentButton.padding -children {
                     AccentButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -72,7 +224,7 @@ namespace eval ttk::theme::sun-valley-light {
             TitlebarButton.button -children {
                 TitlebarButton.padding -children {
                     TitlebarButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -80,7 +232,7 @@ namespace eval ttk::theme::sun-valley-light {
             CloseButton.button -children {
                 CloseButton.padding -children {
                     CloseButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -106,7 +258,7 @@ namespace eval ttk::theme::sun-valley-light {
             ToggleButton.button -children {
                 ToggleButton.padding -children {
                     ToggleButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -149,23 +301,23 @@ namespace eval ttk::theme::sun-valley-light {
                 Combobox.arrow -sticky nsew
             }
         }
-        
+
         ttk::style layout TSpinbox {
             Spinbox.field -sticky nsew -children {
                 Spinbox.padding -expand 1 -sticky nsew -children {
                     Spinbox.textarea -sticky nsew
                 }
-                
+
             }
             null -side right -sticky nsew -children {
                 Spinbox.uparrow -side left -sticky nsew
                 Spinbox.downarrow -side right -sticky nsew
             }
-        }  
-        
+        }
+
         ttk::style layout Card.TFrame {
             Card.field {
-                Card.padding -expand 1 
+                Card.padding -expand 1
             }
         }
 
@@ -228,7 +380,7 @@ namespace eval ttk::theme::sun-valley-light {
                 disabled $images(button-disabled) \
                 pressed $images(button-pressed) \
                 active $images(button-hover) \
-            ] -border 4 -sticky nsew 
+            ] -border 4 -sticky nsew
 
         ttk::style element create Menubutton.indicator image $images(arrow-down) -width 28 -sticky {}
 
@@ -240,7 +392,7 @@ namespace eval ttk::theme::sun-valley-light {
                 disabled $images(button-disabled) \
                 pressed $images(button-pressed) \
                 active $images(button-hover) \
-            ] -border 4 -sticky nsew 
+            ] -border 4 -sticky nsew
 
         ttk::style element create OptionMenu.indicator image $images(arrow-down) -width 28 -sticky {}
 
@@ -445,7 +597,7 @@ namespace eval ttk::theme::sun-valley-light {
                 focus $images(entry-focus) \
                 hover $images(entry-hover) \
             ] -border 5 -padding {8 8 28 8}
-            
+
         ttk::style element create Combobox.arrow image $images(arrow-down) -width 35 -sticky {}
 
         # Spinbox
@@ -482,7 +634,7 @@ namespace eval ttk::theme::sun-valley-light {
         # Labelframe
         ttk::style element create Labelframe.border image $images(card) \
             -border 5 -padding 4 -sticky nsew
-        
+
         # Notebook
         ttk::style configure TNotebook -padding 1
 
@@ -506,7 +658,7 @@ namespace eval ttk::theme::sun-valley-light {
                 pressed $images(treeheading-pressed) \
                 active $images(treeheading-hover)
             ] -border 5 -padding 15 -sticky nsew
-        
+
         ttk::style element create Treeitem.indicator \
             image [list $images(arrow-right) \
                 user2 $images(empty) \
@@ -529,15 +681,167 @@ namespace eval ttk::theme::sun-valley-dark {
     package provide ttk::theme::sun-valley-dark $version
 
     ttk::style theme create sun-valley-dark -parent clam -settings {
-        proc load_images {imgdir} {
-            variable images
-            foreach file [glob -directory $imgdir *.png] {
-                set images([file tail [file rootname $file]]) \
-                [image create photo -file $file -format png]
-            }
-        }
+        variable sprites [image create photo -file [file join [file dirname [info script]] sprites.png] -format png]
 
-        load_images [file join [file dirname [info script]] dark]
+        variable images
+        set images(arrow-down) [image create photo -width 10 -height 5]
+        $images(arrow-down) copy $sprites -from 112 253 122 258
+        set images(arrow-right) [image create photo -width 5 -height 10]
+        $images(arrow-right) copy $sprites -from 32 140 37 150
+        set images(arrow-up) [image create photo -width 10 -height 5]
+        $images(arrow-up) copy $sprites -from 254 197 264 202
+        set images(button-accent-disabled) [image create photo -width 20 -height 20]
+        $images(button-accent-disabled) copy $sprites -from 196 74 216 94
+        set images(button-accent-hover) [image create photo -width 20 -height 20]
+        $images(button-accent-hover) copy $sprites -from 218 52 238 72
+        set images(button-accent-pressed) [image create photo -width 20 -height 20]
+        $images(button-accent-pressed) copy $sprites -from 238 52 258 72
+        set images(button-accent-rest) [image create photo -width 20 -height 20]
+        $images(button-accent-rest) copy $sprites -from 62 230 82 250
+        set images(button-close-hover) [image create photo -width 20 -height 20]
+        $images(button-close-hover) copy $sprites -from 62 250 82 270
+        set images(button-close-pressed) [image create photo -width 20 -height 20]
+        $images(button-close-pressed) copy $sprites -from 102 144 122 164
+        set images(button-disabled) [image create photo -width 20 -height 20]
+        $images(button-disabled) copy $sprites -from 122 148 142 168
+        set images(button-hover) [image create photo -width 20 -height 20]
+        $images(button-hover) copy $sprites -from 94 164 114 184
+        set images(button-pressed) [image create photo -width 20 -height 20]
+        $images(button-pressed) copy $sprites -from 94 184 114 204
+        set images(button-rest) [image create photo -width 20 -height 20]
+        $images(button-rest) copy $sprites -from 94 204 114 224
+        set images(button-titlebar-hover) [image create photo -width 20 -height 20]
+        $images(button-titlebar-hover) copy $sprites -from 114 168 134 188
+        set images(button-titlebar-pressed) [image create photo -width 20 -height 20]
+        $images(button-titlebar-pressed) copy $sprites -from 114 188 134 208
+        set images(card) [image create photo -width 50 -height 50]
+        $images(card) copy $sprites -from 0 0 50 50
+        set images(check-disabled) [image create photo -width 20 -height 20]
+        $images(check-disabled) copy $sprites -from 114 208 134 228
+        set images(check-hover) [image create photo -width 20 -height 20]
+        $images(check-hover) copy $sprites -from 94 224 114 244
+        set images(check-pressed) [image create photo -width 20 -height 20]
+        $images(check-pressed) copy $sprites -from 114 228 134 248
+        set images(check-rest) [image create photo -width 20 -height 20]
+        $images(check-rest) copy $sprites -from 92 244 112 264
+        set images(check-tri-disabled) [image create photo -width 20 -height 20]
+        $images(check-tri-disabled) copy $sprites -from 152 96 172 116
+        set images(check-tri-hover) [image create photo -width 20 -height 20]
+        $images(check-tri-hover) copy $sprites -from 172 96 192 116
+        set images(check-tri-pressed) [image create photo -width 20 -height 20]
+        $images(check-tri-pressed) copy $sprites -from 146 116 166 136
+        set images(check-tri-rest) [image create photo -width 20 -height 20]
+        $images(check-tri-rest) copy $sprites -from 166 116 186 136
+        set images(check-unsel-disabled) [image create photo -width 20 -height 20]
+        $images(check-unsel-disabled) copy $sprites -from 146 136 166 156
+        set images(check-unsel-hover) [image create photo -width 20 -height 20]
+        $images(check-unsel-hover) copy $sprites -from 166 136 186 156
+        set images(check-unsel-pressed) [image create photo -width 20 -height 20]
+        $images(check-unsel-pressed) copy $sprites -from 134 168 154 188
+        set images(check-unsel-rest) [image create photo -width 20 -height 20]
+        $images(check-unsel-rest) copy $sprites -from 134 188 154 208
+        set images(empty) [image create photo -width 10 -height 10]
+        $images(empty) copy $sprites -from 40 100 50 110
+        set images(entry-disabled) [image create photo -width 20 -height 20]
+        $images(entry-disabled) copy $sprites -from 134 208 154 228
+        set images(entry-focus) [image create photo -width 20 -height 20]
+        $images(entry-focus) copy $sprites -from 134 228 154 248
+        set images(entry-hover) [image create photo -width 20 -height 20]
+        $images(entry-hover) copy $sprites -from 154 156 174 176
+        set images(entry-invalid) [image create photo -width 20 -height 20]
+        $images(entry-invalid) copy $sprites -from 154 176 174 196
+        set images(entry-rest) [image create photo -width 20 -height 20]
+        $images(entry-rest) copy $sprites -from 154 196 174 216
+        set images(notebook-border) [image create photo -width 50 -height 50]
+        $images(notebook-border) copy $sprites -from 0 50 50 100
+        set images(notebook) [image create photo -width 40 -height 40]
+        $images(notebook) copy $sprites -from 0 100 40 140
+        set images(progress-pbar-hor) [image create photo -width 20 -height 5]
+        $images(progress-pbar-hor) copy $sprites -from 62 270 82 275
+        set images(progress-pbar-vert) [image create photo -width 5 -height 20]
+        $images(progress-pbar-vert) copy $sprites -from 270 52 275 72
+        set images(progress-trough-hor) [image create photo -width 20 -height 5]
+        $images(progress-trough-hor) copy $sprites -from 112 248 132 253
+        set images(progress-trough-vert) [image create photo -width 5 -height 20]
+        $images(progress-trough-vert) copy $sprites -from 212 94 217 114
+        set images(radio-disabled) [image create photo -width 20 -height 20]
+        $images(radio-disabled) copy $sprites -from 154 216 174 236
+        set images(radio-hover) [image create photo -width 20 -height 20]
+        $images(radio-hover) copy $sprites -from 174 156 194 176
+        set images(radio-pressed) [image create photo -width 20 -height 20]
+        $images(radio-pressed) copy $sprites -from 174 176 194 196
+        set images(radio-rest) [image create photo -width 20 -height 20]
+        $images(radio-rest) copy $sprites -from 174 196 194 216
+        set images(radio-unsel-disabled) [image create photo -width 20 -height 20]
+        $images(radio-unsel-disabled) copy $sprites -from 174 216 194 236
+        set images(radio-unsel-hover) [image create photo -width 20 -height 20]
+        $images(radio-unsel-hover) copy $sprites -from 154 236 174 256
+        set images(radio-unsel-pressed) [image create photo -width 20 -height 20]
+        $images(radio-unsel-pressed) copy $sprites -from 174 236 194 256
+        set images(radio-unsel-rest) [image create photo -width 20 -height 20]
+        $images(radio-unsel-rest) copy $sprites -from 122 256 142 276
+        set images(scale-thumb-disabled) [image create photo -width 22 -height 22]
+        $images(scale-thumb-disabled) copy $sprites -from 40 230 62 252
+        set images(scale-thumb-hover) [image create photo -width 22 -height 22]
+        $images(scale-thumb-hover) copy $sprites -from 40 252 62 274
+        set images(scale-thumb-pressed) [image create photo -width 22 -height 22]
+        $images(scale-thumb-pressed) copy $sprites -from 80 110 102 132
+        set images(scale-thumb-rest) [image create photo -width 22 -height 22]
+        $images(scale-thumb-rest) copy $sprites -from 80 132 102 154
+        set images(scale-trough-hor) [image create photo -width 22 -height 22]
+        $images(scale-trough-hor) copy $sprites -from 72 154 94 176
+        set images(scale-trough-vert) [image create photo -width 22 -height 22]
+        $images(scale-trough-vert) copy $sprites -from 72 176 94 198
+        set images(scroll-down) [image create photo -width 8 -height 6]
+        $images(scroll-down) copy $sprites -from 32 230 40 236
+        set images(scroll-hor-thumb) [image create photo -width 20 -height 12]
+        $images(scroll-hor-thumb) copy $sprites -from 232 40 252 52
+        set images(scroll-hor-trough) [image create photo -width 20 -height 12]
+        $images(scroll-hor-trough) copy $sprites -from 252 40 272 52
+        set images(scroll-left) [image create photo -width 6 -height 8]
+        $images(scroll-left) copy $sprites -from 146 104 152 112
+        set images(scroll-right) [image create photo -width 6 -height 8]
+        $images(scroll-right) copy $sprites -from 140 52 146 60
+        set images(scroll-up) [image create photo -width 8 -height 6]
+        $images(scroll-up) copy $sprites -from 94 154 102 160
+        set images(scroll-vert-thumb) [image create photo -width 10 -height 20]
+        $images(scroll-vert-thumb) copy $sprites -from 82 240 92 260
+        set images(scroll-vert-trough) [image create photo -width 12 -height 20]
+        $images(scroll-vert-trough) copy $sprites -from 220 32 232 52
+        set images(separator) [image create photo -width 1 -height 1]
+        $images(separator) copy $sprites -from 236 92 237 93
+        set images(sizegrip) [image create photo -width 10 -height 10]
+        $images(sizegrip) copy $sprites -from 90 50 100 60
+        set images(switch-off-disabled) [image create photo -width 40 -height 20]
+        $images(switch-off-disabled) copy $sprites -from 236 0 276 20
+        set images(switch-off-hover) [image create photo -width 40 -height 20]
+        $images(switch-off-hover) copy $sprites -from 236 20 276 40
+        set images(switch-off-pressed) [image create photo -width 40 -height 20]
+        $images(switch-off-pressed) copy $sprites -from 0 236 40 256
+        set images(switch-off-rest) [image create photo -width 40 -height 20]
+        $images(switch-off-rest) copy $sprites -from 0 256 40 276
+        set images(switch-on-disabled) [image create photo -width 40 -height 20]
+        $images(switch-on-disabled) copy $sprites -from 50 90 90 110
+        set images(switch-on-hover) [image create photo -width 40 -height 20]
+        $images(switch-on-hover) copy $sprites -from 100 40 140 60
+        set images(switch-on-pressed) [image create photo -width 40 -height 20]
+        $images(switch-on-pressed) copy $sprites -from 140 32 180 52
+        set images(switch-on-rest) [image create photo -width 40 -height 20]
+        $images(switch-on-rest) copy $sprites -from 180 32 220 52
+        set images(tab-hover) [image create photo -width 32 -height 32]
+        $images(tab-hover) copy $sprites -from 0 140 32 172
+        set images(tab-rest) [image create photo -width 32 -height 32]
+        $images(tab-rest) copy $sprites -from 140 0 172 32
+        set images(tab-selected) [image create photo -width 32 -height 32]
+        $images(tab-selected) copy $sprites -from 0 172 32 204
+        set images(treeheading-hover) [image create photo -width 22 -height 22]
+        $images(treeheading-hover) copy $sprites -from 72 198 94 220
+        set images(treeheading-pressed) [image create photo -width 22 -height 22]
+        $images(treeheading-pressed) copy $sprites -from 102 100 124 122
+        set images(treeheading-rest) [image create photo -width 22 -height 22]
+        $images(treeheading-rest) copy $sprites -from 102 122 124 144
+
+        unset sprites
 
         array set colors {
             -fg             "#ffffff"
@@ -551,7 +855,7 @@ namespace eval ttk::theme::sun-valley-dark {
             Button.button -children {
                 Button.padding -children {
                     Button.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -559,7 +863,7 @@ namespace eval ttk::theme::sun-valley-dark {
             Toolbutton.button -children {
                 Toolbutton.padding -children {
                     Toolbutton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -585,7 +889,7 @@ namespace eval ttk::theme::sun-valley-dark {
             AccentButton.button -children {
                 AccentButton.padding -children {
                     AccentButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -593,7 +897,7 @@ namespace eval ttk::theme::sun-valley-dark {
             TitlebarButton.button -children {
                 TitlebarButton.padding -children {
                     TitlebarButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -601,7 +905,7 @@ namespace eval ttk::theme::sun-valley-dark {
             CloseButton.button -children {
                 CloseButton.padding -children {
                     CloseButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -627,7 +931,7 @@ namespace eval ttk::theme::sun-valley-dark {
             ToggleButton.button -children {
                 ToggleButton.padding -children {
                     ToggleButton.label -side left -expand 1
-                } 
+                }
             }
         }
 
@@ -670,23 +974,23 @@ namespace eval ttk::theme::sun-valley-dark {
                 Combobox.arrow -sticky nsew
             }
         }
-        
+
         ttk::style layout TSpinbox {
             Spinbox.field -sticky nsew -children {
                 Spinbox.padding -expand 1 -sticky nsew -children {
                     Spinbox.textarea -sticky nsew
                 }
-                
+
             }
             null -side right -sticky nsew -children {
                 Spinbox.uparrow -side left -sticky nsew
                 Spinbox.downarrow -side right -sticky nsew
             }
-        }  
-        
+        }
+
         ttk::style layout Card.TFrame {
             Card.field {
-                Card.padding -expand 1 
+                Card.padding -expand 1
             }
         }
 
@@ -748,7 +1052,7 @@ namespace eval ttk::theme::sun-valley-dark {
                 disabled $images(button-disabled) \
                 pressed $images(button-pressed) \
                 active $images(button-hover) \
-            ] -border 4 -sticky nsew 
+            ] -border 4 -sticky nsew
 
         ttk::style element create Menubutton.indicator image $images(arrow-down) -width 28 -sticky {}
 
@@ -760,7 +1064,7 @@ namespace eval ttk::theme::sun-valley-dark {
                 disabled $images(button-disabled) \
                 pressed $images(button-pressed) \
                 active $images(button-hover) \
-            ] -border 4 -sticky nsew 
+            ] -border 4 -sticky nsew
 
         ttk::style element create OptionMenu.indicator image $images(arrow-down) -width 28 -sticky {}
 
@@ -962,7 +1266,7 @@ namespace eval ttk::theme::sun-valley-dark {
                 focus $images(entry-focus) \
                 hover $images(entry-hover) \
             ] -border 5 -padding {8 8 28 8}
-            
+
         ttk::style element create Combobox.arrow image $images(arrow-down) -width 35 -sticky {}
 
         # Spinbox
@@ -998,7 +1302,7 @@ namespace eval ttk::theme::sun-valley-dark {
         # Labelframe
         ttk::style element create Labelframe.border image $images(card) \
             -border 5 -padding 4 -sticky nsew
-        
+
         # Notebook
         ttk::style configure TNotebook -padding 1
 
@@ -1022,7 +1326,7 @@ namespace eval ttk::theme::sun-valley-dark {
                 pressed $images(treeheading-pressed) \
                 active $images(treeheading-hover)
             ] -border 5 -padding 15 -sticky nsew
-        
+
         ttk::style element create Treeitem.indicator \
             image [list $images(arrow-right) \
                 user2 $images(empty) \

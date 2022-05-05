@@ -42,41 +42,9 @@ jobs:
           fi
       - name: Build executable
         run: |
-          PYI_SEPARATOR=
-          if [ $RUNNER_OS == "Windows" ]; then
-            PYI_SEPARATOR=";"
-          elif [ $RUNNER_OS == "Linux" ]; then
-            PYI_SEPARATOR=":"
-          fi
-
           pip install pyinstaller
           python -c "import time;open('build_time.py','w').write(f'BUILD_TIME={time.time():.0f}')"
-          pyinstaller \
-            --additional-hooks-dir pyi-hooks \
-            --hidden-import PIL._tkinter_finder \
-            --exclude-module _asyncio \
-            --exclude-module _bz2 \
-            --exclude-module _ctypes \
-            --exclude-module _decimal \
-            --exclude-module _hashlib \
-            --exclude-module _lzma \
-            --exclude-module _multiprocessing \
-            --exclude-module _overlapped \
-            --exclude-module _queue \
-            --exclude-module _ssl \
-            --exclude-module pyexpat \
-            --exclude-module unicodedata \
-            --add-data "theme${PYI_SEPARATOR}theme" \
-            --add-data "icon-256px.ico${PYI_SEPARATOR}." \
-            --add-data "icon-128px.webp${PYI_SEPARATOR}." \
-            --name realesrgan-gui \
-            --icon icon-256px.ico \
-            --noconsole \
-            --noconfirm \
-            --clean \
-            --onefile \
-            --log-level WARN \
-            main.py
+          pyinstaller --clean --log-level WARN realesrgan-gui.spec
       - name: Upload result
         uses: actions/upload-artifact@v2
         with:
