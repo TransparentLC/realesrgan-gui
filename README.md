@@ -51,4 +51,4 @@
 ## 借物表
 
 * [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) 原版工具
-* [Sun-Valley-ttk-theme](https://github.com/rdbende/Sun-Valley-ttk-theme) Windows 11 风格的 tkinter 主题
+* [Sun-Valley-ttk-theme](https://github.com/rdbende/Sun-Valley-ttk-theme) Windows 11 风格的 tkinter 主题，在原版基础上将所有控件的图片打包成了单张 Sprite Sheet，具体操作参见[这里](https://github.com/rdbende/Sun-Valley-ttk-theme/issues/30)
