@@ -14,8 +14,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        (os.path.join('theme', 'sprites.png'), 'theme'),
-        (os.path.join('theme', 'sun-valley.tcl'), 'theme'),
+        ('theme', 'theme'),
         ('icon-256px.ico', '.'),
         ('icon-128px.webp', '.'),
     ],
