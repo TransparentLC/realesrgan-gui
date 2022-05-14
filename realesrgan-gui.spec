@@ -30,7 +30,6 @@ a = Analysis(
     excludes=[
         '_asyncio',
         '_bz2',
-        '_ctypes',
         '_decimal',
         '_hashlib',
         '_lzma',
