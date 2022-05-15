@@ -4,12 +4,13 @@ import subprocess
 import io
 import os
 import shutil
-import sys
 import tempfile
 import time
+import traceback
 import typing
 from PIL import Image
 
+import define
 import param
 
 def buildTempPath(ext: str) -> str:
@@ -37,11 +38,7 @@ class RESpawnTask(AbstractTask):
         self.removeInput = removeInput
 
     def run(self) -> None:
-        reExecutable = os.path.join(
-            os.path.dirname(os.path.realpath(sys.executable if hasattr(sys, '_MEIPASS') else __file__)),
-            'realesrgan-ncnn-vulkan' + ('.exe' if os.name == 'nt' else ''),
-        )
-        self.outputCallback(f'Using executable: {reExecutable}\n')
+        self.outputCallback(f'Using executable: {define.RE_PATH}\n')
 
         with Image.open(self.inputPath) as img:
             srcWidth, srcHeight = img.size
@@ -75,7 +72,7 @@ class RESpawnTask(AbstractTask):
             inputPath, outputPath = files[i:(i + 2)]
             with subprocess.Popen(
                 (
-                    reExecutable,
+                    define.RE_PATH,
                     '-v',
                     '-i', inputPath,
                     '-o', outputPath,
@@ -191,7 +188,7 @@ def taskRunner(
             te = time.perf_counter()
             outputCallback(f'Task #{counter} completed in {round((te - ts) * 1000)}ms.\n')
             counter += 1
-    except Exception as ex:
-        outputCallback(f'{type(ex).__name__}: {ex} ({ex.__traceback__.tb_frame.f_code.co_filename}:{ex.__traceback__.tb_lineno})\n')
+    except:
+        outputCallback(traceback.format_exc())
     finally:
         completeCallback()

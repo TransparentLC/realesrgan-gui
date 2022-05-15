@@ -15,17 +15,15 @@ from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES
 from tkinterdnd2 import TkinterDnD
 
+import define
+import i18n
 import param
 import task
-
-BASE_PATH = sys._MEIPASS if hasattr(sys, '_MEIPASS') else ''
-APP_PATH = os.path.dirname(os.path.realpath(sys.executable if hasattr(sys, '_MEIPASS') else __file__))
-from build_time import BUILD_TIME
 
 class REGUIApp(ttk.Frame):
     def __init__(self, parent: tk.Tk):
         super().__init__(parent)
-        modelFiles = set(os.listdir(os.path.join(APP_PATH, 'models')))
+        modelFiles = set(os.listdir(os.path.join(define.APP_PATH, 'models')))
         self.models = sorted(
             x for x in set(os.path.splitext(y)[0] for y in modelFiles)
             if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
@@ -82,23 +80,23 @@ class REGUIApp(ttk.Frame):
 
         self.frameBasicConfig = ttk.Frame(self.notebookConfig, padding=5)
         self.frameBasicConfig.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Label(self.frameBasicConfig, text='输入（文件或文件夹）').pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Input')).pack(padx=10, pady=5, fill=tk.X)
         self.frameInputPath = ttk.Frame(self.frameBasicConfig)
         self.frameInputPath.columnconfigure(0, weight=1)
         self.frameInputPath.columnconfigure(1, weight=0)
         self.frameInputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryInputPath = ttk.Entry(self.frameInputPath, textvariable=self.varstrInputPath)
         self.entryInputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonInputPath = ttk.Button(self.frameInputPath, text='浏览', command=self.buttonInputPath_click)
+        self.buttonInputPath = ttk.Button(self.frameInputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonInputPath_click)
         self.buttonInputPath.grid(row=0, column=1, padx=5)
-        ttk.Label(self.frameBasicConfig, text='输出').pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Output')).pack(padx=10, pady=5, fill=tk.X)
         self.frameOutputPath = ttk.Frame(self.frameBasicConfig)
         self.frameOutputPath.columnconfigure(0, weight=1)
         self.frameOutputPath.columnconfigure(1, weight=0)
         self.frameOutputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryOutputPath = ttk.Entry(self.frameOutputPath, textvariable=self.varstrOutputPath)
         self.entryOutputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonOutputPath = ttk.Button(self.frameOutputPath, text='浏览', command=self.buttonOutputPath_click)
+        self.buttonOutputPath = ttk.Button(self.frameOutputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonOutputPath_click)
         self.buttonOutputPath.grid(row=0, column=1, padx=5)
         self.frameBasicConfigBottom = ttk.Frame(self.frameBasicConfig)
         self.frameBasicConfigBottom.columnconfigure(0, weight=0)
@@ -106,27 +104,27 @@ class REGUIApp(ttk.Frame):
         self.frameBasicConfigBottom.pack(fill=tk.X)
         self.frameModel = ttk.Frame(self.frameBasicConfigBottom)
         self.frameModel.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameModel, text='模型').pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameModel, text=i18n.getTranslatedString('UsedModel')).pack(padx=10, pady=5, fill=tk.X)
         self.comboModel = ttk.Combobox(self.frameModel, state='readonly', values=self.models, textvariable=self.varstrModel)
         self.comboModel.current(0)
         self.comboModel.pack(padx=10, pady=5, fill=tk.X)
         self.comboModel.bind('<<ComboboxSelected>>', lambda e: e.widget.select_clear())
         self.frameResize = ttk.Frame(self.frameBasicConfigBottom)
         self.frameResize.grid(row=0, column=0, sticky=tk.NSEW)
-        ttk.Label(self.frameResize, text='放大尺寸计算方式').grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky=tk.EW)
-        self.radioResizeRatio = ttk.Radiobutton(self.frameResize, text='固定倍率', value=int(param.ResizeMode.RATIO), variable=self.varintResizeMode)
+        ttk.Label(self.frameResize, text=i18n.getTranslatedString('ResizeMode')).grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky=tk.EW)
+        self.radioResizeRatio = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeRatio'), value=int(param.ResizeMode.RATIO), variable=self.varintResizeMode)
         self.radioResizeRatio.grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeRatio = ttk.Spinbox(self.frameResize, from_=2, to=16, increment=1, width=12, textvariable=self.varintResizeRatio)
         self.spinResizeRatio.grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.radioResizeWidth = ttk.Radiobutton(self.frameResize, text='等比放大到宽度', value=int(param.ResizeMode.WIDTH), variable=self.varintResizeMode)
+        self.radioResizeWidth = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeWidth'), value=int(param.ResizeMode.WIDTH), variable=self.varintResizeMode)
         self.radioResizeWidth.grid(row=2, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeWidth = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeWidth)
         self.spinResizeWidth.grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.radioResizeHeight = ttk.Radiobutton(self.frameResize, text='等比放大到高度', value=int(param.ResizeMode.HEIGHT), variable=self.varintResizeMode)
+        self.radioResizeHeight = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeHeight'), value=int(param.ResizeMode.HEIGHT), variable=self.varintResizeMode)
         self.radioResizeHeight.grid(row=3, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeHeight = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeHeight)
         self.spinResizeHeight.grid(row=3, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.buttonProcess = ttk.Button(self.frameBasicConfigBottom, text='开始', style='Accent.TButton', width=6, command=self.buttonProcess_click)
+        self.buttonProcess = ttk.Button(self.frameBasicConfigBottom, text=i18n.getTranslatedString('StartProcessing'), style='Accent.TButton', width=6, command=self.buttonProcess_click)
         self.buttonProcess.grid(row=0, column=1, padx=5, pady=5, sticky=tk.SE)
 
         self.frameAdvancedConfig = ttk.Frame(self.notebookConfig, padding=5)
@@ -137,23 +135,23 @@ class REGUIApp(ttk.Frame):
         self.frameAdvancedConfigLeft.grid(row=0, column=0, sticky=tk.NSEW)
         self.frameAdvancedConfigRight = ttk.Frame(self.frameAdvancedConfig)
         self.frameAdvancedConfigRight.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameAdvancedConfigLeft, text='降采样方式').pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('DownsampleMode')).pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=tuple(x[0] for x in self.downsample))
         self.comboDownsample.current(0)
         self.comboDownsample.pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample.bind('<<ComboboxSelected>>', self.comboDownsample_click)
-        ttk.Label(self.frameAdvancedConfigLeft, text='使用的 GPU ID').pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
         self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=7, increment=1, width=12, textvariable=self.varintGPUID)
         self.spinGPUID.set(0)
         self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
-        ttk.Label(self.frameAdvancedConfigLeft, text='拆分大小').pack(padx=10, pady=5, fill=tk.X)
-        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=('自动决定', *self.tileSize[1:]))
+        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
+        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]))
         self.comboTileSize.current(0)
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize.bind('<<ComboboxSelected>>', self.comboTileSize_click)
-        self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text='优先保存为无损 WebP', style='Switch.TCheckbutton', variable=self.varboolUseWebP)
+        self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('PreferWebP'), style='Switch.TCheckbutton', variable=self.varboolUseWebP)
         self.checkUseWebP.pack(padx=10, pady=5, fill=tk.X)
-        self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, text='使用 TTA 模式（速度大幅下降，稍微提高质量）', style='Switch.TCheckbutton', variable=self.varboolUseTTA)
+        self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableTTA'), style='Switch.TCheckbutton', variable=self.varboolUseTTA)
         self.checkUseTTA.pack(padx=10, pady=5, fill=tk.X)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
@@ -163,18 +161,18 @@ class REGUIApp(ttk.Frame):
         f = ttk.Label().cget('font').string.split(' ')
         f[-1] = '16'
         f = ' '.join(f)
-        self.imageIcon = ImageTk.PhotoImage(Image.open(os.path.join(BASE_PATH, 'icon-128px.webp')))
+        self.imageIcon = ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-128px.webp')))
         ttk.Label(self.frameAboutContent, image=self.imageIcon).pack(padx=10, pady=10)
-        ttk.Label(self.frameAboutContent, text='Real-ESRGAN GUI', font=f, justify=tk.CENTER).pack()
-        ttk.Label(self.frameAboutContent, text='By TransparentLC' + (time.strftime("\nBuilt at %Y-%m-%d %H:%M:%S", time.localtime(BUILD_TIME)) if BUILD_TIME else ""), justify=tk.CENTER).pack()
+        ttk.Label(self.frameAboutContent, text=define.APP_TITLE, font=f, justify=tk.CENTER).pack()
+        ttk.Label(self.frameAboutContent, text='By TransparentLC' + (time.strftime("\nBuilt at %Y-%m-%d %H:%M:%S", time.localtime(define.BUILD_TIME)) if define.BUILD_TIME else ""), justify=tk.CENTER).pack()
         self.frameAboutBottom = ttk.Frame(self.frameAboutContent)
         self.frameAboutBottom.pack()
-        ttk.Button(self.frameAboutBottom, text='查看源代码', command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.frameAboutBottom, text='查看 Real-ESRGAN 介绍', command=lambda: webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan')).grid(row=0, column=1, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewREGUISource'), command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewRESource'), command=lambda: webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan')).grid(row=0, column=1, padx=5, pady=5, sticky=tk.NSEW)
 
-        self.notebookConfig.add(self.frameBasicConfig, text='基本设定')
-        self.notebookConfig.add(self.frameAdvancedConfig, text='高级设定')
-        self.notebookConfig.add(self.frameAbout, text='关于')
+        self.notebookConfig.add(self.frameBasicConfig, text=i18n.getTranslatedString('FrameBasicConfig'))
+        self.notebookConfig.add(self.frameAdvancedConfig, text=i18n.getTranslatedString('FrameAdvancedConfig'))
+        self.notebookConfig.add(self.frameAbout, text=i18n.getTranslatedString('FrameAbout'))
 
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -182,7 +180,7 @@ class REGUIApp(ttk.Frame):
 
     def buttonInputPath_click(self):
         p = filedialog.askopenfilename(filetypes=(
-            ('Image files', ('.jpg', '.png', '.gif', '.webp')),
+            ('Image files', ('.jpg', '.jpeg', '.png', '.gif', '.webp')),
         ))
         if not p:
             return
@@ -208,11 +206,11 @@ class REGUIApp(ttk.Frame):
         inputPath = self.varstrInputPath.get()
         outputPath = self.varstrOutputPath.get()
         if not inputPath or not outputPath:
-            return messagebox.showwarning(None, '请输入有效的输入和输出路径。')
+            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidPath'))
         inputPath = os.path.normpath(inputPath)
         outputPath = os.path.normpath(outputPath)
         if not os.path.exists(inputPath):
-            return messagebox.showwarning(None, '输入的文件或目录不存在。')
+            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
 
         initialConfigParams = self.getConfigParams()
         queue = collections.deque()
@@ -229,7 +227,7 @@ class REGUIApp(ttk.Frame):
                         task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams)
                     ))
             if not queue:
-                return messagebox.showwarning('批量处理提示', '文件夹内没有可以处理的图片文件。')
+                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
         elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
             queue.append((
                 task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue)
@@ -237,7 +235,7 @@ class REGUIApp(ttk.Frame):
                 task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams)
             ))
         else:
-            return messagebox.showwarning('格式错误', '仅支持 JPEG、PNG、GIF 和 WebP 格式的图片文件。')
+            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
         self.buttonProcess.config(state=tk.DISABLED)
         self.textOutput.config(state=tk.NORMAL)
         self.textOutput.delete(1.0, tk.END)
@@ -307,21 +305,18 @@ if __name__ == '__main__':
     root = TkinterDnD.Tk()
     root.withdraw()
 
-    if not os.path.exists(os.path.join(APP_PATH, 'realesrgan-ncnn-vulkan' + ('.exe' if os.name == 'nt' else ''))):
-        messagebox.showwarning(
-            '未找到主程序',
-            '未找到 Real-ESRGAN-ncnn-vulkan 主程序。\n请前往 https://github.com/xinntao/Real-ESRGAN/releases 下载，并将本文件和主程序放在同一目录下。',
-        )
+    if not os.path.exists(define.RE_PATH):
+        messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundRE'))
         webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN/releases')
         sys.exit(0)
 
-    root.title('Real-ESRGAN GUI')
+    root.title(define.APP_TITLE)
     try:
-        root.iconbitmap(os.path.join(BASE_PATH, 'icon-256px.ico'))
+        root.iconbitmap(os.path.join(define.BASE_PATH, 'icon-256px.ico'))
     except tk.TclError:
-        root.tk.call('wm', 'iconphoto', root._w, ImageTk.PhotoImage(Image.open(os.path.join(BASE_PATH, 'icon-256px.ico'))))
+        root.tk.call('wm', 'iconphoto', root._w, ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-256px.ico'))))
 
-    root.tk.call('source', os.path.join(BASE_PATH, 'theme/sun-valley.tcl'))
+    root.tk.call('source', os.path.join(define.BASE_PATH, 'theme', 'sun-valley.tcl'))
     root.tk.call('set_theme', 'dark' if darkdetect.isDark() else 'light')
     if os.name == 'nt' and hasattr(darkdetect, 'listener'):
         t = threading.Thread(target=darkdetect.listener, args=(lambda e: root.tk.call('set_theme', e.lower()),))

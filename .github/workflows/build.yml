@@ -43,7 +43,7 @@ jobs:
       - name: Build executable
         run: |
           pip install pyinstaller
-          python -c "import time;open('build_time.py','w').write(f'BUILD_TIME={time.time():.0f}')"
+          python -c "import time;open('define.py','a').write(f'\nBUILD_TIME={time.time():.0f}')"
           pyinstaller --clean --log-level WARN realesrgan-gui.spec
       - name: Upload result
         uses: actions/upload-artifact@v2

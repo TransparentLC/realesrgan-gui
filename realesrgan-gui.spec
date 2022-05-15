@@ -15,6 +15,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('theme', 'theme'),
+        ('i18n.ini', '.'),
         ('icon-256px.ico', '.'),
         ('icon-128px.webp', '.'),
     ],
