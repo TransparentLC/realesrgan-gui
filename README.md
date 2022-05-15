@@ -48,6 +48,10 @@
 | --- | --- | --- | --- |
 | ![](https://user-images.githubusercontent.com/47057319/166262217-7623a30d-e4e9-46e4-a869-1dcabdbbd74e.png) | ![](https://user-images.githubusercontent.com/47057319/166262210-a836ed72-b197-4f5f-bcfd-3e459ebf5776.png) | ![](https://user-images.githubusercontent.com/47057319/166262243-810b894d-657d-4a84-84bb-88e76845404f.png) | ![](https://user-images.githubusercontent.com/47057319/166262229-6bc75e4b-9980-4c14-b4e4-4c0d53642a35.png) |
 
+| Nearest Neighbor | Real-ESRGAN |
+| --- | --- |
+| ![](https://user-images.githubusercontent.com/47057319/168476063-28a142d4-87ef-491e-b50e-6c981236133f.gif) | ![](https://user-images.githubusercontent.com/47057319/168476067-68e76ed6-9589-44f8-ada8-2792dda0ded4.gif) |
+
 * waifu2x-caffe 使用 UpResNet10 和 UpPhoto 模型，降噪等级 3，开启 TTA。
 * Real-ESRGAN 使用 realesrgan-x4plus-anime 和 realesrgan-x4plus 模型，开启 TTA。
 * 放大倍率均为 4x。

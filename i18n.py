@@ -14,6 +14,6 @@ translation['DEFAULT'].update(translation['en_US'])
 def getTranslatedString(key: str) -> str:
     lang = locale.getdefaultlocale()[0]
     try:
-        return translation[lang][key]
+        return translation[lang if lang in translation else 'DEFAULT']
     except KeyError:
         return f'{key}${lang}'
