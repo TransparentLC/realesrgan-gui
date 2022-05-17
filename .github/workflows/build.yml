@@ -67,6 +67,10 @@ jobs:
         with:
           name: realesrgan-gui-Linux
           path: dist-Linux
+      - uses: actions/download-artifact@v3
+        with:
+          name: realesrgan-gui-macOS
+          path: dist-macOS
       - name: Create release assets
         id: vars
         run: |
