@@ -159,9 +159,7 @@ class SplitGIFTask(AbstractTask):
                 try:
                     frameSrcPath = buildTempPath('.webp')
                     frameDstPath = buildTempPath('.webp')
-                    with Image.new('RGBA', img.size) as frame:
-                        frame.paste(img)
-                        frame.save(frameSrcPath, lossless=True)
+                    img.save(frameSrcPath, lossless=True)
                     d = img.info['duration']
                     self.outputCallback(f'Frame #{len(frames)}: {frameSrcPath} -> {frameDstPath} Duration: {d}\n')
                     frames.append(frameDstPath)

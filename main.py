@@ -213,6 +213,9 @@ class REGUIApp(ttk.Frame):
             return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
 
         initialConfigParams = self.getConfigParams()
+        if initialConfigParams.resizeMode == param.ResizeMode.RATIO and initialConfigParams.resizeModeValue == 1:
+            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
+
         queue = collections.deque()
         if os.path.isdir(inputPath):
             for curDir, dirs, files in os.walk(inputPath):
