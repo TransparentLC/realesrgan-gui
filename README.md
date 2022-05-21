@@ -12,9 +12,9 @@
 
 使用时请将这里的所有文件或打包后的可执行文件和 Real-ESRGAN-ncnn-vulkan 的可执行文件放在同一个目录。从源代码运行前，请使用 `pip install -r requirements.txt` 安装依赖。
 
-> 可以在 [Release](https://github.com/TransparentLC/realesrgan-gui/releases) 下载适用于 Windows 10 和 Ubuntu 20.04（或更新版本系统）的打包好的版本。
+> 可以在 [Release](https://github.com/TransparentLC/realesrgan-gui/releases) 下载适用于 Windows 10 和 Ubuntu 20.04（或更新版本系统，其他 Linux 发行版未测试）的打包好的版本。文件名包含 `bundled` 的压缩包整合了 Real-ESRGAN-ncnn-vulkan 的可执行文件和模型，这样就不需要另外下载了。
 >
-> 文件名包含 `bundled` 的压缩包整合了 Real-ESRGAN-ncnn-vulkan 的可执行文件和模型，这样就不需要另外下载了。
+> 也可以在 [Actions](https://nightly.link/TransparentLC/realesrgan-gui/workflows/build/master) 下载根据现有代码打包好的版本（相当于 Nightly）。Actions 打包额外添加了 macOS 版本，但是可用性未经测试。
 
 ## 功能介绍
 
