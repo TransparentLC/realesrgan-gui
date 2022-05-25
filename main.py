@@ -69,6 +69,7 @@ class REGUIApp(ttk.Frame):
         self.varintGPUID = tk.IntVar()
         self.varboolUseTTA = tk.BooleanVar()
         self.varboolUseWebP = tk.BooleanVar()
+        self.varboolOptimizeGIF = tk.BooleanVar()
 
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
@@ -153,6 +154,8 @@ class REGUIApp(ttk.Frame):
         self.checkUseWebP.pack(padx=10, pady=5, fill=tk.X)
         self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableTTA'), style='Switch.TCheckbutton', variable=self.varboolUseTTA)
         self.checkUseTTA.pack(padx=10, pady=5, fill=tk.X)
+        self.checkOptimizeGIF = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('GIFOptimizeTransparency'), style='Switch.TCheckbutton', variable=self.varboolOptimizeGIF)
+        self.checkOptimizeGIF.pack(padx=10, pady=5, fill=tk.X)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAbout.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -225,7 +228,7 @@ class REGUIApp(ttk.Frame):
                     f = os.path.join(curDir, f)
                     g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
                     queue.append((
-                        task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue)
+                        task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get())
                         if os.path.splitext(f)[1].lower() == '.gif' else
                         task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams)
                     ))
@@ -233,7 +236,7 @@ class REGUIApp(ttk.Frame):
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
         elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
             queue.append((
-                task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue)
+                task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get())
                 if os.path.splitext(inputPath)[1].lower() == '.gif' else
                 task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams)
             ))
