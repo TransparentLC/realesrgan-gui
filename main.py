@@ -1,10 +1,10 @@
 import collections
-import darkdetect
 import os
 import sys
 import time
 import threading
 import tkinter as tk
+import traceback
 import webbrowser
 from PIL import Image
 from PIL import ImageTk
@@ -323,11 +323,16 @@ if __name__ == '__main__':
         root.tk.call('wm', 'iconphoto', root._w, ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-256px.ico'))))
 
     root.tk.call('source', os.path.join(define.BASE_PATH, 'theme', 'sun-valley.tcl'))
-    root.tk.call('set_theme', 'dark' if darkdetect.isDark() else 'light')
-    if sys.platform in {'win32', 'linux'} and hasattr(darkdetect, 'listener'):
-        t = threading.Thread(target=darkdetect.listener, args=(lambda e: root.tk.call('set_theme', e.lower()),))
-        t.daemon = True
-        t.start()
+    try:
+        import darkdetect
+        root.tk.call('set_theme', 'dark' if darkdetect.isDark() else 'light')
+        if sys.platform in {'win32', 'linux'}:
+            t = threading.Thread(target=darkdetect.listener, args=(lambda e: root.tk.call('set_theme', e.lower()),))
+            t.daemon = True
+            t.start()
+    except:
+        print(traceback.format_exc())
+        root.tk.call('set_theme', 'light')
 
     app = REGUIApp(root)
     app.drop_target_register(DND_FILES)
