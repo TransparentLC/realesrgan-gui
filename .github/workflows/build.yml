@@ -112,7 +112,7 @@ jobs:
                 . \
                 -mx9 -mfb256 -md1g -ms
             else
-              chmod +x realsergan-gui realesrgan-ncnn-vulkan
+              chmod +x realesrgan-gui realesrgan-ncnn-vulkan
               XZ_OPT=-e9 tar Jcvf \
                 ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.tar.xz \
                 --transform "s,^\.,realesrgan-gui," \
