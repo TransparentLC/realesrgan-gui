@@ -94,7 +94,6 @@ jobs:
               REAL_ESRGAN_PLATFORM=macos
             fi
             cd "dist-${BUILD_OS}"
-            zip -9 -r ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.zip .
             wget \
               -nv \
               -O realesrgan-ncnn-vulkan.zip \
@@ -102,7 +101,28 @@ jobs:
             unzip realesrgan-ncnn-vulkan.zip
             rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
             cp ../README.md README_gui.md
-            zip -9 -r "../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.zip" .
+
+            if [ $BUILD_OS == "Windows" ]; then
+              7z a \
+                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.7z \
+                realesrgan-gui.exe \
+                -mx9 -mfb256 -md1g -ms
+              7z a \
+                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.7z \
+                . \
+                -mx9 -mfb256 -md1g -ms
+            else
+              chmod +x realsergan-gui realesrgan-ncnn-vulkan
+              XZ_OPT=-e9 tar Jcvf \
+                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.tar.xz \
+                --transform "s,^\.,realesrgan-gui," \
+                ./realesrgan-gui
+              XZ_OPT=-e9 tar Jcvf \
+                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.tar.xz \
+                --transform "s,^\.,realesrgan-gui," \
+                .
+            fi
+
             cd ..
           done
 
