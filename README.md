@@ -1,6 +1,7 @@
 # Real-ESRGAN GUI
 
 [![build](https://github.com/TransparentLC/realesrgan-gui/actions/workflows/build.yml/badge.svg)](https://github.com/TransparentLC/realesrgan-gui/actions/workflows/build.yml)
+[![download](https://img.shields.io/github/downloads/TransparentLC/realesrgan-gui/total.svg)](https://github.com/TransparentLC/realesrgan-gui/releases)
 
 实用、美观的图片放大工具 Real-ESRGAN 的图形界面，参考 [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) 设计。
 
@@ -12,9 +13,13 @@
 
 使用时请将这里的所有文件或打包后的可执行文件和 Real-ESRGAN-ncnn-vulkan 的可执行文件放在同一个目录。从源代码运行前，请使用 `pip install -r requirements.txt` 安装依赖。
 
+注意：在 Linux 或 macOS 上运行之前，不要忘了为 `realesrgan-ncnn-vulkan` 和 `realesrgan-gui`（如果使用打包后的可执行文件）这两个文件添加可执行权限（`chmod +x`）。
+
 > 可以在 [Release](https://github.com/TransparentLC/realesrgan-gui/releases) 下载适用于 Windows 10 和 Ubuntu 20.04（或更新版本系统，其他 Linux 发行版未测试）的打包好的版本。文件名包含 `bundled` 的压缩包整合了 Real-ESRGAN-ncnn-vulkan 的可执行文件和模型，这样就不需要另外下载了。
 >
-> 也可以在 [Actions](https://nightly.link/TransparentLC/realesrgan-gui/workflows/build/master) 下载根据现有代码打包好的版本（相当于 Nightly）。Actions 打包额外添加了 macOS 版本，但是可用性未经测试。
+> 也可以在 [Actions](https://nightly.link/TransparentLC/realesrgan-gui/workflows/build/master) 下载根据现有代码打包好的版本（相当于 Nightly）。
+>
+> 虽然上传了 macOS 版的打包，但由于我没有运行 macOS 的设备，因此**无法进行测试以保证其可用性**。如果你发现这个程序在 macOS 下不能正常使用，请随意尝试自行修改使它可以使用～
 
 ## 功能介绍
 
@@ -32,11 +37,12 @@
     * 根据拖拽时选择的放大尺寸计算方式，在输出路径中会自动添加形如 x4、w1280、h1080 的后缀。
 * 深色模式界面
     * 使用 [darkdetect](https://github.com/albertosottile/darkdetect) 实现。
-    * 在启动时根据系统设定选择使用浅色或深色模式界面，在 Windows 上还支持在修改系统设定时自动切换。
+    * 在启动时根据系统设定选择使用浅色或深色模式界面，支持在修改系统设定时自动切换。
+    * 在 macOS 上不适用（？）
 * 多语言支持
     * 界面语言和系统语言（使用 `locale.getdefaultlocale` 获取）一致。
-    * 目前支持简繁中文和英语。
-    * 可以通过 `i18n.ini` 添加和修改翻译。在缺少某个语言的翻译文本的情况下，默认会回退到英语。
+    * 目前支持简繁中文和英语。在缺少某个语言的翻译文本的情况下，默认会回退到英语。
+    * **欢迎添加更多语言的翻译，或对现有的翻译进行改进～**（参见 `i18n.ini`）
 
 ## 效果对比
 
