@@ -70,6 +70,8 @@ class REGUIApp(ttk.Frame):
         self.varboolUseTTA = tk.BooleanVar()
         self.varboolUseWebP = tk.BooleanVar()
         self.varboolOptimizeGIF = tk.BooleanVar()
+        self.varboolLossyMode = tk.BooleanVar()
+        self.varintLossyQuality = tk.IntVar()
 
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
@@ -149,6 +151,10 @@ class REGUIApp(ttk.Frame):
         self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]))
         self.comboTileSize.current(0)
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('LossyModeQuality')).pack(padx=10, pady=5, fill=tk.X)
+        self.spinLossyQuality = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=100, increment=5, width=12, textvariable=self.varintLossyQuality)
+        self.spinLossyQuality.set(80)
+        self.spinLossyQuality.pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize.bind('<<ComboboxSelected>>', self.comboTileSize_click)
         self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('PreferWebP'), style='Switch.TCheckbutton', variable=self.varboolUseWebP)
         self.checkUseWebP.pack(padx=10, pady=5, fill=tk.X)
@@ -156,6 +162,8 @@ class REGUIApp(ttk.Frame):
         self.checkUseTTA.pack(padx=10, pady=5, fill=tk.X)
         self.checkOptimizeGIF = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('GIFOptimizeTransparency'), style='Switch.TCheckbutton', variable=self.varboolOptimizeGIF)
         self.checkOptimizeGIF.pack(padx=10, pady=5, fill=tk.X)
+        self.checkLossyMode = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableLossyMode'), style='Switch.TCheckbutton', variable=self.varboolLossyMode)
+        self.checkLossyMode.pack(padx=10, pady=5, fill=tk.X)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAbout.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -227,19 +235,25 @@ class REGUIApp(ttk.Frame):
                         continue
                     f = os.path.join(curDir, f)
                     g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
-                    queue.append((
-                        task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get())
-                        if os.path.splitext(f)[1].lower() == '.gif' else
-                        task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams)
-                    ))
+                    if os.path.splitext(f)[1].lower() == '.gif':
+                        queue.append(task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                    elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                        t = task.buildTempPath('.webp')
+                        queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                        queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
+                    else:
+                        queue.append(task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams))
             if not queue:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
         elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
-            queue.append((
-                task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get())
-                if os.path.splitext(inputPath)[1].lower() == '.gif' else
-                task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams)
-            ))
+            if os.path.splitext(inputPath)[1].lower() == '.gif':
+                queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+            elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                t = task.buildTempPath('.webp')
+                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
+            else:
+                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams))
         else:
             return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
         self.buttonProcess.config(state=tk.DISABLED)

@@ -205,6 +205,32 @@ class SplitGIFTask(AbstractTask):
         for t in tasks:
             self.queue.appendleft(t)
 
+class LossyCompressTask(AbstractTask):
+    def __init__(
+        self,
+        outputCallback: typing.Callable[[str], None],
+        inputPath: str, outputPath: str,
+        quality: int,
+        removeInput: bool = False,
+    ) -> None:
+        super().__init__(outputCallback)
+        self.inputPath = inputPath
+        self.outputPath = outputPath
+        self.quality = quality
+        self.removeInput = removeInput
+
+    def run(self) -> None:
+        self.outputCallback(f'Compressing {self.inputPath} to {self.outputPath} with quality {self.quality}\n')
+        os.makedirs(os.path.split(self.outputPath)[0], exist_ok=True)
+        with Image.open(self.inputPath) as img:
+            match os.path.splitext(self.outputPath)[1].lower():
+                case '.webp':
+                    img.save(self.outputPath, quality=self.quality, method=6)
+                case '.jpg' | '.jpeg':
+                    img.save(self.outputPath, quality=self.quality, optimize=True, progressive=True)
+        if self.removeInput:
+            os.remove(self.inputPath)
+
 def taskRunner(
     queue: collections.deque[AbstractTask],
     outputCallback: typing.Callable[[str], None],
