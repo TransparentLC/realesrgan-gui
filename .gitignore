@@ -146,3 +146,5 @@ realesrgan-ncnn-vulkan
 realesrgan-ncnn-vulkan.exe
 vcomp140.dll
 vcomp140d.dll
+
+config.ini

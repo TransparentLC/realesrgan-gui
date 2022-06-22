@@ -1,4 +1,5 @@
 import collections
+import configparser
 import os
 import sys
 import time
@@ -53,25 +54,44 @@ class REGUIApp(ttk.Frame):
             ('Nearest', Image.Resampling.NEAREST),
         )
         self.tileSize = (0, 32, 64, 128, 256, 512, 1024)
+
+        self.config = configparser.ConfigParser({
+            'ResizeMode': int(param.ResizeMode.RATIO),
+            'ResizeRatio': 4,
+            'ResizeWidth': 1024,
+            'ResizeHeight': 1024,
+            'Model': self.models[0],
+            'DownsampleIndex': 0,
+            'GPUID': 0,
+            'TileSizeIndex': 0,
+            'LossyQuality': 80,
+            'UseWebP': False,
+            'UseTTA': False,
+            'OptimizeGIF': False,
+            'LossyMode': False,
+        })
+        self.config['Config'] = {}
+        self.config.read(define.APP_CONFIG_PATH)
+
         self.setupVars()
         self.setupWidgets()
 
     def setupVars(self):
         self.varstrInputPath = tk.StringVar()
         self.varstrOutputPath = tk.StringVar()
-        self.varintResizeMode = tk.IntVar(value=int(param.ResizeMode.RATIO))
-        self.varintResizeRatio = tk.IntVar(value=4)
-        self.varintResizeWidth = tk.IntVar()
-        self.varintResizeHeight = tk.IntVar()
-        self.varstrModel = tk.StringVar()
-        self.varintDownsampleIndex = tk.IntVar()
-        self.varintTileSizeIndex = tk.IntVar()
-        self.varintGPUID = tk.IntVar()
-        self.varboolUseTTA = tk.BooleanVar()
-        self.varboolUseWebP = tk.BooleanVar()
-        self.varboolOptimizeGIF = tk.BooleanVar()
-        self.varboolLossyMode = tk.BooleanVar()
-        self.varintLossyQuality = tk.IntVar()
+        self.varintResizeMode = tk.IntVar(value=self.config['Config'].getint('ResizeMode'))
+        self.varintResizeRatio = tk.IntVar(value=self.config['Config'].getint('ResizeRatio'))
+        self.varintResizeWidth = tk.IntVar(value=self.config['Config'].getint('ResizeWidth'))
+        self.varintResizeHeight = tk.IntVar(value=self.config['Config'].getint('ResizeHeight'))
+        self.varstrModel = tk.StringVar(value=self.config['Config'].get('Model'))
+        self.varintDownsampleIndex = tk.IntVar(value=self.config['Config'].getint('DownsampleIndex'))
+        self.varintTileSizeIndex = tk.IntVar(value=self.config['Config'].getint('TileSizeIndex'))
+        self.varintGPUID = tk.IntVar(value=self.config['Config'].getint('GPUID'))
+        self.varboolUseTTA = tk.BooleanVar(value=self.config['Config'].getboolean('UseTTA'))
+        self.varboolUseWebP = tk.BooleanVar(value=self.config['Config'].getboolean('UseWebP'))
+        self.varboolOptimizeGIF = tk.BooleanVar(value=self.config['Config'].getboolean('OptimizeGIF'))
+        self.varboolLossyMode = tk.BooleanVar(value=self.config['Config'].getboolean('LossyMode'))
+        self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
 
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
@@ -109,7 +129,7 @@ class REGUIApp(ttk.Frame):
         self.frameModel.grid(row=0, column=1, sticky=tk.NSEW)
         ttk.Label(self.frameModel, text=i18n.getTranslatedString('UsedModel')).pack(padx=10, pady=5, fill=tk.X)
         self.comboModel = ttk.Combobox(self.frameModel, state='readonly', values=self.models, textvariable=self.varstrModel)
-        self.comboModel.current(0)
+        self.comboModel.current(self.models.index(self.varstrModel.get()))
         self.comboModel.pack(padx=10, pady=5, fill=tk.X)
         self.comboModel.bind('<<ComboboxSelected>>', lambda e: e.widget.select_clear())
         self.frameResize = ttk.Frame(self.frameBasicConfigBottom)
@@ -140,7 +160,7 @@ class REGUIApp(ttk.Frame):
         self.frameAdvancedConfigRight.grid(row=0, column=1, sticky=tk.NSEW)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('DownsampleMode')).pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=tuple(x[0] for x in self.downsample))
-        self.comboDownsample.current(0)
+        self.comboDownsample.current(self.varintDownsampleIndex.get())
         self.comboDownsample.pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample.bind('<<ComboboxSelected>>', self.comboDownsample_click)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
@@ -149,11 +169,11 @@ class REGUIApp(ttk.Frame):
         self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]))
-        self.comboTileSize.current(0)
+        self.comboTileSize.current(self.varintTileSizeIndex.get())
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('LossyModeQuality')).pack(padx=10, pady=5, fill=tk.X)
         self.spinLossyQuality = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=100, increment=5, width=12, textvariable=self.varintLossyQuality)
-        self.spinLossyQuality.set(80)
+        self.spinLossyQuality.set(self.varintLossyQuality.get())
         self.spinLossyQuality.pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize.bind('<<ComboboxSelected>>', self.comboTileSize_click)
         self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('PreferWebP'), style='Switch.TCheckbutton', variable=self.varboolUseWebP)
@@ -188,6 +208,26 @@ class REGUIApp(ttk.Frame):
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
         self.textOutput.configure(state=tk.DISABLED)
+
+    def close(self):
+        self.config['DEFAULT'] = {}
+        self.config['Config'] = {
+            'ResizeMode': self.varintResizeMode.get(),
+            'ResizeRatio': self.varintResizeRatio.get(),
+            'ResizeWidth': self.varintResizeWidth.get(),
+            'ResizeHeight': self.varintResizeHeight.get(),
+            'Model': self.varstrModel.get(),
+            'DownsampleIndex': self.varintDownsampleIndex.get(),
+            'GPUID': self.varintGPUID.get(),
+            'TileSizeIndex': self.varintTileSizeIndex.get(),
+            'LossyQuality': self.varintLossyQuality.get(),
+            'UseWebP': self.varboolUseWebP.get(),
+            'UseTTA': self.varboolUseTTA.get(),
+            'OptimizeGIF': self.varboolOptimizeGIF.get(),
+            'LossyMode': self.varboolLossyMode.get(),
+        }
+        with open(define.APP_CONFIG_PATH, 'w', encoding='utf-8') as f:
+            self.config.write(f)
 
     def buttonInputPath_click(self):
         p = filedialog.askopenfilename(filetypes=(
@@ -355,6 +395,10 @@ if __name__ == '__main__':
         lambda e: app.setInputPath(e.data[1:-1] if '{' == e.data[0] and '}' == e.data[-1] else e.data),
     )
     app.pack(fill=tk.BOTH, expand=True)
+    root.protocol('WM_DELETE_WINDOW', lambda: (
+        app.close(),
+        root.destroy(),
+    ))
 
     initialSize = (720, 540)
     root.minsize(*initialSize)
