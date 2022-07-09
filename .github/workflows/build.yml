@@ -123,7 +123,7 @@ jobs:
               cp ../README.md README_gui.md
             fi
 
-
+            ls -la
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
                 ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.7z \
