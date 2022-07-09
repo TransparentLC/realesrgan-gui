@@ -123,6 +123,7 @@ jobs:
               cp ../README.md README_gui.md
             fi
 
+            echo $(pwd)
             ls -la
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
