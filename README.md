@@ -9,17 +9,26 @@
 
 ## 基本介绍
 
-这个程序是 Real-ESRGAN 的命令行程序 [Real-ESRGAN-ncnn-vulkan](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan) 的图形界面，使用 Python 和 tkinter 编写。
+这个程序是 Real-ESRGAN 的命令行程序 [Real-ESRGAN-ncnn-vulkan](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan) 的图形界面，使用 Python 和 tkinter 编写，同时支持 Windows、Ubuntu 和 macOS 平台。
 
-使用时请将这里的所有文件或打包后的可执行文件和 Real-ESRGAN-ncnn-vulkan 的可执行文件放在同一个目录。从源代码运行前，请使用 `pip install -r requirements.txt` 安装依赖。
+快速上手：
 
-注意：在 Linux 或 macOS 上运行之前，不要忘了为 `realesrgan-ncnn-vulkan` 和 `realesrgan-gui`（如果使用打包后的可执行文件）这两个文件添加可执行权限（`chmod +x`）。
+* ![Windows 10+](https://img.shields.io/badge/Windows-10+-06b?logo=windows) 在 Release 中下载最新的 `realesrgan-gui-windows-bundled-v*.7z`，解压后打开 `realesrgan-gui.exe` 即可使用。
+* ![Ubuntu 20.04+](https://img.shields.io/badge/Ubuntu-20.04+-e52?logo=ubuntu) 在 Release 中下载最新的 `realesrgan-gui-ubuntu-bundled-v*.tar.xz`，解压后打开 `realesrgan-gui` 即可使用。
+* ![macOS Big Sur+](https://img.shields.io/badge/macOS-Big%20Sur+-111?logo=apple) 在 Release 中下载最新的 `realesrgan-gui-macos-appbundle-v*.tar.xz`，解压后在终端中执行 `xattr -cr "Real-ESRGAN GUI.app"`，打开 `Real-ESRGAN GUI` 即可使用。
 
-> 可以在 [Release](https://github.com/TransparentLC/realesrgan-gui/releases) 下载适用于 Windows 10 和 Ubuntu 20.04（或更新版本系统，其他 Linux 发行版未测试）的打包好的版本。文件名包含 `bundled` 的压缩包整合了 Real-ESRGAN-ncnn-vulkan 的可执行文件和模型，这样就不需要另外下载了。
->
-> 也可以在 [Actions](https://nightly.link/TransparentLC/realesrgan-gui/workflows/build/master) 下载根据现有代码打包好的版本（相当于 Nightly）。
->
-> 虽然上传了 macOS 版的打包，但由于我没有运行 macOS 的设备，因此**无法进行测试以保证其可用性**。如果你发现这个程序在 macOS 下不能正常使用，请随意尝试自行修改使它可以使用～
+<details>
+
+<summary>其它的运行方式和说明</summary>
+
+* Release 中的 `realesrgan-gui-windows.7z` 和 `realesrgan-gui-ubuntu.tar.xz` 不包含 Real-ESRGAN-ncnn-vulkan 的主程序和模型，请自行在[这里](https://github.com/xinntao/Real-ESRGAN/releases) 下载后解压到 GUI 的主程序所在的目录。
+* Actions 中上传的是根据最新提交的代码打包的版本（相当于 Nightly），同样不包含 Real-ESRGAN-ncnn-vulkan 的主程序和模型。
+* 如果需要从源代码运行，请使用 Python 3.10 或以上版本，执行 `pip install -r requirements.txt` 安装依赖，将 Real-ESRGAN-ncnn-vulkan 解压到项目目录，然后执行 `main.py`。
+* 在其它的 Linux 发行版中可能也可以运行本项目，不过我没有进行测试。
+
+</details>
+
+> ⚠️ 由于我没有运行 macOS 的设备，因此可能无法处理和 macOS 相关的使用问题。
 
 ## 功能介绍
 
@@ -128,3 +137,7 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 * [TkInterDnD2](https://github.com/pmgagne/tkinterdnd2) Tkinter 的拖拽支持
 * [darkdetect](https://github.com/albertosottile/darkdetect) 检测是否正在使用深色模式
 * [pyinstaller](https://github.com/pyinstaller/pyinstaller)
+
+## 致谢
+
+* 感谢 [@blacklein](https://github.com/blacklein) 提供在 macOS 下使用这个 GUI 和打包为应用程序的帮助。
