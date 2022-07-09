@@ -47,7 +47,7 @@ jobs:
         run: |
           pip install pyinstaller
           python -c "import time;open('define.py','a').write(f'\nBUILD_TIME={time.time():.0f}')"
-          if [[ $RUNNER_OS == "Windows" || $RUNNER_OS == "Linux" ]];
+          if [[ $RUNNER_OS == "Windows" || $RUNNER_OS == "Linux" ]]; then
             export REGUI_ONEFILE=1
           fi
           pyinstaller --clean --log-level WARN realesrgan-gui.spec
