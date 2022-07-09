@@ -362,6 +362,7 @@ class REGUIApp(ttk.Frame):
         return f'{base}-{suffix}{ext}'
 
 if __name__ == '__main__':
+    os.chdir(define.APP_PATH)
     root = TkinterDnD.Tk(className=define.APP_TITLE)
     root.withdraw()
 

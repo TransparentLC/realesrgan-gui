@@ -1,18 +1,7 @@
-# -*- mode: python ; coding: utf-8 -*-
-
-# Created from command:
-# pyi-makespec --additional-hooks-dir pyi-hooks --hidden-import PIL._tkinter_finder --exclude-module ... --add-data ... --icon icon-256px.ico --name realesrgan-gui --noconsole --onefile main.py
-# Build:
-# pyinstaller --clean realesrgan-gui.spec
-
 import os
-
-block_cipher = None
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
-    binaries=[],
     datas=[
         ('theme', 'theme'),
         ('i18n.ini', '.'),
@@ -25,8 +14,6 @@ a = Analysis(
     hookspath=[
         'pyi-hooks',
     ],
-    hooksconfig={},
-    runtime_hooks=[],
     excludes=[
         '_asyncio',
         '_bz2',
@@ -40,10 +27,6 @@ a = Analysis(
         'pyexpat',
         'unicodedata',
     ],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
-    noarchive=False,
 )
 
 a.binaries = [
@@ -78,27 +61,48 @@ print('Datas:')
 for i in a.datas:
     print(i)
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data)
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    [],
-    name='realesrgan-gui',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-    icon='icon-256px.ico',
-)
+if os.environ.get('REGUI_ONEFILE'):
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        [],
+        name='realesrgan-gui',
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=True,
+        console=False,
+        disable_windowed_traceback=False,
+        argv_emulation=False,
+        icon='icon-256px.ico',
+    )
+else:
+    exe = EXE(
+        pyz,
+        a.scripts,
+        [],
+        exclude_binaries=True,
+        name='realesrgan-gui',
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=True,
+        console=False,
+        disable_windowed_traceback=False,
+        argv_emulation=False,
+        icon='icon-256px.ico',
+    )
+    coll = COLLECT(
+        exe,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        name='realesrgan-gui',
+        strip=False,
+        upx=True,
+    )

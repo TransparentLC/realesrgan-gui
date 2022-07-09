@@ -47,7 +47,20 @@ jobs:
         run: |
           pip install pyinstaller
           python -c "import time;open('define.py','a').write(f'\nBUILD_TIME={time.time():.0f}')"
+          if [[ $RUNNER_OS == "Windows" || $RUNNER_OS == "Linux" ]];
+            export REGUI_ONEFILE=1
+          fi
           pyinstaller --clean --log-level WARN realesrgan-gui.spec
+          if [ $RUNNER_OS == "macOS" ]; then
+            mkdir "dist/Real-ESRGAN GUI.app"
+            mkdir "dist/Real-ESRGAN GUI.app/Contents"
+            mkdir "dist/Real-ESRGAN GUI.app/Contents/MacOS"
+            mkdir "dist/Real-ESRGAN GUI.app/Contents/Resources"
+            cp Info.plist "dist/Real-ESRGAN GUI.app/Contents/Info.plist"
+            cp icon.icns "dist/Real-ESRGAN GUI.app/Contents/Resources/icon.icns"
+            mv dist/realesrgan-gui/* "dist/Real-ESRGAN GUI.app/Contents/MacOS"
+            rm -rf dist/realesrgan-gui
+          fi
       - name: Upload result
         uses: actions/upload-artifact@v2
         with:
@@ -93,14 +106,23 @@ jobs:
             elif [ $BUILD_OS == "macOS" ]; then
               REAL_ESRGAN_PLATFORM=macos
             fi
-            cd "dist-${BUILD_OS}"
+            if [ $RUNNER_OS == "macOS" ]; then
+              cd "dist-${BUILD_OS}/Real-ESRGAN GUI.app/Contents/MacOS"
+            else
+              cd "dist-${BUILD_OS}"
+            fi
             wget \
               -nv \
               -O realesrgan-ncnn-vulkan.zip \
               "https://github.com/xinntao/Real-ESRGAN/releases/download/${REAL_ESRGAN_VERSION}/realesrgan-ncnn-vulkan-${REAL_ESRGAN_RELEASE_TIME}-${REAL_ESRGAN_PLATFORM}.zip"
             unzip realesrgan-ncnn-vulkan.zip
             rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
-            cp ../README.md README_gui.md
+            if [ $RUNNER_OS == "macOS" ]; then
+              cp ../../../../README.md README_gui.md
+            else
+              cp ../README.md README_gui.md
+            fi
+
 
             if [ $BUILD_OS == "Windows" ]; then
               7z a \
@@ -111,7 +133,7 @@ jobs:
                 ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.7z \
                 . \
                 -mx9 -mfb256 -md1g -ms
-            else
+            elif [ $RUNNER_OS == "Linux" ]; then
               chmod +x realesrgan-gui realesrgan-ncnn-vulkan
               XZ_OPT=-e9 tar Jcvf \
                 ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}.tar.xz \
@@ -121,6 +143,12 @@ jobs:
                 ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-bundled-${REAL_ESRGAN_VERSION}.tar.xz \
                 --transform "s,^\.,realesrgan-gui," \
                 .
+            elif [ $RUNNER_OS == "macOS" ]; then
+              chmod +x realesrgan-gui realesrgan-ncnn-vulkan
+              cd ../../../
+              XZ_OPT=-e9 tar Jcvf \
+                ../release/realesrgan-gui-${REAL_ESRGAN_PLATFORM}-appbundle-${REAL_ESRGAN_VERSION}.tar.xz \
+                "Real-ESRGAN GUI.app"
             fi
 
             cd ..
