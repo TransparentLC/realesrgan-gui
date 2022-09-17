@@ -3,7 +3,16 @@
 [![build](https://github.com/TransparentLC/realesrgan-gui/actions/workflows/build.yml/badge.svg)](https://github.com/TransparentLC/realesrgan-gui/actions/workflows/build.yml)
 [![download](https://img.shields.io/github/downloads/TransparentLC/realesrgan-gui/total.svg)](https://github.com/TransparentLC/realesrgan-gui/releases)
 
-实用、美观的图片放大工具 Real-ESRGAN 的图形界面，参考 [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) 设计。
+实用、美观的图片放大工具 [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) 的图形界面，参考 [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) 设计。
+
+<details>
+
+<summary>README translations</summary>
+
+* [简体中文](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.md)
+* [English](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.en-US.md)
+
+</details>
 
 ![](https://user-images.githubusercontent.com/47057319/166252452-d3e7dfbd-2e91-4aaa-95bd-0937adb3d00b.png)
 
@@ -21,7 +30,7 @@
 
 <summary>其它的运行方式和说明</summary>
 
-* Release 中的 `realesrgan-gui-windows.7z` 和 `realesrgan-gui-ubuntu.tar.xz` 不包含 Real-ESRGAN-ncnn-vulkan 的主程序和模型，请自行在[这里](https://github.com/xinntao/Real-ESRGAN/releases) 下载后解压到 GUI 的主程序所在的目录。
+* Release 中的 `realesrgan-gui-windows.7z` 和 `realesrgan-gui-ubuntu.tar.xz` 不包含 Real-ESRGAN-ncnn-vulkan 的主程序和模型，请自行在[这里](https://github.com/xinntao/Real-ESRGAN/releases)下载后解压到 GUI 的主程序所在的目录。
 * Actions 中上传的是根据最新提交的代码打包的版本（相当于 Nightly），同样不包含 Real-ESRGAN-ncnn-vulkan 的主程序和模型。
 * 如果需要从源代码运行，请使用 Python 3.10 或以上版本，执行 `pip install -r requirements.txt` 安装依赖，将 Real-ESRGAN-ncnn-vulkan 解压到项目目录，然后执行 `main.py`。
 * 在其它的 Linux 发行版中可能也可以运行本项目，不过我没有进行测试。
@@ -51,7 +60,7 @@
 * 多语言支持
     * 界面语言和系统语言（使用 `locale.getdefaultlocale` 获取）一致。
     * 目前支持简繁中文和英语。在缺少某个语言的翻译文本的情况下，默认会回退到英语。
-    * **欢迎添加更多语言的翻译，或对现有的翻译进行改进～**（参见 `i18n.ini`）
+    * **欢迎添加更多语言的翻译，或对现有的翻译进行改进～**（参见 [`i18n.ini`](https://github.com/TransparentLC/realesrgan-gui/blob/master/i18n.ini)）
 
 ## 效果对比
 
@@ -71,8 +80,8 @@
 | --- | --- |
 | ![](https://user-images.githubusercontent.com/47057319/170270314-dce674be-e1d3-433f-a71f-763983b33e97.gif) | ![](https://user-images.githubusercontent.com/47057319/170273963-4b11551b-44e7-42f8-b0fd-5b2599087a95.gif) |
 
-* waifu2x-caffe 使用 UpResNet10 和 UpPhoto 模型，降噪等级 3，开启 TTA。
-* Real-ESRGAN 使用 realesrgan-x4plus-anime 和 realesrgan-x4plus 模型，开启 TTA。
+* waifu2x-caffe 使用 `UpResNet10` 和 `UpPhoto` 模型，降噪等级 3，开启 TTA。
+* Real-ESRGAN 使用 `realesrgan-x4plus-anime` 和 `realesrgan-x4plus` 模型，开启 TTA。
 * 放大倍率均为 4x。
 * 为了减小文件大小，展示的 GIF 进行了有损压缩处理。
 

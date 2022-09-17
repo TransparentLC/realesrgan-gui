@@ -119,8 +119,10 @@ jobs:
             rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
             if [ $BUILD_OS == "macOS" ]; then
               cp ../../../../README.md README_gui.md
+              cp ../../../../README.en-US.md README_gui.en-US.md
             else
               cp ../README.md README_gui.md
+              cp ../README.en-US.md README_gui.en-US.md
             fi
 
             if [ $BUILD_OS == "Windows" ]; then
