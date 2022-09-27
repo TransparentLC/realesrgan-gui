@@ -9,8 +9,9 @@ A cross-platform GUI for image upscaler [Real-ESRGAN](https://github.com/xinntao
 
 <summary>README translations</summary>
 
-* [简体中文](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.md)
+* [简体中文 (Simplified Chinese)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.md)
 * [English](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.en-US.md)
+* [Ukrainian (Українська)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.uk-UA.md) Translated by [@kirill0ermakov](https://github.com/kirill0ermakov)
 
 </details>
 

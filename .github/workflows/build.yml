@@ -120,9 +120,11 @@ jobs:
             if [ $BUILD_OS == "macOS" ]; then
               cp ../../../../README.md README_gui.md
               cp ../../../../README.en-US.md README_gui.en-US.md
+              cp ../../../../README.uk-UA.md README_gui.uk-UA.md
             else
               cp ../README.md README_gui.md
               cp ../README.en-US.md README_gui.en-US.md
+              cp ../README.uk-UA.md README_gui.uk-UA.md
             fi
 
             if [ $BUILD_OS == "Windows" ]; then
