@@ -63,7 +63,7 @@ jobs:
             rm -rf dist/realesrgan-gui
           fi
       - name: Upload result
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: realesrgan-gui-${{ runner.os }}
           path: dist
@@ -158,11 +158,9 @@ jobs:
             cd ..
           done
 
-          RELEASE_FILES=$(find release -type f)
-          RELEASE_FILES="${RELEASE_FILES//'%'/'%25'}"
-          RELEASE_FILES="${RELEASE_FILES//$'\n'/'%0A'}"
-          RELEASE_FILES="${RELEASE_FILES//$'\r'/'%0D'}"
-          echo "release_files=${RELEASE_FILES}" >> $GITHUB_OUTPUT
+          echo "release_files<<EOF" >> $GITHUB_OUTPUT
+          find release -type f >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Release automated build
         uses: softprops/action-gh-release@v1
         if: ${{ github.event.inputs.release }}
