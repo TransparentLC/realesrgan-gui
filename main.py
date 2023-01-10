@@ -360,7 +360,7 @@ class REGUIApp(ttk.Frame):
                 suffix = f'w{self.varintResizeWidth.get()}'
             case param.ResizeMode.HEIGHT:
                 suffix = f'h{self.varintResizeHeight.get()}'
-        return f'{base}-{suffix}{ext}'
+        return f'{base} ({self.models[self.comboModel.current()]} {suffix}){ext}'
 
 if __name__ == '__main__':
     os.chdir(define.APP_PATH)
