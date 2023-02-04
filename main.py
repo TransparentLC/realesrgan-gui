@@ -73,17 +73,30 @@ class REGUIApp(ttk.Frame):
         self.config['Config'] = {}
         self.config.read(define.APP_CONFIG_PATH)
 
+        self.outputPathChanged = True
+
         self.setupVars()
         self.setupWidgets()
 
     def setupVars(self):
+        def varstrOutputPathCallback(var: tk.IntVar | tk.StringVar, index: str, mode: str):
+            self.outputPathChanged = True
+        def outputPathTraceCallback(var: tk.IntVar | tk.StringVar, index: str, mode: str):
+            if not self.outputPathChanged:
+                self.setInputPath(self.varstrInputPath.get())
         self.varstrInputPath = tk.StringVar()
         self.varstrOutputPath = tk.StringVar()
+        self.varstrOutputPath.trace_add('write', varstrOutputPathCallback)
         self.varintResizeMode = tk.IntVar(value=self.config['Config'].getint('ResizeMode'))
+        self.varintResizeMode.trace_add('write', outputPathTraceCallback)
         self.varintResizeRatio = tk.IntVar(value=self.config['Config'].getint('ResizeRatio'))
+        self.varintResizeRatio.trace_add('write', outputPathTraceCallback)
         self.varintResizeWidth = tk.IntVar(value=self.config['Config'].getint('ResizeWidth'))
+        self.varintResizeWidth.trace_add('write', outputPathTraceCallback)
         self.varintResizeHeight = tk.IntVar(value=self.config['Config'].getint('ResizeHeight'))
+        self.varintResizeHeight.trace_add('write', outputPathTraceCallback)
         self.varstrModel = tk.StringVar(value=self.config['Config'].get('Model'))
+        self.varstrModel.trace_add('write', outputPathTraceCallback)
         self.varintDownsampleIndex = tk.IntVar(value=self.config['Config'].getint('DownsampleIndex'))
         self.varintTileSizeIndex = tk.IntVar(value=self.config['Config'].getint('TileSizeIndex'))
         self.varintGPUID = tk.IntVar(value=self.config['Config'].getint('GPUID'))
@@ -314,6 +327,7 @@ class REGUIApp(ttk.Frame):
     def setInputPath(self, p: str):
         self.varstrInputPath.set(p)
         self.varstrOutputPath.set(self.getOutputPath(p))
+        self.outputPathChanged = False
 
     def writeToOutput(self, s: str):
         self.textOutput.config(state=tk.NORMAL)
