@@ -2,18 +2,21 @@ import os
 
 a = Analysis(
     ['main.py'],
+    binaries=[
+        ('realesrgan-ncnn-vulkan', '.'),
+        ('models', 'models'),
+        ('tkinterdnd2', 'tkinterdnd2'),
+    ],
     datas=[
         ('theme', 'theme'),
         ('i18n.ini', '.'),
-        ('icon-256px.ico', '.'),
+        ('icon.icns', '.'),
         ('icon-128px.webp', '.'),
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
     ],
-    hookspath=[
-        'pyi-hooks',
-    ],
+    hookspath=[],
     excludes=[
         '_asyncio',
         '_bz2',
@@ -79,7 +82,7 @@ if os.environ.get('REGUI_ONEFILE'):
         console=False,
         disable_windowed_traceback=False,
         argv_emulation=False,
-        icon='icon-256px.ico',
+        icon='icon.icns',
     )
 else:
     exe = EXE(
@@ -95,7 +98,7 @@ else:
         console=False,
         disable_windowed_traceback=False,
         argv_emulation=False,
-        icon='icon-256px.ico',
+        icon='icon.icns',
     )
     coll = COLLECT(
         exe,
@@ -105,4 +108,10 @@ else:
         name='realesrgan-gui',
         strip=False,
         upx=True,
+    )
+    app = BUNDLE(
+    coll,
+    name='RealESRGAN GUI.app',
+    icon='icon.icns',
+    bundle_identifier=None,
     )
