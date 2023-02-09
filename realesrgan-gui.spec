@@ -114,4 +114,18 @@ else:
     name='RealESRGAN GUI.app',
     icon='icon.icns',
     bundle_identifier=None,
+    info_plist={
+            'CFBundleDisplayName': 'Real-ESRGAN GUI',
+            'CFBundleName': 'Real-ESRGAN GUI',
+            'CFBundlePackageType': 'APPL',
+            'CFBundleSignature': 'RLES',
+            'CFBundleShortVersionString': '0.2.5.0',
+            'CFBundleVersion': '0.2.5.0',
+            'CFBundleExecutable': 'realesrgan-gui',
+            'CFBundleIconFile': 'icon.icns',
+            'CFBundleIdentifier': 'dev.transparentlc.regui',
+            'CFBundleInfoDictionaryVersion': '6.0',
+            'LSApplicationCategoryType': 'public.app-category.graphics-design',
+            'LSEnvironment': {'LANG': 'zh_CN.UTF-8'},
+            }
     )
