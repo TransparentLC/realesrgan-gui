@@ -6,7 +6,7 @@ a = Analysis(
         ('theme', 'theme'),
         ('i18n.ini', '.'),
         ('icon-256px.ico', '.'),
-        ('icon-128px.webp', '.'),
+        ('icon-128px.png', '.'),
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
@@ -21,7 +21,6 @@ a = Analysis(
         '_hashlib',
         '_lzma',
         '_multiprocessing',
-        '_overlapped',
         '_queue',
         '_ssl',
         'pyexpat',
@@ -32,16 +31,16 @@ a = Analysis(
 a.binaries = [
     x
     for x in a.binaries
-    if not any(x[0].startswith(y) for y in(
+    if not any(x[0].startswith(y) for y in {
         'api-ms-win-',
         'ucrtbase.dll',
-    ))
+    })
 ]
 
 a.datas = [
     x
     for x in a.datas
-    if not any(x[0].startswith(y) for y in(
+    if not any(x[0].startswith(y) for y in {
         os.path.join('tcl', 'encoding'),
         os.path.join('tcl', 'http'),
         os.path.join('tcl', 'msgs'),
@@ -50,7 +49,7 @@ a.datas = [
         os.path.join('tcl8'),
         os.path.join('tk', 'images'),
         os.path.join('tk', 'msgs'),
-    ))
+    })
 ]
 
 print('Binaries:')

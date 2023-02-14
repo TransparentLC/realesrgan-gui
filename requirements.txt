@@ -1,3 +1,4 @@
-darkdetect == 0.7.*
+darkdetect == 0.8.*
+notify-py == 0.3.*
 pillow == 9.*
 tkinterdnd2 == 0.3.*

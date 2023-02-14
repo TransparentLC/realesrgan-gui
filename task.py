@@ -235,6 +235,7 @@ def taskRunner(
     queue: collections.deque[AbstractTask],
     outputCallback: typing.Callable[[str], None],
     completeCallback: typing.Callable[[], None],
+    failCallback: typing.Callable[[Exception], None],
 ) -> None:
     counter = 0
     try:
@@ -244,7 +245,7 @@ def taskRunner(
             te = time.perf_counter()
             outputCallback(f'Task #{counter} completed in {round((te - ts) * 1000)}ms.\n')
             counter += 1
-    except:
-        outputCallback(traceback.format_exc())
-    finally:
         completeCallback()
+    except Exception as ex:
+        outputCallback(traceback.format_exc())
+        failCallback(ex)

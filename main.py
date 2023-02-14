@@ -1,5 +1,6 @@
 import collections
 import configparser
+import notifypy
 import os
 import sys
 import time
@@ -205,7 +206,7 @@ class REGUIApp(ttk.Frame):
         f = ttk.Label().cget('font').string.split(' ')
         f[-1] = '16'
         f = ' '.join(f)
-        self.imageIcon = ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-128px.webp')))
+        self.imageIcon = ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-128px.png')))
         ttk.Label(self.frameAboutContent, image=self.imageIcon).pack(padx=10, pady=10)
         ttk.Label(self.frameAboutContent, text=define.APP_TITLE, font=f, justify=tk.CENTER).pack()
         ttk.Label(self.frameAboutContent, text='By TransparentLC' + (time.strftime("\nBuilt at %Y-%m-%d %H:%M:%S", time.localtime(define.BUILD_TIME)) if define.BUILD_TIME else ""), justify=tk.CENTER).pack()
@@ -314,12 +315,29 @@ class REGUIApp(ttk.Frame):
         self.textOutput.config(state=tk.NORMAL)
         self.textOutput.delete(1.0, tk.END)
         self.textOutput.config(state=tk.DISABLED)
+        notification = notifypy.Notify(
+            default_notification_application_name=define.APP_TITLE,
+            default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
+        )
+        ts = time.perf_counter()
+        def completeCallback():
+            te = time.perf_counter()
+            self.buttonProcess.config(state=tk.NORMAL)
+            notification.title = i18n.getTranslatedString('ToastCompletedTitle')
+            notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, (te - ts) / 1000)
+            notification.send(False)
+        def failCallback(ex: Exception):
+            self.buttonProcess.config(state=tk.NORMAL)
+            notification.title = i18n.getTranslatedString('ToastFailedTitle')
+            notification.message = f'{type(ex).__name__}: {ex}'
+            notification.send(False)
         t = threading.Thread(
             target=task.taskRunner,
             args=(
                 queue,
                 self.writeToOutput,
-                lambda: self.buttonProcess.config(state=tk.NORMAL),
+                completeCallback,
+                failCallback,
             )
         )
         t.start()
