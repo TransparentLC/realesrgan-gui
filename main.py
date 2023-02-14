@@ -324,7 +324,7 @@ class REGUIApp(ttk.Frame):
             te = time.perf_counter()
             self.buttonProcess.config(state=tk.NORMAL)
             notification.title = i18n.getTranslatedString('ToastCompletedTitle')
-            notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, (te - ts) / 1000)
+            notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
             notification.send(False)
         def failCallback(ex: Exception):
             self.buttonProcess.config(state=tk.NORMAL)
