@@ -15,7 +15,10 @@
 
 </details>
 
-![](https://user-images.githubusercontent.com/47057319/190863242-a47a3675-fb22-4a1f-96e9-8edb810386be.png)
+<picture>
+    <source media="(prefers-color-scheme:dark)" srcset="https://user-images.githubusercontent.com/47057319/219046059-6611f26b-c558-436e-a1d2-9576d355c2c6.png">
+    <img src="https://user-images.githubusercontent.com/47057319/219046017-467f4020-5257-4938-9bfe-b6ab6c65b706.png">
+</picture>
 
 ## Вступ
 

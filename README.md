@@ -15,7 +15,10 @@
 
 </details>
 
-![](https://user-images.githubusercontent.com/47057319/166252452-d3e7dfbd-2e91-4aaa-95bd-0937adb3d00b.png)
+<picture>
+    <source media="(prefers-color-scheme:dark)" srcset="https://user-images.githubusercontent.com/47057319/219046038-0edbb076-a4b3-4c6b-884e-46895f38bae8.png">
+    <img src="https://user-images.githubusercontent.com/47057319/219045988-f1515ffa-a190-499d-9cf0-ec044cb478ef.png">
+</picture>
 
 ## 基本介绍
 
