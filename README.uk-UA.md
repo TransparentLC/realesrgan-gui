@@ -27,8 +27,8 @@
 Quick Start：
 
 * ![Windows 10+](https://img.shields.io/badge/Windows-10+-06b?logo=windows) Завантажте останній `realesrgan-gui-windows-bundled-v*.7z` з релізу, розпакуйте архів та запустіть `realesrgan-gui.exe`.
-* ![Ubuntu 20.04+](https://img.shields.io/badge/Ubuntu-20.04+-e52?logo=ubuntu) Завантажте найновіший `realesrgan-gui-ubuntu-bundled-v*.tar.xz` з релізу, розпакуйте архів і запустіть `realesrgan-gui`.
-* ![macOS Big Sur+](https://img.shields.io/badge/macOS-Big%20Sur+-111?logo=apple) Завантажте останню версію `realesrgan-gui-macos-appbundle-v*.tar.xz` з релізу, розпакуйте архів і виконайте `xattr -cr "Real-ESRGAN GUI.app"` у терміналі, потім запустіть `Real-ESRGAN GUI`.
+* ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) Завантажте найновіший `realesrgan-gui-ubuntu-bundled-v*.tar.xz` з релізу, розпакуйте архів і запустіть `realesrgan-gui`.
+* ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) Завантажте останню версію `realesrgan-gui-macos-appbundle-v*.tar.xz` з релізу, розпакуйте архів і виконайте `xattr -cr "Real-ESRGAN GUI.app"` у терміналі, потім запустіть `Real-ESRGAN GUI`.
 
 <details>
 
