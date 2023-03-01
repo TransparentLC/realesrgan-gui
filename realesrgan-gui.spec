@@ -1,4 +1,6 @@
 import os
+import sys
+from PyInstaller.utils.hooks import collect_data_files
 
 a = Analysis(
     ['main.py'],
@@ -7,6 +9,8 @@ a = Analysis(
         ('i18n.ini', '.'),
         ('icon-256px.ico', '.'),
         ('icon-128px.png', '.'),
+        # macOS下通过app实现通知，打包时需要附带
+        *(collect_data_files('notifypy') if sys.platform == 'darwin' else []),
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
@@ -28,6 +32,7 @@ a = Analysis(
     ],
 )
 
+# Windows 10+已经自带UCRT了，打包时不需要附带
 a.binaries = [
     x
     for x in a.binaries
@@ -37,6 +42,7 @@ a.binaries = [
     })
 ]
 
+# tcl/tk相关的没有实际使用的大量小文件，在不使用onefile的情况下打包测试，即使不附带这些文件也后不影响运行
 a.datas = [
     x
     for x in a.datas
