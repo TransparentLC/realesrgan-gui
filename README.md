@@ -43,6 +43,24 @@
 
 > ⚠️ 由于我没有运行 macOS 的设备，因此可能无法处理和 macOS 相关的使用问题。
 
+### 一键打包`arm64`单架构的`Real-ESRGAN GUI.app`
+经实测，`arm64`单架构比`universal2`双架构在Apple芯片Mac上的性能表现要更加出色，因此建议Apple芯片用户自行打包`arm64`单架构应用程序。
+    #### 第一步
+    准备一台Apple芯片Mac，M1、M1 Pro、M1 Max、M2、M2 Pro、M2 Max均可。
+    #### 第二步
+    下载仓库
+    ```
+    git clone https://github.com/TransparentLC/realesrgan-gui.git
+    cd realesrgan-gui
+    ```
+    #### 第三步
+    在终端内运行shell脚本一键打包，到`pyinstaller`打包环节，`sudo`命令需要输入开机密码
+    ```
+    sh Build-macOS-arm64.sh
+    ```
+    #### 第四步
+    大功告成，打包号的应用在`./realesrgan-gui/dist/Real-ESRGAN GUI.app`
+
 ## 功能介绍
 
 在原版支持的功能的基础上，增加了以下功能：
