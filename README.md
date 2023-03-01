@@ -58,7 +58,7 @@
 >sh Build-macOS-arm64.sh
 >```
 >
->第四步：大功告成，打包号的应用在`./realesrgan-gui/dist/Real-ESRGAN GUI.app`
+>第四步：大功告成，打包好的应用在`./realesrgan-gui/dist/Real-ESRGAN GUI.app`
 
 ## 功能介绍
 
