@@ -16,6 +16,7 @@ source ./realgui/bin/activate
 # Step 3
 ## Install dependcies
 pip3 install -r requirements.txt
+pip3 install pyinstaller
 
 # Step 4
 ## Create macOS App Bundle

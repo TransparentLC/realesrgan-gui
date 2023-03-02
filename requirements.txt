@@ -1,6 +1,5 @@
 darkdetect == 0.8.*
 notify-py == 0.3.*
 pillow == 9.*
-pyinstaller == 5.8.*
 tkinterdnd2 == 0.3.*; sys_platform != 'darwin' or platform_machine != 'arm64'
 git+https://github.com/blacklein/tkinterdnd2@master; sys_platform == 'darwin' and platform_machine == 'arm64'
