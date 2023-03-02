@@ -41,6 +41,22 @@ Quick Start：
 
 </details>
 
+### Build `Real-ESRGAN GUI.app` for Apple Silicon (`arm64`)
+
+The `arm64` builds have been tested to perform better than `universal2` builds. If you are using Apple Silicon, it is recommended that you can make an `arm64` build by yourself.
+
+```shell
+# 1. Clone this repository.
+git clone https://github.com/TransparentLC/realesrgan-gui.git
+cd realesrgan-gui
+
+# 2. Run the shell script to start building.
+# Password is required for "sudo pyinstaller realesrgan-gui-macOS-arm64.spec"
+sh Build-macOS-arm64.sh
+
+# 3. The built application is saved in "./realesrgan-gui/dist/Real-ESRGAN GUI.app".
+```
+
 > ⚠️ Since I don't have any device running macOS, I may not be able to handle macOS-related issues.
 
 ## Features
