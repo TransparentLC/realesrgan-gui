@@ -63,7 +63,7 @@ class REGUIApp(ttk.Frame):
             'ResizeHeight': 1024,
             'Model': self.models[0],
             'DownsampleIndex': 0,
-            'GPUID': 0,
+            'GPUID': -1,
             'TileSizeIndex': 0,
             'LossyQuality': 80,
             'UseWebP': False,
@@ -178,8 +178,7 @@ class REGUIApp(ttk.Frame):
         self.comboDownsample.pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample.bind('<<ComboboxSelected>>', self.comboDownsample_click)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
-        self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=7, increment=1, width=12, textvariable=self.varintGPUID)
-        self.spinGPUID.set(0)
+        self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=-1, to=7, increment=1, width=12, textvariable=self.varintGPUID)
         self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]))

@@ -80,7 +80,7 @@ class RESpawnTask(AbstractTask):
                 '-s', str(self.config.modelFactor),
                 '-t', str(self.config.tileSize),
                 '-n', self.config.model,
-                '-g', str(self.config.gpuID),
+                '-g', 'auto' if self.config.gpuID < 0 else str(self.config.gpuID),
                 ('-x' if self.config.useTTA else ''),
             )
             with subprocess.Popen(
