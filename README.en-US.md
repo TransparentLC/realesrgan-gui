@@ -38,7 +38,7 @@ Quick Start：
 * The artifacts in GitHub Actions are built based on the latest commits. They don't contain Real-ESRGAN-ncnn-vulkan's executable file and models either.
 * Use Python 3.10 or above if you want to run Real-ESRGAN GUI from source. Don't forget to install the dependcies by `pip install -r requirements.txt` and extract Real-ESRGAN-ncnn-vulkan to the repository before running `python main.py`.
 * It may be possible to run Real-ESRGAN GUI in other Linux distributions, but I have not tested it.
-* You can also download more [additional models](#addition-models) and place the `bin` and `param` files in the `models` directory.
+* You can also download more [additional models](#additional-models) and place the `bin` and `param` files in the `models` directory.
 
 </details>
 
