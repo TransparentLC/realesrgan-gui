@@ -38,6 +38,7 @@ Quick Start：
 * The artifacts in GitHub Actions are built based on the latest commits. They don't contain Real-ESRGAN-ncnn-vulkan's executable file and models either.
 * Use Python 3.10 or above if you want to run Real-ESRGAN GUI from source. Don't forget to install the dependcies by `pip install -r requirements.txt` and extract Real-ESRGAN-ncnn-vulkan to the repository before running `python main.py`.
 * It may be possible to run Real-ESRGAN GUI in other Linux distributions, but I have not tested it.
+* You can also download more [additional models](#addition-models) and place the `bin` and `param` files in the `models` directory.
 
 </details>
 
@@ -58,6 +59,11 @@ sh Build-macOS-arm64.sh
 ```
 
 > ⚠️ Since I don't have any device running macOS, I may not be able to handle macOS-related issues.
+
+### Related projects
+
+* Use Real-ESRGAN on Android: [tumuyan/RealSR-NCNN-Android](https://github.com/tumuyan/RealSR-NCNN-Android)
+* Upscale video with Real-ESRGAN and Vapoursynth: [HolyWu/vs-realesrgan](https://github.com/HolyWu/vs-realesrgan)
 
 ## Features
 
@@ -114,7 +120,7 @@ I recommend `realesrgan-x4plus` for real-life photos and `realesrgan-x4plus-anim
 
 For different upscale ratio versions of the same model, it is recommended to choose the version that is equal to or greater than the ratio at which you want to enlarge the image. For example, if a model has x2 and x4 version and you want to upscale an image by 3x, you should choose the x4 version.
 
-Models with `animevideo` in the filename are designed for anime videos. These models are small and have a faster processing speed (about 1.5-3x compare to `realesrgan-x4plus-anime`). However, I recommend [VapourSynth](https://www.vapoursynth.com/) and its [Real-ESRGAN plugin](https://github.com/HolyWu/vs-realesrgan) if you want to upscale an video. Real-ESRGAN GUI will not consider adding video processing related features.
+Models with `animevideo` in the filename are designed for anime videos. These models are small and have a faster processing speed (about 1.5-3x compare to `realesrgan-x4plus-anime`). However, Real-ESRGAN GUI will not consider adding video processing related features.
 
 ### The usage of tile size
 
@@ -158,6 +164,14 @@ If this option is not turned on, lossless compression is used when the output is
 `config.ini` in the repository's directory or in the directory where Real-ESRGAN GUI's executable is located, without this file the default configuration is used.
 
 The configuration will be saved automatically when exiting the program.
+
+### Additional models
+
+You can download additional models from [Upscale Wiki](https://upscale.wiki/wiki/Model_Database) and use them in Real-ESRGAN GUI. These model may produce better (or worse) results than the official model for some images.
+
+These model uses PyTorch's `pth` format, but Real-ESRGAN GUI (Real-ESRGAN-ncnn-vulkan) needs NCNN's `bin` and `param` format. You can follow this [guide](https://note.youdao.com/ynoteshare/?id=2b001cd4175ab46d2ce11ecb5a6d84ff) (written by RealSR-NCNN-Android's author in Chinese) to make a conversion with [cupscale](https://github.com/n00mkrad/cupscale)'s `pth2ncnn` utility. The model's filename must contain its upscale factor like `x4` or `4x`.
+
+You can download some converted additional models from [here](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models).
 
 ## Open-source libraries used
 

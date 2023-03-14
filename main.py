@@ -2,6 +2,7 @@ import collections
 import configparser
 import notifypy
 import os
+import re
 import sys
 import time
 import threading
@@ -41,10 +42,8 @@ class REGUIApp(ttk.Frame):
         self.modelFactors: dict[str, int] = {}
         for m in self.models:
             self.modelFactors[m] = 4
-            for i in range(2, 5):
-                if f'x{i}' in m:
-                    self.modelFactors[m] = i
-                    break
+            if s := re.search(r'(\d+)x|x(\d+)', m):
+                self.modelFactors[m] = int(s.group(1) or s.group(2))
 
         self.downsample = (
             ('Lanczos', Image.Resampling.LANCZOS),
@@ -143,7 +142,10 @@ class REGUIApp(ttk.Frame):
         self.frameModel.grid(row=0, column=1, sticky=tk.NSEW)
         ttk.Label(self.frameModel, text=i18n.getTranslatedString('UsedModel')).pack(padx=10, pady=5, fill=tk.X)
         self.comboModel = ttk.Combobox(self.frameModel, state='readonly', values=self.models, textvariable=self.varstrModel)
-        self.comboModel.current(self.models.index(self.varstrModel.get()))
+        if self.varstrModel.get() in self.models:
+            self.comboModel.current(self.models.index(self.varstrModel.get()))
+        else:
+            self.varstrModel.set(self.models[0])
         self.comboModel.pack(padx=10, pady=5, fill=tk.X)
         self.comboModel.bind('<<ComboboxSelected>>', lambda e: e.widget.select_clear())
         self.frameResize = ttk.Frame(self.frameBasicConfigBottom)
