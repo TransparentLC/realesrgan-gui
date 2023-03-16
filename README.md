@@ -38,7 +38,6 @@
 * Actions 中上传的是根据最新提交的代码打包的版本（相当于 Nightly），同样不包含 Real-ESRGAN-ncnn-vulkan 的主程序和官方模型。
 * 如果需要从源代码运行，请使用 Python 3.10 或以上版本，执行 `pip install -r requirements.txt` 安装依赖，将 Real-ESRGAN-ncnn-vulkan 解压到项目目录，然后执行 `main.py`。
 * 在其它的 Linux 发行版中可能也可以运行本项目，不过我没有进行测试。
-* 你也可以自己下载更多的[扩展模型](#扩展模型)，将模型的文件名相同的 `bin` 和 `param` 文件放在 `models` 目录，主程序在启动后会自动识别到这些模型。
 
 </details>
 
@@ -121,6 +120,8 @@ sh Build-macOS-arm64.sh
 
 带有 `animevideo` 的几个模型是针对二次元视频使用的，特点是模型文件较小以及处理速度较快（我自己的测试是 `realesrgan-x4plus-anime` 的 1.5x 到 3x 不等）。不过这个 GUI 并不会考虑加入视频处理功能。
 
+你也可以在[这里](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models)下载使用第三方的附加模型，对于某些图片（特别是三次元图片）可能会有比官方模型更好的效果，请根据实际情况自由尝试。将模型的文件名相同的 `bin` 和 `param` 文件放在 `models` 目录，主程序在启动后会自动识别到这些模型。
+
 ### 拆分大小的作用
 
 对应原版的 `-t tile-size` 参数。“自动设定”已经可以满足日常使用了，但是如果想要自己设定的话，在显存充足的情况下建议使用较大的值，处理速度更快，放大后的图片质量更好，细节更多（虽然可能不太明显）。
@@ -163,14 +164,6 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 项目目录或打包后的可执行文件所在目录下的 `config.ini`，没有这个文件的情况下会使用默认的配置。在退出程序时会自动保存配置。
 
 如果因为配置文件的问题导致程序不能运行的话，可以先尝试将配置文件删除。
-
-### 扩展模型
-
-除了 Real-ESRGAN 的官方模型，你也可以从 [Upscale Wiki](https://upscale.wiki/wiki/Model_Database) 下载更多的扩展模型，对于某些图片可能会有比官方模型更好的效果，请根据实际情况自由尝试。
-
-这些模型使用的是 PyTorch 的 `pth` 格式，而不是 NCNN 的 `bin` 和 `param` 格式，因此需要进行转换，具体的操作方法可以参见 RealSR-NCNN-Android 的原作者提供的[教程](https://note.youdao.com/ynoteshare/?id=2b001cd4175ab46d2ce11ecb5a6d84ff)。为了识别模型的放大倍数，请确保模型的文件名中有类似 `x4` 或 `4x` 的字样。
-
-可以在[这里](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models)下载一些转换好的模型。
 
 ## 借物表
 

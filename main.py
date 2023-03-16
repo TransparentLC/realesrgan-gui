@@ -215,7 +215,8 @@ class REGUIApp(ttk.Frame):
         self.frameAboutBottom.pack()
         ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewREGUISource'), command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
         ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewRESource'), command=lambda: webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan')).grid(row=0, column=1, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewDonatePage'), command=lambda: webbrowser.open_new_tab('https://i.akarin.dev/donate/')).grid(row=0, column=2, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewAdditionalModel'), command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models')).grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewDonatePage'), command=lambda: webbrowser.open_new_tab('https://i.akarin.dev/donate/')).grid(row=1, column=1, padx=5, pady=5, sticky=tk.NSEW)
 
         self.notebookConfig.add(self.frameBasicConfig, text=i18n.getTranslatedString('FrameBasicConfig'))
         self.notebookConfig.add(self.frameAdvancedConfig, text=i18n.getTranslatedString('FrameAdvancedConfig'))

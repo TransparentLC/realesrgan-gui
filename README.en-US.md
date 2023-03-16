@@ -38,7 +38,6 @@ Quick Start：
 * The artifacts in GitHub Actions are built based on the latest commits. They don't contain Real-ESRGAN-ncnn-vulkan's executable file and models either.
 * Use Python 3.10 or above if you want to run Real-ESRGAN GUI from source. Don't forget to install the dependcies by `pip install -r requirements.txt` and extract Real-ESRGAN-ncnn-vulkan to the repository before running `python main.py`.
 * It may be possible to run Real-ESRGAN GUI in other Linux distributions, but I have not tested it.
-* You can also download more [additional models](#additional-models) and place the `bin` and `param` files in the `models` directory.
 
 </details>
 
@@ -121,6 +120,8 @@ I recommend `realesrgan-x4plus` for real-life photos and `realesrgan-x4plus-anim
 For different upscale ratio versions of the same model, it is recommended to choose the version that is equal to or greater than the ratio at which you want to enlarge the image. For example, if a model has x2 and x4 version and you want to upscale an image by 3x, you should choose the x4 version.
 
 Models with `animevideo` in the filename are designed for anime videos. These models are small and have a faster processing speed (about 1.5-3x compare to `realesrgan-x4plus-anime`). However, Real-ESRGAN GUI will not consider adding video processing related features.
+
+You can download additional models from [here](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models) and place the `bin` and `param` files in the `models` directory to install. These model may produce better (or worse) results than the official models for some images, especially for real-life photos.
 
 ### The usage of tile size
 
