@@ -12,9 +12,9 @@ from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
 s = platform.system()
 p = {
-    'Windows': ('win64', {'tkdnd_unix.tcl', 'tkdnd_macosx.tcl'}),
-    'Linux': ('linux64', {'tkdnd_windows.tcl', 'tkdnd_macosx.tcl'}),
-    'Darwin': ('osx64', {'tkdnd_windows.tcl', 'tkdnd_unix.tcl'}),
+    'Windows': ({'win64'}, {'tkdnd_unix.tcl', 'tkdnd_macosx.tcl'}),
+    'Linux': ({'linux64'}, {'tkdnd_windows.tcl', 'tkdnd_macosx.tcl'}),
+    'Darwin': ({'osx64', 'osx64arm'}, {'tkdnd_windows.tcl', 'tkdnd_unix.tcl'}),
 }
 if s in p:
     datas = set([
@@ -22,7 +22,7 @@ if s in p:
             *collect_data_files('tkinterdnd2'),
             *collect_dynamic_libs('tkinterdnd2'),
         )
-        if os.path.split(x[1])[1] == p[s][0] and os.path.split(x[0])[1] not in p[s][1]
+        if os.path.split(x[1])[1] in p[s][0] and os.path.split(x[0])[1] not in p[s][1]
     ])
 else:
     raise RuntimeError(f'TkinterDnD2 is not supported on platform "{s}".')
