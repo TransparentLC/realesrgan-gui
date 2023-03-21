@@ -10,12 +10,16 @@ import os
 import platform
 from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
-s = platform.system()
+
 p = {
-    'Windows': ({'win64'}, {'tkdnd_unix.tcl', 'tkdnd_macosx.tcl'}),
-    'Linux': ({'linux64'}, {'tkdnd_windows.tcl', 'tkdnd_macosx.tcl'}),
-    'Darwin': ({'osx64', 'osx64arm'}, {'tkdnd_windows.tcl', 'tkdnd_unix.tcl'}),
+    ('Windows', 'AMD64'): ({'win-x64'}, {'tkdnd_unix.tcl', 'tkdnd_macosx.tcl'}),
+    ('Windows', 'ARM64'): ({'win-arm64'}, {'tkdnd_unix.tcl', 'tkdnd_macosx.tcl'}),
+    ('Linux', 'x86_64'): ({'linux-x64'}, {'tkdnd_windows.tcl', 'tkdnd_macosx.tcl'}),
+    ('Linux', 'aarch64'): ({'linux-arm64'}, {'tkdnd_windows.tcl', 'tkdnd_macosx.tcl'}),
+    ('Darwin', 'x86_64'): ({'osx-x64'}, {'tkdnd_windows.tcl', 'tkdnd_unix.tcl'}),
+    ('Darwin', 'arm64'): ({'osx-arm64'}, {'tkdnd_windows.tcl', 'tkdnd_unix.tcl'}),
 }
+s = (platform.system(), platform.machine())
 if s in p:
     datas = set([
         x for x in (
