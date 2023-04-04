@@ -1,5 +1,6 @@
 import collections
 import configparser
+import ctypes
 import notifypy
 import os
 import re
@@ -8,6 +9,7 @@ import time
 import threading
 import tkinter as tk
 import traceback
+import typing
 import webbrowser
 from PIL import Image
 from PIL import ImageTk
@@ -413,16 +415,34 @@ if __name__ == '__main__':
         root.tk.call('wm', 'iconphoto', root._w, ImageTk.PhotoImage(Image.open(os.path.join(define.BASE_PATH, 'icon-256px.ico'))))
 
     root.tk.call('source', os.path.join(define.BASE_PATH, 'theme', 'sun-valley.tcl'))
+    def changeTheme(theme: typing.Literal['Dark', 'Light']):
+        root.tk.call('set_theme', 'dark' if theme == 'Dark' else 'light')
+        # https://stackoverflow.com/questions/57124243/winforms-dark-title-bar-on-windows-10
+        if sys.platform == 'win32':
+            match sys.getwindowsversion().build:
+                case build if build >= 18985:
+                    attribute = 20
+                case build if build >= 17763:
+                    attribute = 19
+                case _:
+                    attribute = None
+            if attribute:
+                ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                    ctypes.windll.user32.GetParent(root.winfo_id()),
+                    attribute,
+                    ctypes.byref(ctypes.c_int(theme == 'Dark')),
+                    ctypes.sizeof(ctypes.c_int),
+                )
     try:
         import darkdetect
-        root.tk.call('set_theme', 'dark' if darkdetect.isDark() else 'light')
+        changeTheme(darkdetect.theme())
         if sys.platform in {'win32', 'linux'}:
-            t = threading.Thread(target=darkdetect.listener, args=(lambda e: root.tk.call('set_theme', e.lower()),))
+            t = threading.Thread(target=darkdetect.listener, args=(changeTheme,))
             t.daemon = True
             t.start()
     except:
         print(traceback.format_exc())
-        root.tk.call('set_theme', 'light')
+        changeTheme('Light')
 
     app = REGUIApp(root)
     app.drop_target_register(DND_FILES)
