@@ -1,4 +1,5 @@
-darkdetect == 0.8.*
+darkdetect == 0.8.*; sys_platform != 'darwin'
+darkdetect[macos-listener] == 0.8.*; sys_platform == 'darwin'
 notify-py == 0.3.*
 pillow == 9.*
 # https://github.com/TransparentLC/realesrgan-gui/issues/18#issuecomment-1477203041
