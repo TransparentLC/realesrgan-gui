@@ -129,6 +129,8 @@ Corresponding to Real-ESRGAN-ncnn-vulkan's `-t tile-size` param. You can choose 
 
 You can check the difference between the two images upscaled to 4x with tile size [32](https://user-images.githubusercontent.com/47057319/168460056-1aaf420a-c2d0-4bbf-a350-703f69cd947f.png) and [256](https://user-images.githubusercontent.com/47057319/168460053-0c34296f-a5c7-447c-9f34-e86b6ebc7035.png) from the [256x256 test image](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/blob/master/images/input2.jpg) comes with Real-ESRGAN-ncnn-vulkan.
 
+See [#32](https://github.com/TransparentLC/realesrgan-gui/issues/32#issuecomment-1547148843) (in Chinese) for more details on this.
+
 ### The usage of TTA mode
 
 Slightly improve the quality of upscaled image, but the effect is actually very insignificant. The processing speed will become extremely slow if TTA mode is enabled, so it is not recommended to enable it.
