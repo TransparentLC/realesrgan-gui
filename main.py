@@ -25,6 +25,11 @@ import i18n
 import param
 import task
 
+# [error] exceeds limit of 178956970 pixels，能否扩大图片像素的限制呢，比如10亿像素。 · Issue #34 · TransparentLC/realesrgan-gui
+# https://github.com/TransparentLC/realesrgan-gui/issues/34
+# https://github.com/python-pillow/Pillow/blob/e3cca4298011a4e74d6f42b4cfe5a0610d3c79a9/src/PIL/Image.py#L3140
+Image.MAX_IMAGE_PIXELS = None
+
 class REGUIApp(ttk.Frame):
     def __init__(self, parent: tk.Tk):
         super().__init__(parent)
