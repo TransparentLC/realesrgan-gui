@@ -187,7 +187,7 @@ class SplitGIFTask(AbstractTask):
                 f: Image.Image
                 frameSrcPath = buildTempPath('.png' if self.optimizeTransparency else '.webp')
                 frameDstPath = buildTempPath('.png' if self.optimizeTransparency else '.webp')
-                d = f.info['duration']
+                d = f.info.get('duration', 0)
                 if self.optimizeTransparency:
                     f = f.convert('RGBA')
                     with Image.new('RGBA', img.size, (255, 255, 255, 255)) as g:
