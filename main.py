@@ -77,6 +77,7 @@ class REGUIApp(ttk.Frame):
             'OptimizeGIF': False,
             'LossyMode': False,
             'IgnoreError': False,
+            'CustomCommand': '',
         })
         self.config['Config'] = {}
         self.config.read(define.APP_CONFIG_PATH)
@@ -115,6 +116,7 @@ class REGUIApp(ttk.Frame):
         self.varboolOptimizeGIF = tk.BooleanVar(value=self.config['Config'].getboolean('OptimizeGIF'))
         self.varboolLossyMode = tk.BooleanVar(value=self.config['Config'].getboolean('LossyMode'))
         self.varboolIgnoreError = tk.BooleanVar(value=self.config['Config'].getboolean('IgnoreError'))
+        self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
 
     def setupWidgets(self):
@@ -180,28 +182,39 @@ class REGUIApp(ttk.Frame):
         self.frameAdvancedConfig = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAdvancedConfig.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
         self.frameAdvancedConfig.columnconfigure(0, weight=1)
-        self.frameAdvancedConfig.columnconfigure(1, weight=1)
+        self.frameAdvancedConfig.columnconfigure(1, weight=3)
         self.frameAdvancedConfigLeft = ttk.Frame(self.frameAdvancedConfig)
         self.frameAdvancedConfigLeft.grid(row=0, column=0, sticky=tk.NSEW)
         self.frameAdvancedConfigRight = ttk.Frame(self.frameAdvancedConfig)
         self.frameAdvancedConfigRight.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('DownsampleMode')).pack(padx=10, pady=5, fill=tk.X)
-        self.comboDownsample = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=tuple(x[0] for x in self.downsample))
+        self.frameAdvancedConfigLeftSub = ttk.Frame(self.frameAdvancedConfigLeft)
+        self.frameAdvancedConfigLeftSub.pack(fill=tk.X)
+        self.frameAdvancedConfigLeftSub.columnconfigure(0, weight=1)
+        self.frameAdvancedConfigLeftSub.columnconfigure(1, weight=1)
+        self.frameAdvancedConfigLeftSubLeft = ttk.Frame(self.frameAdvancedConfigLeftSub)
+        self.frameAdvancedConfigLeftSubLeft.grid(row=0, column=0, sticky=tk.NSEW)
+        self.frameAdvancedConfigLeftSubRight = ttk.Frame(self.frameAdvancedConfigLeftSub)
+        self.frameAdvancedConfigLeftSubRight.grid(row=0, column=1, sticky=tk.NSEW)
+        ttk.Label(self.frameAdvancedConfigLeftSubLeft, text=i18n.getTranslatedString('DownsampleMode')).pack(padx=10, pady=5, fill=tk.X)
+        self.comboDownsample = ttk.Combobox(self.frameAdvancedConfigLeftSubLeft, state='readonly', values=tuple(x[0] for x in self.downsample), width=12)
         self.comboDownsample.current(self.varintDownsampleIndex.get())
         self.comboDownsample.pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample.bind('<<ComboboxSelected>>', self.comboDownsample_click)
+        ttk.Label(self.frameAdvancedConfigLeftSubRight, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
+        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeftSubRight, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]), width=12)
+        self.comboTileSize.current(self.varintTileSizeIndex.get())
+        self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
         self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=-1, to=7, increment=1, width=12, textvariable=self.varintGPUID)
         self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
-        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
-        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeft, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]))
-        self.comboTileSize.current(self.varintTileSizeIndex.get())
-        self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('LossyModeQuality')).pack(padx=10, pady=5, fill=tk.X)
         self.spinLossyQuality = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=100, increment=5, width=12, textvariable=self.varintLossyQuality)
         self.spinLossyQuality.set(self.varintLossyQuality.get())
         self.spinLossyQuality.pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize.bind('<<ComboboxSelected>>', self.comboTileSize_click)
+        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('CustomCommand')).pack(padx=10, pady=5, fill=tk.X)
+        self.entryCustomCommand = ttk.Entry(self.frameAdvancedConfigLeft, textvariable=self.varstrCustomCommand)
+        self.entryCustomCommand.pack(padx=10, pady=5, fill=tk.X)
         self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('PreferWebP'), style='Switch.TCheckbutton', variable=self.varboolUseWebP)
         self.checkUseWebP.pack(padx=10, pady=5, fill=tk.X)
         self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableTTA'), style='Switch.TCheckbutton', variable=self.varboolUseTTA)
@@ -255,6 +268,7 @@ class REGUIApp(ttk.Frame):
             'UseTTA': self.varboolUseTTA.get(),
             'OptimizeGIF': self.varboolOptimizeGIF.get(),
             'LossyMode': self.varboolLossyMode.get(),
+            'CustomCommand': self.varstrCustomCommand.get(),
         }
         with open(define.APP_CONFIG_PATH, 'w', encoding='utf-8') as f:
             self.config.write(f)
@@ -307,6 +321,10 @@ class REGUIApp(ttk.Frame):
                     g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
                     if os.path.splitext(f)[1].lower() == '.gif':
                         queue.append(task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                    elif self.varstrCustomCommand.get().strip():
+                        t = task.buildTempPath('.png')
+                        queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                        queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
                     elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
                         t = task.buildTempPath('.webp')
                         queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
@@ -318,6 +336,10 @@ class REGUIApp(ttk.Frame):
         elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
             if os.path.splitext(inputPath)[1].lower() == '.gif':
                 queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+            elif self.varstrCustomCommand.get().strip():
+                t = task.buildTempPath('.png')
+                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
             elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
                 t = task.buildTempPath('.webp')
                 queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
@@ -394,6 +416,7 @@ class REGUIApp(ttk.Frame):
             self.tileSize[self.varintTileSizeIndex.get()],
             self.varintGPUID.get(),
             self.varboolUseTTA.get(),
+            self.varstrCustomCommand.get().strip(),
         )
 
     def getOutputPath(self, p: str) -> str:
@@ -401,9 +424,9 @@ class REGUIApp(ttk.Frame):
             base, ext = p, ''
         else:
             base, ext = os.path.splitext(p)
-            if ext.lower() == '.jpg':
+            if ext.lower() == '.jpg' or self.varstrCustomCommand.get().strip():
                 ext = '.png'
-            if ext.lower() == '.png' and self.varboolUseWebP.get():
+            elif ext.lower() == '.png' and self.varboolUseWebP.get():
                 ext = '.webp'
         suffix = ''
         match self.varintResizeMode.get():

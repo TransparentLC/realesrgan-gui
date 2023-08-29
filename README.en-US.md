@@ -156,11 +156,22 @@ This option was added to resolve these issues. It adds the following actions:
 
 This option is experimental and it is recommended to enable it only when upscaling GIFs with transparency.
 
-### About lossy compression and compression quality
+### About lossy compression, compression quality and custom compression/post-processing command
 
-If lossy compression is enabled and the output format is JPEG or WebP, you can control the compression quality of the output image to the set value. If the input is a directory, the output compression quality will also be affected by this option when upscaling JPEG or WebP images in the directory.
+If lossy compression is enabled and the output format is JPEG or WebP, you can control the compression quality of the output image to the set value. If the input is a directory, the output compression quality will also be affected by this option when upscaling JPEG or WebP images in the directory. The compression is done using Pillow.
 
 If this option is not turned on, lossless compression is used when the output is in WebP format.
+
+If custom compression/post-processing command is set, the Pillow's compression will not be performed. You can set a command to compress the upscaled image or do other processing with it.
+
+* `{input}` represents the path of the input file.
+* `{output}` represents the path of the output file.
+* `{output:ext}` represents the path of the output file with the extension `ext`.
+* Cookbook:
+    * Use [avifenc (libavif)](https://github.com/AOMediaCodec/libavif/blob/main/doc/avifenc.1.md) to convert to AVIF: `avifenc --speed 6 --jobs all --depth 8 --yuv 420 --min 0 --max 63 -a end-usage=q -a cq-level=30 -a enable-chroma-deltaq=1 --autotiling --ignore-icc --ignore-xmp --ignore-exif {input} {output:avif}`
+    * Use [cjxl (libjxl)](https://github.com/libjxl/libjxl#usage) to convert to JPEG XL: `cjxl {input} {output:jxl} --quality=80 --effort=9 --progressive --verbose`
+    * Use [gif2webp (libwebp)](https://developers.google.com/speed/webp/docs/gif2webp) to convert the output GIF to WebP: `gif2webp -lossy -q 80 -m 6 -min_size -mt -v {input} -o {output:webp}`
+    * Use [ImageMagick](https://imagemagick.org/) to add a text watermark in the lower-right corner and then convert to AVIF: `magick convert -fill white -pointsize 24 -gravity SouthEast -draw "text 16 16 'https://github.com/TransparentLC/realesrgan-gui'" -quality 80 {input} {output:avif}`
 
 ### Where the configuration file is saved?
 

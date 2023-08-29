@@ -3,6 +3,8 @@ import secrets
 import subprocess
 import io
 import os
+import re
+import shlex
 import shutil
 import tempfile
 import time
@@ -200,7 +202,12 @@ class SplitGIFTask(AbstractTask):
                 frames.append(frameDstPath)
                 durations.append(d)
                 tasks.append(RESpawnTask(self.outputCallback, frameSrcPath, frameDstPath, self.config, True))
-        tasks.append(MergeGIFTask(self.outputCallback, self.outputPath, frames, durations, self.optimizeTransparency))
+        if self.config.customCommand:
+            t = buildTempPath('.gif')
+            tasks.append(MergeGIFTask(self.outputCallback, t, frames, durations, self.optimizeTransparency))
+            tasks.append(CustomCompressTask(self.outputCallback, t, self.outputPath, self.config.customCommand, True))
+        else:
+            tasks.append(MergeGIFTask(self.outputCallback, self.outputPath, frames, durations, self.optimizeTransparency))
         tasks.reverse()
         for t in tasks:
             self.queue.appendleft(t)
@@ -228,6 +235,46 @@ class LossyCompressTask(AbstractTask):
                     img.save(self.outputPath, quality=self.quality, method=6)
                 case '.jpg' | '.jpeg':
                     img.save(self.outputPath, quality=self.quality, optimize=True, progressive=True)
+        if self.removeInput:
+            os.remove(self.inputPath)
+
+class CustomCompressTask(AbstractTask):
+    def __init__(
+        self,
+        outputCallback: typing.Callable[[str], None],
+        inputPath: str, outputPath: str,
+        commandTemplate: str,
+        removeInput: bool = False,
+    ) -> None:
+        super().__init__(outputCallback)
+        self.inputPath = inputPath
+        self.outputPath = outputPath
+        self.commandTemplate = commandTemplate
+        self.removeInput = removeInput
+
+    def run(self) -> None:
+        cmd = []
+        for x in shlex.split(self.commandTemplate):
+            if x == '{input}':
+                cmd.append(self.inputPath)
+            elif x == '{output}':
+                cmd.append(self.outputPath)
+            elif (m := re.search(r'^{output:(.+)}$', x)):
+                cmd.append(f'{os.path.splitext(self.outputPath)[0]}.{m.group(1)}')
+            else:
+                cmd.append(x)
+        self.outputCallback(f'Compressing {self.inputPath} with command: {shlex.join(cmd)}\n')
+        os.makedirs(os.path.split(self.outputPath)[0], exist_ok=True)
+        with subprocess.Popen(
+            cmd,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
+        ) as p:
+            for line in p.stderr:
+                self.outputCallback(line)
+        if p.returncode:
+            raise subprocess.CalledProcessError(p.returncode, cmd)
         if self.removeInput:
             os.remove(self.inputPath)
 

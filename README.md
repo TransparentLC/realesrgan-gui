@@ -155,11 +155,24 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 这个选项是实验性的，建议在放大存在透明部分的 GIF 时手动开启，在放大不存在透明部分的 GIF 时关闭。可能是由于这里的实现或 Pillow 对 GIF 的处理存在问题，在开启时处理后者会出现一些奇怪的问题（主要是出现不该出现的透明色以及仿色效果非常差）。也许会有更好的处理方法。
 
-### 高级设定中的“使用有损压缩”和“有损压缩质量”是什么？
+### 高级设定中的“使用有损压缩”、“有损压缩质量”和“自定义压缩/后期处理命令”是什么？
 
-开启这个选项以后，如果输出的文件是 JPEG 或 WebP 格式，就可以根据设定的值（0-100 表示从低质量到高质量）控制输出的文件的压缩质量了。如果输入的是文件夹，则放大文件夹中 JPEG 或 WebP 格式的图片时输出的压缩质量也会受这个选项影响。
+开启“使用有损压缩”以后，如果输出的文件是 JPEG 或 WebP 格式，就可以根据设定的值（0-100 表示从低质量到高质量）控制输出的文件的压缩质量了。如果输入的是文件夹，则放大文件夹中 JPEG 或 WebP 格式的图片时输出的压缩质量也会受这个选项影响。压缩使用 Python 的图像处理库 Pillow 完成。
 
 不开启这个选项的话，输出为 WebP 格式时使用的是无损压缩。
+
+如果设定了“自定义压缩/后期处理命令”，则不会进行上面的压缩操作。在这里你可以输入一条命令对放大后的图片进行压缩或其他的处理，还可以自定义命令中的参数。
+
+* `{input}` 表示输入文件的路径。
+* `{output}` 表示输出文件的路径。
+* `{output:ext}` 表示输出文件的路径，但把扩展名修改为 `ext`。
+* 命令示例：
+    * 使用 [avifenc (libavif)](https://github.com/AOMediaCodec/libavif/blob/main/doc/avifenc.1.md) 转换为 AVIF 格式：`avifenc --speed 6 --jobs all --depth 8 --yuv 420 --min 0 --max 63 -a end-usage=q -a cq-level=30 -a enable-chroma-deltaq=1 --autotiling --ignore-icc --ignore-xmp --ignore-exif {input} {output:avif}`
+    * 使用 [cjxl (libjxl)](https://github.com/libjxl/libjxl#usage) 转换为 JPEG XL 格式：`cjxl {input} {output:jxl} --quality=80 --effort=9 --progressive --verbose`
+    * 使用 [gif2webp (libwebp)](https://developers.google.com/speed/webp/docs/gif2webp) 将输出的 GIF 转换为 WebP 格式：`gif2webp -lossy -q 80 -m 6 -min_size -mt -v {input} -o {output:webp}`
+    * 使用 [ImageMagick](https://imagemagick.org/) 在右下角添加文字水印，然后转换为 AVIF 格式：`magick convert -fill white -pointsize 24 -gravity SouthEast -draw "text 16 16 'https://github.com/TransparentLC/realesrgan-gui'" -quality 80 {input} {output:avif}`
+
+请忽略“基本设定”的“输出”的扩展名，实际的输出文件扩展名由设定的命令决定。
 
 ### 配置文件的保存位置
 
