@@ -234,18 +234,26 @@ class LossyCompressTask(AbstractTask):
 def taskRunner(
     queue: collections.deque[AbstractTask],
     outputCallback: typing.Callable[[str], None],
-    completeCallback: typing.Callable[[], None],
+    completeCallback: typing.Callable[[bool], None],
     failCallback: typing.Callable[[Exception], None],
+    finallyCallback: typing.Callable[[], None],
+    ignoreError: bool,
 ) -> None:
     counter = 0
-    try:
-        while queue:
+    withError = False
+    while queue:
+        try:
             ts = time.perf_counter()
             queue.popleft().run()
             te = time.perf_counter()
             outputCallback(f'Task #{counter} completed in {round((te - ts) * 1000)}ms.\n')
             counter += 1
-        completeCallback()
-    except Exception as ex:
-        outputCallback(traceback.format_exc())
-        failCallback(ex)
+        except Exception as ex:
+            withError = True
+            outputCallback(traceback.format_exc())
+            failCallback(ex)
+            if not ignoreError:
+                finallyCallback()
+                return
+    completeCallback(withError)
+    finallyCallback()

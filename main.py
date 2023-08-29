@@ -76,11 +76,14 @@ class REGUIApp(ttk.Frame):
             'UseTTA': False,
             'OptimizeGIF': False,
             'LossyMode': False,
+            'IgnoreError': False,
         })
         self.config['Config'] = {}
         self.config.read(define.APP_CONFIG_PATH)
 
         self.outputPathChanged = True
+        self.logPath = os.path.join(define.APP_PATH, 'output.log')
+        self.logFile: typing.IO = None
 
         self.setupVars()
         self.setupWidgets()
@@ -111,6 +114,7 @@ class REGUIApp(ttk.Frame):
         self.varboolUseWebP = tk.BooleanVar(value=self.config['Config'].getboolean('UseWebP'))
         self.varboolOptimizeGIF = tk.BooleanVar(value=self.config['Config'].getboolean('OptimizeGIF'))
         self.varboolLossyMode = tk.BooleanVar(value=self.config['Config'].getboolean('LossyMode'))
+        self.varboolIgnoreError = tk.BooleanVar(value=self.config['Config'].getboolean('IgnoreError'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
 
     def setupWidgets(self):
@@ -206,6 +210,8 @@ class REGUIApp(ttk.Frame):
         self.checkOptimizeGIF.pack(padx=10, pady=5, fill=tk.X)
         self.checkLossyMode = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableLossyMode'), style='Switch.TCheckbutton', variable=self.varboolLossyMode)
         self.checkLossyMode.pack(padx=10, pady=5, fill=tk.X)
+        self.checkIgnoreError = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableIgnoreError'), style='Switch.TCheckbutton', variable=self.varboolIgnoreError)
+        self.checkIgnoreError.pack(padx=10, pady=5, fill=tk.X)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAbout.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -329,17 +335,20 @@ class REGUIApp(ttk.Frame):
             default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
         )
         ts = time.perf_counter()
-        def completeCallback():
+        def completeCallback(withError: bool):
             te = time.perf_counter()
-            self.buttonProcess.config(state=tk.NORMAL)
             notification.title = i18n.getTranslatedString('ToastCompletedTitle')
-            notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
+            if withError:
+                notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
+            else:
+                notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
             notification.send(False)
         def failCallback(ex: Exception):
-            self.buttonProcess.config(state=tk.NORMAL)
             notification.title = i18n.getTranslatedString('ToastFailedTitle')
             notification.message = f'{type(ex).__name__}: {ex}'
             notification.send(False)
+
+        self.logFile = open(self.logPath, 'w', encoding='utf-8')
         t = threading.Thread(
             target=task.taskRunner,
             args=(
@@ -347,6 +356,8 @@ class REGUIApp(ttk.Frame):
                 self.writeToOutput,
                 completeCallback,
                 failCallback,
+                lambda: (self.buttonProcess.config(state=tk.NORMAL), self.logFile.close()),
+                self.varboolIgnoreError.get(),
             )
         )
         t.start()
@@ -357,6 +368,7 @@ class REGUIApp(ttk.Frame):
         self.outputPathChanged = False
 
     def writeToOutput(self, s: str):
+        self.logFile.write(s)
         self.textOutput.config(state=tk.NORMAL)
         self.textOutput.insert(tk.END, s)
         self.textOutput.config(state=tk.DISABLED)
