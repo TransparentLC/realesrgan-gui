@@ -1,14 +1,18 @@
 import os
 import sys
 from PyInstaller.utils.hooks import collect_data_files
+import subprocess
+
+commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()  
+version = "0.2.5." + commit_hash
 
 a = Analysis(
     ['main.py'],
     binaries=[
         ('realesrgan-ncnn-vulkan', '.'),
-        ('models', 'models'),
     ],
     datas=[
+        ('models', 'models'),
         ('theme', 'theme'),
         ('i18n.ini', '.'),
         ('icon.icns', '.'),
@@ -28,7 +32,6 @@ a = Analysis(
         '_decimal',
         '_hashlib',
         '_lzma',
-        '_multiprocessing',
         '_queue',
         '_ssl',
         'pyexpat',
@@ -125,8 +128,8 @@ else:
             'CFBundleName': 'Real-ESRGAN GUI',
             'CFBundlePackageType': 'APPL',
             'CFBundleSignature': 'RLES',
-            'CFBundleShortVersionString': '0.2.5.0',
-            'CFBundleVersion': '0.2.5.0',
+            'CFBundleShortVersionString': version,
+            'CFBundleVersion': version,
             'CFBundleExecutable': 'realesrgan-gui',
             'CFBundleIconFile': 'icon.icns',
             'CFBundleIdentifier': 'dev.transparentlc.regui',
