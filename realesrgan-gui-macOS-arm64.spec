@@ -9,27 +9,32 @@ commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).d
 version = "0.2.5." + commit_hash
 
 # PyInstaller分析脚本
-# 指定主入口文件,需要打包的二进制和数据文件等
+# 指定主入口文件
 a = Analysis(
     ['main.py'],
+    # 需要打包的二进制
     binaries=[
         ('realesrgan-ncnn-vulkan', '.'),
     ],
+    # 需要打包的数据文件
     datas=[
         ('models', 'models'),
         ('theme', 'theme'),
         ('i18n.ini', '.'),
         ('icon.icns', '.'),
         ('icon-128px.png', '.'),
-        # macOS下通过app实现通知，打包时需要附带
+        # 收集macOS通知模块
         *(collect_data_files('notifypy') if sys.platform == 'darwin' else []),
     ],
+    # 隐藏导入
     hiddenimports=[
         'PIL._tkinter_finder',
     ],
+    # PyInstaller钩子目录
     hookspath=[
         'pyi-hooks',
     ],
+    # 排除不需要的模块
     excludes=[
         '_asyncio',
         '_bz2',
