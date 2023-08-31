@@ -1,11 +1,15 @@
+# 导入模块
 import os
 import sys
 from PyInstaller.utils.hooks import collect_data_files
 import subprocess
 
+# 获取提交哈希和构造版本号
 commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()  
 version = "0.2.5." + commit_hash
 
+# PyInstaller分析脚本
+# 指定主入口文件,需要打包的二进制和数据文件等
 a = Analysis(
     ['main.py'],
     binaries=[
@@ -39,7 +43,8 @@ a = Analysis(
     ],
 )
 
-# Windows 10+已经自带UCRT了，打包时不需要附带
+# 从binaries中排除不需要的系统dll
+# Windows 10+已经自带UCRT，无需打包
 a.binaries = [
     x
     for x in a.binaries
@@ -49,7 +54,7 @@ a.binaries = [
     })
 ]
 
-# tcl/tk相关的没有实际使用的大量小文件，在不使用onefile的情况下打包测试，即使不附带这些文件也后不影响运行
+# 从datas中排除不需要的tcl/tk文件，经测试这些文件实际上没有用到
 a.datas = [
     x
     for x in a.datas
@@ -65,6 +70,7 @@ a.datas = [
     })
 ]
 
+# 打印binaries和datas的调试信息
 print('Binaries:')
 for i in a.binaries:
     print(i)
@@ -73,8 +79,10 @@ print('Datas:')
 for i in a.datas:
     print(i)
 
+# 生成PYZ文件
 pyz = PYZ(a.pure, a.zipped_data)
 
+# 构建可执行文件
 if os.environ.get('REGUI_ONEFILE'):
     exe = EXE(
         pyz,
@@ -109,6 +117,8 @@ else:
         argv_emulation=False,
         icon='icon.icns',
     )
+    
+    # 收集所有文件打包
     coll = COLLECT(
         exe,
         a.binaries,
@@ -118,6 +128,8 @@ else:
         strip=False,
         upx=True,
     )
+    
+    # 生成macOS应用
     app = BUNDLE(
     coll,
     name='Real-ESRGAN GUI.app',
