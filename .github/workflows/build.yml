@@ -54,16 +54,9 @@ jobs:
           if [ $RUNNER_OS == "macOS" ]; then
             chmod +x Build-macOS-arm64.sh
             sh Build-macOS-arm64.sh
-            mkdir "dist/Real-ESRGAN GUI.app"
-            mkdir "dist/Real-ESRGAN GUI.app/Contents"
-            mkdir "dist/Real-ESRGAN GUI.app/Contents/MacOS"
-            mkdir "dist/Real-ESRGAN GUI.app/Contents/Resources"
-            cp Info.plist "dist/Real-ESRGAN GUI.app/Contents/Info.plist"
-            cp icon.icns "dist/Real-ESRGAN GUI.app/Contents/Resources/icon.icns"
-            mv dist/realesrgan-gui/* "dist/Real-ESRGAN GUI.app/Contents/MacOS"
-            chmod +x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"
-            chmod +x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"
-            rm -rf dist/realesrgan-gui
+            chmod u+x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"
+            chmod u+x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"
+            xattr -cr "dist/Real-ESRGAN GUI.app"
           else
             pyinstaller --clean --log-level WARN realesrgan-gui.spec
           fi
