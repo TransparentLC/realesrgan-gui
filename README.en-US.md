@@ -50,7 +50,7 @@ The `arm64` builds have been tested to perform better than `universal2` builds. 
 git clone https://github.com/TransparentLC/realesrgan-gui.git
 cd realesrgan-gui
 
-# 2. Run the shell script to start building.
+# 2. Run the shell script to start building. Since the latest commit of this project requires tk version 8.6, while Python 3.10 bundles tk version 8.5, the local packaging must be done in Python 3.11 environment. Before packaging, enter python3 -V in the terminal to confirm the current version is 3.11.
 # Password is required for "sudo pyinstaller realesrgan-gui-macOS-arm64.spec"
 sh Build-macOS-arm64.sh
 
