@@ -46,7 +46,8 @@
 经实测，`arm64` 单架构比 `universal2` 双架构在 Apple 芯片 Mac 上的性能表现要更加出色，因此建议 Apple 芯片用户自行打包 `arm64` 单架构应用程序。
 
 1. 准备一台 Apple 芯片 Mac，M1、M1 Pro、M1 Max、M2、M2 Pro、M2 Max 均可。
-2. 下载仓库。
+2. 由于本项目最新commit的tk版本要求是8.6，而Python 3.10自带tk版本是8.5，因此本地打包必须在`Python 3.11`环境下，打包前在终端输入`python3 -V`确认当前版本是否3.11
+3. 下载仓库。
 ```shell
 git clone https://github.com/TransparentLC/realesrgan-gui.git
 cd realesrgan-gui
