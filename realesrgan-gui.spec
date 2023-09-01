@@ -24,7 +24,7 @@ a = Analysis(
         '_decimal',
         '_hashlib',
         '_lzma',
-        '_multiprocessing',
+        *(['_multiprocessing'] if sys.platform == 'win32' else []),
         '_queue',
         '_ssl',
         'pyexpat',
