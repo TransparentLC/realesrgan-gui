@@ -28,7 +28,7 @@
 
 * ![Windows 10+](https://img.shields.io/badge/Windows-10+-06b?logo=windows) 在 Release 中下载最新的 `realesrgan-gui-windows-bundled-v*.7z`，解压后打开 `realesrgan-gui.exe` 即可使用。
 * ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) 在 Release 中下载最新的 `realesrgan-gui-ubuntu-bundled-v*.tar.xz`，解压后打开 `realesrgan-gui` 即可使用。
-* ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) 在 Release 中下载最新的 `realesrgan-gui-macos-appbundle-v*.tar.xz`，解压后在终端中执行 `xattr -cr "Real-ESRGAN GUI.app"`，打开 `Real-ESRGAN GUI` 即可使用。
+* ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) 在 Release 中下载最新的 `realesrgan-gui-macos-appbundle-v*.tar.xz`，解压后在终端中执行 `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"`、`chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"` 和 `xattr -cr "Real-ESRGAN GUI.app"`，打开 `Real-ESRGAN GUI` 即可使用。
 
 <details>
 

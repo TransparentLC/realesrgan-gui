@@ -28,7 +28,7 @@ Quick Start：
 
 * ![Windows 10+](https://img.shields.io/badge/Windows-10+-06b?logo=windows) Download the latest `realesrgan-gui-windows-bundled-v*.7z` from Release, extract the archive then launch `realesrgan-gui.exe`.
 * ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) Download the latest `realesrgan-gui-ubuntu-bundled-v*.tar.xz` from Release, extract the archive then launch `realesrgan-gui`.
-* ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) Download the latest `realesrgan-gui-macos-appbundle-v*.tar.xz` from Release, extract the archive and run `xattr -cr "Real-ESRGAN GUI.app"` in terminal, then launch `Real-ESRGAN GUI`.
+* ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) Download the latest `realesrgan-gui-macos-appbundle-v*.tar.xz` from Release, extract the archive and run `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"`, `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"` and `xattr -cr "Real-ESRGAN GUI.app"` in terminal, then launch `Real-ESRGAN GUI`.
 
 <details>
 
