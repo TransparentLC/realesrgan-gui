@@ -114,7 +114,7 @@ jobs:
               -nv \
               -O realesrgan-ncnn-vulkan.zip \
               "https://github.com/xinntao/Real-ESRGAN/releases/download/${REAL_ESRGAN_VERSION}/realesrgan-ncnn-vulkan-${REAL_ESRGAN_RELEASE_TIME}-${REAL_ESRGAN_PLATFORM}.zip"
-            unzip realesrgan-ncnn-vulkan.zip
+            unzip -o realesrgan-ncnn-vulkan.zip
             rm -f realesrgan-ncnn-vulkan.zip input.jpg input2.jpg onepiece_demo.mp4
             if [ $BUILD_OS == "macOS" ]; then
               cp ../../../../README.md README_gui.md
