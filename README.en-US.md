@@ -198,4 +198,4 @@ You can download some converted additional models from [here](https://github.com
 
 ## Credits
 
-* Thanks [@blacklein](https://github.com/blacklein) for offering helps on using and bundling this application in macOS.
+* Thanks [@blacklein](https://github.com/blacklein) and [@hyrulelinks](https://github.com/hyrulelinks) for offering helps on using and bundling this application in macOS.

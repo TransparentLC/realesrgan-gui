@@ -192,4 +192,4 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 ## 致谢
 
-* 感谢 [@blacklein](https://github.com/blacklein) 提供在 macOS 下使用这个 GUI 和打包为应用程序的帮助。
+* 感谢 [@blacklein](https://github.com/blacklein) 和 [@hyrulelinks](https://github.com/hyrulelinks) 提供在 macOS 下使用这个 GUI 和打包为应用程序的帮助。

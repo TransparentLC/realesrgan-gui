@@ -275,7 +275,7 @@ class REGUIApp(ttk.Frame):
 
     def buttonInputPath_click(self):
         p = filedialog.askopenfilename(filetypes=(
-            ('Image files', ('.jpg', '.jpeg', '.png', '.gif', '.webp')),
+            ('Image files', ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff')),
         ))
         if not p:
             return
@@ -315,7 +315,7 @@ class REGUIApp(ttk.Frame):
         if os.path.isdir(inputPath):
             for curDir, dirs, files in os.walk(inputPath):
                 for f in files:
-                    if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
+                    if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
                         continue
                     f = os.path.join(curDir, f)
                     g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
@@ -330,10 +330,12 @@ class REGUIApp(ttk.Frame):
                         queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
                         queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
                     else:
+                        if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
+                            g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
                         queue.append(task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams))
             if not queue:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
-        elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
+        elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
             if os.path.splitext(inputPath)[1].lower() == '.gif':
                 queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
             elif self.varstrCustomCommand.get().strip():
@@ -424,9 +426,9 @@ class REGUIApp(ttk.Frame):
             base, ext = p, ''
         else:
             base, ext = os.path.splitext(p)
-            if ext.lower() == '.jpg' or self.varstrCustomCommand.get().strip():
+            if ext.lower() in {'.jpg', '.tif', '.tiff'} or self.varstrCustomCommand.get().strip():
                 ext = '.png'
-            elif ext.lower() == '.png' and self.varboolUseWebP.get():
+            if ext.lower() == '.png' and self.varboolUseWebP.get():
                 ext = '.webp'
         suffix = ''
         match self.varintResizeMode.get():
