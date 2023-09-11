@@ -1,5 +1,4 @@
 # Download required files
-## Download and extract arm64 version from 'realesrgan-ncnn-vulkan'
 curl -L "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-macos.zip" -o realesrgan-ncnn-vulkan-20220424-macos.zip
 unzip -o realesrgan-ncnn-vulkan-20220424-macos.zip
 rm -f realesrgan-ncnn-vulkan-20220424-macos.zip input.jpg input2.jpg onepiece_demo.mp4
