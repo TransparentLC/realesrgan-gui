@@ -33,6 +33,7 @@ else
   if command -v pyenv >/dev/null 2>&1; then
     pyenv install 3.11
     pyenv shell 3.11
+    eval "$(pyenv init -)"
   else
     echo "pyenv command is not available, please install Python 3.11 manually."
   fi
