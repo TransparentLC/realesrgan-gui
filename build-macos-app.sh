@@ -30,10 +30,14 @@ if [[ "$python_version" == "3.11" ]]; then
   source 'venv/bin/activate'
 else
   echo "Current Python version is $python_version, but 3.11 is required."
+  echo "Try to install Python 3.11 via pyenv command."
   if command -v pyenv >/dev/null 2>&1; then
     pyenv install 3.11
+    echo "Switch current Python version to 3.11"
     pyenv global 3.11
     exec zsh
+    python3 -m venv 'venv'
+    source 'venv/bin/activate'
   else
     echo "pyenv command is not available"
     echo "Please ensure current Python version is 3.11, then run script again."
@@ -48,5 +52,6 @@ pip3 install pyinstaller
 sudo pyinstaller realesrgan-gui-macos.spec
 
 # Copy built app to Download directory
-cp -R dist/Real-ESRGAN\ GUI.app $HOME/Downloads
-echo "'Real-ESRGAN GUI.app' is in Downloads directory now"
+ditto dist/Real-ESRGAN\ GUI.app $HOME/Downloads/Real-ESRGAN\ GUI.app
+echo "'Real-ESRGAN GUI.app' is in Downloads directory."
+echo "Please manually drag 'Real-ESRGAN GUI.app' to Applications directory to finish install."
