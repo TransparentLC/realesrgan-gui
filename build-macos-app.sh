@@ -1,9 +1,13 @@
+# Clone repo
+git clone https://github.com/TransparentLC/realesrgan-gui.git
+cd realesrgan-gui
+
 # Download required files
 curl -L "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-macos.zip" -o realesrgan-ncnn-vulkan-20220424-macos.zip
 unzip -o realesrgan-ncnn-vulkan-20220424-macos.zip
 rm -f realesrgan-ncnn-vulkan-20220424-macos.zip input.jpg input2.jpg onepiece_demo.mp4
 
-# Thin fat files to specified architecture
+# Thin fat files to single architecture
 cpu=$(sysctl -n machdep.cpu.brand_string)
 if [[ $cpu == *"Intel"* ]]; then
   echo "Intel chip"
@@ -20,8 +24,19 @@ elif [[ $cpu == *"Apple"* ]]; then
 fi
 
 # Create and activate Python virtualenv
-python3 -m venv 'venv'
-source 'venv/bin/activate'
+python_version=$(python -V 2>&1 | cut -d" " -f2 | cut -d. -f1-2)
+if [[ "$python_version" == "3.11" ]]; then
+  python3 -m venv 'venv'
+  source 'venv/bin/activate'
+else
+  echo "Current Python version is $python_version, but 3.11 is required."
+  if command -v pyenv >/dev/null 2>&1; then
+    pyenv install 3.11
+    pyenv shell 3.11
+  else
+    echo "pyenv command is not available, please install Python 3.11 manually."
+  fi
+fi
 
 # Install dependencies
 pip3 install -r requirements.txt
