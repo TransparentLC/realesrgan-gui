@@ -48,4 +48,4 @@ pip3 install pyinstaller
 sudo pyinstaller realesrgan-gui-macos.spec
 
 # Copy built app to Download directory
-cp dist/Real-ESRGAN\ GUI.app $HOME/Downloads
+cp -R dist/Real-ESRGAN\ GUI.app $HOME/Downloads
