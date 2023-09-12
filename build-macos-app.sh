@@ -30,7 +30,7 @@ if [[ "$python_version" == "3.11" ]]; then
   source 'venv/bin/activate'
 else
   echo "Current Python version is $python_version, but 3.11 is required."
-  echo "Try to install Python 3.11 via pyenv command."
+  echo "Try install Python 3.11 via pyenv command."
   if command -v pyenv >/dev/null 2>&1; then
     pyenv install 3.11
     echo "Switch current Python version to 3.11"
