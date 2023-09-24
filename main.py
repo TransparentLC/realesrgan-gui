@@ -506,5 +506,10 @@ if __name__ == '__main__':
         (root.winfo_screenheight() - initialSize[1]) // 2,
     ))
 
+    # 最好用的一个 要是第一次通过拖放打开文件路径就好了 · Issue #45 · TransparentLC/realesrgan-gui
+    # https://github.com/TransparentLC/realesrgan-gui/issues/45
+    if len(sys.argv) > 1:
+        app.setInputPath(sys.argv[1])
+
     root.deiconify()
     root.mainloop()
