@@ -52,8 +52,8 @@ jobs:
             export REGUI_ONEFILE=1
           fi
           if [ $RUNNER_OS == "macOS" ]; then
-            chmod +x Build-macOS-arm64.sh
-            sh Build-macOS-arm64.sh
+            chmod +x build-macos-app.sh
+            sh build-macos-app.sh
             chmod u+x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"
             chmod u+x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"
             xattr -cr "dist/Real-ESRGAN GUI.app"
