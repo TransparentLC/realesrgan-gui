@@ -5,7 +5,7 @@ from PyInstaller.utils.hooks import collect_data_files
 import subprocess
 
 # 获取提交哈希和构造版本号
-commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()  
+commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()
 version = "0.2.5." + commit_hash
 
 # PyInstaller分析脚本
@@ -43,7 +43,6 @@ a = Analysis(
         '_lzma',
         '_queue',
         '_ssl',
-        'pyexpat',
         'unicodedata',
     ],
 )
@@ -122,7 +121,7 @@ else:
         argv_emulation=False,
         icon='icon.icns',
     )
-    
+
     # 收集所有文件打包
     coll = COLLECT(
         exe,
@@ -133,7 +132,7 @@ else:
         strip=False,
         upx=True,
     )
-    
+
     # 生成macOS应用
     app = BUNDLE(
     coll,

@@ -27,7 +27,6 @@ a = Analysis(
         *(['_multiprocessing'] if sys.platform == 'win32' else []),
         '_queue',
         '_ssl',
-        'pyexpat',
         'unicodedata',
     ],
 )
