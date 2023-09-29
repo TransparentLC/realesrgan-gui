@@ -25,7 +25,7 @@ source 'venv/bin/activate'
 
 # Install dependencies
 pip3 install -r requirements.txt
-pip3 install pyinstaller
+pip3 install pyinstaller==5.*
 
 # Build macOS app
 sudo pyinstaller realesrgan-gui-macos.spec
