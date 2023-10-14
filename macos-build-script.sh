@@ -1,54 +1,65 @@
 # Clone repo
+echo "INFO: Clone repo."
 git clone https://github.com/TransparentLC/realesrgan-gui.git
 cd realesrgan-gui
 
+# Create and activate Python virtual environment
+python_version=$(python3 -V 2>&1 | cut -d" " -f2 | cut -d"." -f1-2)
+
+if ! which python3 >/dev/null 2>&1; then
+    echo "ERROR: ❌ The 'python3' command not found."
+    echo "ERROR: Please check the Python environment configuration."
+    exit 1
+else
+    echo "INFO: The 'python3' command found." 
+    if [ "$python_version" == "3.11" ]; then
+        echo "INFO: ✅ The current Python version is 3.11"
+        python3 -m venv venv
+        echo "INFO: ✅ Created Python virtual enviroment."
+        source venv/bin/activate
+        echo "INFO: ✅ Activated Python virtual enviroment."
+    else
+        echo "ERROR: ❌ The current Python version is $python_version but 3.11 is required."
+        echo "ERROR: Please switch to Python 3.11 before running this script."
+        exit 1
+    fi
+fi
+
 # Download required files
-curl -L "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-macos.zip" -o realesrgan-ncnn-vulkan-20220424-macos.zip
-unzip -o realesrgan-ncnn-vulkan-20220424-macos.zip
-rm -f realesrgan-ncnn-vulkan-20220424-macos.zip input.jpg input2.jpg onepiece_demo.mp4
+echo "INFO: Downloading realesrgan-ncnn-vulkan..."
+base_url="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0"
+source_file="realesrgan-ncnn-vulkan-20220424-macos.zip"
+target_file="realesrgan-ncnn-vulkan"
+model_folder="models"
+
+wget -q --show-progress "$base_url/$source_file" -O "$source_file"
+unzip -j "$source_file" "$target_file" -d "."
+unzip -j "$source_file" "$model_folder/*" -d "$model_folder"
+rm -rf "$source_file"
 
 # Thin fat files to single architecture
-cpu=$(sysctl -n machdep.cpu.brand_string)
-if [[ $cpu == *"Intel"* ]]; then
-  echo "Intel chip"
-  ditto realesrgan-ncnn-vulkan realesrgan-ncnn-vulkan-x64 --arch x86_64
-  rm -f realesrgan-ncnn-vulkan
-  mv realesrgan-ncnn-vulkan-x64 realesrgan-ncnn-vulkan
-  chmod u+x realesrgan-ncnn-vulkan
-elif [[ $cpu == *"Apple"* ]]; then
-  echo "Apple Silicon"
-  ditto realesrgan-ncnn-vulkan realesrgan-ncnn-vulkan-arm64 --arch arm64
-  rm -f realesrgan-ncnn-vulkan
-  mv realesrgan-ncnn-vulkan-arm64 realesrgan-ncnn-vulkan
-  chmod u+x realesrgan-ncnn-vulkan
+arch=$(uname -m)
+
+echo "INFO: System architecture is $arch."
+echo "INFO: Extracting architecture specific libraries..."
+
+if [ "$arch" = "arm64" ]; then
+  ditto --arch arm64 "$target_file" "temp_file"
+else
+  ditto --arch x86_64 "$target_file" "temp_file"
 fi
 
-# Create and activate Python virtualenv
-python_version=$(python -V 2>&1 | cut -d" " -f2 | cut -d. -f1-2)
-if [[ "$python_version" == "3.11" ]]; then
-  python3 -m venv 'venv'
-  source 'venv/bin/activate'
-else
-  echo "Current Python version is $python_version, but 3.11 is required."
-  echo "Try install Python 3.11 via pyenv command."
-  if command -v pyenv >/dev/null 2>&1; then
-    pyenv install 3.11
-    echo "Switch current Python version to 3.11"
-    pyenv global 3.11
-    exec zsh
-    python3 -m venv 'venv'
-    source 'venv/bin/activate'
-  else
-    echo "pyenv command is not available"
-    echo "Please ensure current Python version is 3.11, then run script again."
-  fi
-fi
+rm -rf "$target_file"
+mv "temp_file" "$target_file"
+chmod u+x "$target_file"
 
 # Install dependencies
+echo "INFO: Installing requirements..."
 pip3 install -r requirements.txt
-pip3 install pyinstaller
+pip install pyinstaller==5.13.2
 
 # Build macOS app
+echo "INFO: Packaging macOS app..."
 sudo pyinstaller realesrgan-gui-macos.spec
 
 # Copy built app to Download directory
