@@ -75,5 +75,5 @@ sudo pyinstaller realesrgan-gui-macos.spec
 
 # Copy built app to Download directory
 ditto dist/Real-ESRGAN\ GUI.app $HOME/Downloads/Real-ESRGAN\ GUI.app
-echo "'Real-ESRGAN GUI.app' is in Downloads directory."
-echo "Please manually drag 'Real-ESRGAN GUI.app' to Applications directory to finish install."
+echo "INFO: 'Real-ESRGAN GUI.app' is in Downloads directory."
+echo "INFO: Please manually drag 'Real-ESRGAN GUI.app' to Applications directory to finish install."
