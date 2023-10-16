@@ -26,17 +26,17 @@ else
 fi
 
 # Download required files
-echo "INFO: Downloading realesrgan-ncnn-vulkan..."
+echo "INFO: 🔽 Downloading realesrgan-ncnn-vulkan..."
 base_url="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0"
 source_file="realesrgan-ncnn-vulkan-20220424-macos.zip"
 target_file="realesrgan-ncnn-vulkan"
 model_folder="models"
 
 if command -v wget &> /dev/null; then
-    echo "Using wget"
+    echo "INFO: Using wget..."
         wget -q --show-progress "$base_url/$source_file" -O "$source_file"
 else
-    echo "wget not available, using curl"
+    echo "INFO: wget not available, using curl..."
     curl -L "$base_url/$source_file" -o "$source_file"
 fi
 
