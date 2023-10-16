@@ -32,7 +32,14 @@ source_file="realesrgan-ncnn-vulkan-20220424-macos.zip"
 target_file="realesrgan-ncnn-vulkan"
 model_folder="models"
 
-wget -q --show-progress "$base_url/$source_file" -O "$source_file"
+if command -v wget &> /dev/null; then
+    echo "Using wget"
+        wget -q --show-progress "$base_url/$source_file" -O "$source_file"
+else
+    echo "wget not available, using curl"
+    curl -L "$base_url/$source_file" -o "$source_file"
+fi
+
 unzip -j "$source_file" "$target_file" -d "."
 unzip -j "$source_file" "$model_folder/*" -d "$model_folder"
 rm -rf "$source_file"
