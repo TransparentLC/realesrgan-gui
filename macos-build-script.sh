@@ -14,14 +14,18 @@ else
     echo "INFO: The 'python3' command found." 
     if [ "$python_version" == "3.11" ]; then
         echo "INFO: ✅ The current Python version is 3.11"
+        echo "INFO: Creating Python virtual enviroment..."
         python3 -m venv venv
-        echo "INFO: ✅ Created Python virtual enviroment."
+        echo "INFO: Activating Python virtual enviroment..."
         source venv/bin/activate
-        echo "INFO: ✅ Activated Python virtual enviroment."
+
     else
         echo "ERROR: ❌ The current Python version is $python_version but 3.11 is required."
-        echo "ERROR: Please switch to Python 3.11 before running this script."
-        exit 1
+        echo "INFO: Creating Python 3.11 virtual environment via virtualenv."
+        pip3 install virtualenv
+        virtualenv -p python3.11 venv
+        echo "INFO: Activating Python virtual enviroment..."
+        source venv/bin/activate
     fi
 fi
 
