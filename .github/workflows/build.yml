@@ -46,7 +46,7 @@ jobs:
           fi
       - name: Build executable
         run: |
-          pip install pyinstaller==5.*
+          pip install pyinstaller==6.*
           python -c "import time;open('define.py','a').write(f'\nBUILD_TIME={time.time():.0f}')"
           if [[ $RUNNER_OS == "Windows" || $RUNNER_OS == "Linux" ]]; then
             export REGUI_ONEFILE=1

@@ -10,7 +10,7 @@ a = Analysis(
         ('icon-256px.ico', '.'),
         ('icon-128px.png', '.'),
         # macOS下通过app实现通知，打包时需要附带
-        *(collect_data_files('notifypy') if sys.platform == 'darwin' else []),
+        *collect_data_files('notifypy'),
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
