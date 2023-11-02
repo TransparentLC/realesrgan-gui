@@ -67,7 +67,7 @@ chmod u+x "$target_file"
 # Install dependencies
 echo "INFO: Installing requirements..."
 pip3 install -r requirements.txt
-pip install pyinstaller==5.13.2
+pip install pyinstaller
 
 # Build macOS app
 echo "INFO: Packaging macOS app..."
