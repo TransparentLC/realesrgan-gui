@@ -23,8 +23,6 @@ a = Analysis(
         ('i18n.ini', '.'),
         ('icon.icns', '.'),
         ('icon-128px.png', '.'),
-        # 收集macOS通知模块
-        *(collect_data_files('notifypy') if sys.platform == 'darwin' else []),
     ],
     # 隐藏导入
     hiddenimports=[

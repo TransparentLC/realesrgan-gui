@@ -1,10 +1,13 @@
 import collections
 import configparser
 import ctypes
-import notifypy
 import os
 import re
 import sys
+
+if sys.platform != 'darwin':
+    import notifypy
+
 import time
 import threading
 import tkinter as tk
@@ -354,23 +357,27 @@ class REGUIApp(ttk.Frame):
         self.textOutput.config(state=tk.NORMAL)
         self.textOutput.delete(1.0, tk.END)
         self.textOutput.config(state=tk.DISABLED)
-        notification = notifypy.Notify(
-            default_notification_application_name=define.APP_TITLE,
-            default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
+        
+        if sys.platform != 'darwin':
+            notification = notifypy.Notify(
+                default_notification_application_name=define.APP_TITLE,
+                default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
         )
         ts = time.perf_counter()
         def completeCallback(withError: bool):
-            te = time.perf_counter()
-            notification.title = i18n.getTranslatedString('ToastCompletedTitle')
-            if withError:
-                notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
-            else:
-                notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
-            notification.send(False)
+            if sys.platform != 'darwin':
+                te = time.perf_counter()
+                notification.title = i18n.getTranslatedString('ToastCompletedTitle')
+                if withError:
+                    notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
+                else:
+                    notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
+                notification.send(False)
         def failCallback(ex: Exception):
-            notification.title = i18n.getTranslatedString('ToastFailedTitle')
-            notification.message = f'{type(ex).__name__}: {ex}'
-            notification.send(False)
+            if sys.platform != 'darwin':
+                notification.title = i18n.getTranslatedString('ToastFailedTitle')
+                notification.message = f'{type(ex).__name__}: {ex}'
+                notification.send(False)
 
         self.logFile = open(self.logPath, 'w', encoding='utf-8')
         t = threading.Thread(
