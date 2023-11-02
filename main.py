@@ -7,6 +7,11 @@ import sys
 
 if sys.platform != 'darwin':
     import notifypy
+    # fix: UnsupportedPlatform exception on Windows 11 and Python 3.12 by TransparentLC · Pull Request #55 · ms7m/notify-py
+    # https://github.com/ms7m/notify-py/pull/55
+    # Temporary fix:
+    import functools
+    notifypy.Notify._selected_notification_system = functools.partial(notifypy.Notify._selected_notification_system, override_windows_version_detection=True)
 
 import time
 import threading
@@ -301,97 +306,100 @@ class REGUIApp(ttk.Frame):
         self.varintTileSizeIndex.set(self.comboTileSize.current())
 
     def buttonProcess_click(self):
-        inputPath = self.varstrInputPath.get()
-        outputPath = self.varstrOutputPath.get()
-        if not inputPath or not outputPath:
-            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidPath'))
-        inputPath = os.path.normpath(inputPath)
-        outputPath = os.path.normpath(outputPath)
-        if not os.path.exists(inputPath):
-            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
+        try:
+            inputPath = self.varstrInputPath.get()
+            outputPath = self.varstrOutputPath.get()
+            if not inputPath or not outputPath:
+                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidPath'))
+            inputPath = os.path.normpath(inputPath)
+            outputPath = os.path.normpath(outputPath)
+            if not os.path.exists(inputPath):
+                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
 
-        initialConfigParams = self.getConfigParams()
-        if initialConfigParams.resizeMode == param.ResizeMode.RATIO and initialConfigParams.resizeModeValue == 1:
-            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
+            initialConfigParams = self.getConfigParams()
+            if initialConfigParams.resizeMode == param.ResizeMode.RATIO and initialConfigParams.resizeModeValue == 1:
+                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
 
-        queue = collections.deque()
-        if os.path.isdir(inputPath):
-            for curDir, dirs, files in os.walk(inputPath):
-                for f in files:
-                    if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
-                        continue
-                    f = os.path.join(curDir, f)
-                    g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
-                    if os.path.splitext(f)[1].lower() == '.gif':
-                        queue.append(task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
-                    elif self.varstrCustomCommand.get().strip():
-                        t = task.buildTempPath('.png')
-                        queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
-                        queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
-                    elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                        t = task.buildTempPath('.webp')
-                        queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
-                        queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
-                    else:
-                        if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
-                            g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
-                        queue.append(task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams))
-            if not queue:
-                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
-        elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
-            if os.path.splitext(inputPath)[1].lower() == '.gif':
-                queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
-            elif self.varstrCustomCommand.get().strip():
-                t = task.buildTempPath('.png')
-                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
-                queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
-            elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                t = task.buildTempPath('.webp')
-                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
-                queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
-            else:
-                queue.append(task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams))
-        else:
-            return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
-        self.buttonProcess.config(state=tk.DISABLED)
-        self.textOutput.config(state=tk.NORMAL)
-        self.textOutput.delete(1.0, tk.END)
-        self.textOutput.config(state=tk.DISABLED)
-        
-        if sys.platform != 'darwin':
-            notification = notifypy.Notify(
-                default_notification_application_name=define.APP_TITLE,
-                default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
-        )
-        ts = time.perf_counter()
-        def completeCallback(withError: bool):
-            if sys.platform != 'darwin':
-                te = time.perf_counter()
-                notification.title = i18n.getTranslatedString('ToastCompletedTitle')
-                if withError:
-                    notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
+            queue = collections.deque()
+            if os.path.isdir(inputPath):
+                for curDir, dirs, files in os.walk(inputPath):
+                    for f in files:
+                        if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
+                            continue
+                        f = os.path.join(curDir, f)
+                        g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
+                        if os.path.splitext(f)[1].lower() == '.gif':
+                            queue.append(task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                        elif self.varstrCustomCommand.get().strip():
+                            t = task.buildTempPath('.png')
+                            queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                            queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
+                        elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                            t = task.buildTempPath('.webp')
+                            queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                            queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
+                        else:
+                            if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
+                                g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
+                            queue.append(task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams))
+                if not queue:
+                    return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
+            elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
+                if os.path.splitext(inputPath)[1].lower() == '.gif':
+                    queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                elif self.varstrCustomCommand.get().strip():
+                    t = task.buildTempPath('.png')
+                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                    queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
+                elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                    t = task.buildTempPath('.webp')
+                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                    queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
                 else:
-                    notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
-                notification.send(False)
-        def failCallback(ex: Exception):
-            if sys.platform != 'darwin':
-                notification.title = i18n.getTranslatedString('ToastFailedTitle')
-                notification.message = f'{type(ex).__name__}: {ex}'
-                notification.send(False)
+                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams))
+            else:
+                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
+            self.buttonProcess.config(state=tk.DISABLED)
+            self.textOutput.config(state=tk.NORMAL)
+            self.textOutput.delete(1.0, tk.END)
+            self.textOutput.config(state=tk.DISABLED)
 
-        self.logFile = open(self.logPath, 'w', encoding='utf-8')
-        t = threading.Thread(
-            target=task.taskRunner,
-            args=(
-                queue,
-                self.writeToOutput,
-                completeCallback,
-                failCallback,
-                lambda: (self.buttonProcess.config(state=tk.NORMAL), self.logFile.close()),
-                self.varboolIgnoreError.get(),
+            if sys.platform != 'darwin':
+                notification = notifypy.Notify(
+                    default_notification_application_name=define.APP_TITLE,
+                    default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
+                )
+            ts = time.perf_counter()
+            def completeCallback(withError: bool):
+                if sys.platform != 'darwin':
+                    te = time.perf_counter()
+                    notification.title = i18n.getTranslatedString('ToastCompletedTitle')
+                    if withError:
+                        notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
+                    else:
+                        notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
+                    notification.send(False)
+            def failCallback(ex: Exception):
+                if sys.platform != 'darwin':
+                    notification.title = i18n.getTranslatedString('ToastFailedTitle')
+                    notification.message = f'{type(ex).__name__}: {ex}'
+                    notification.send(False)
+
+            self.logFile = open(self.logPath, 'w', encoding='utf-8')
+            t = threading.Thread(
+                target=task.taskRunner,
+                args=(
+                    queue,
+                    self.writeToOutput,
+                    completeCallback,
+                    failCallback,
+                    lambda: (self.buttonProcess.config(state=tk.NORMAL), self.logFile.close()),
+                    self.varboolIgnoreError.get(),
+                )
             )
-        )
-        t.start()
+            t.start()
+        except Exception as ex:
+            messagebox.showerror(define.APP_TITLE, traceback.format_exc())
 
     def setInputPath(self, p: str):
         self.varstrInputPath.set(p)
