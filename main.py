@@ -1,15 +1,13 @@
 import collections
 import configparser
 import ctypes
-
+import os
+import re
 import sys
 
 if sys.platform != 'darwin':
     import notifypy
 
-import os
-import re
-import sys
 import time
 import threading
 import tkinter as tk
