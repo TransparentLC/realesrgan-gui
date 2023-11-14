@@ -19,6 +19,7 @@ import tkinter as tk
 import traceback
 import typing
 import webbrowser
+import pynvml
 from PIL import Image
 from PIL import ImageTk
 from tkinter import filedialog
@@ -94,6 +95,8 @@ class REGUIApp(ttk.Frame):
         self.logPath = os.path.join(define.APP_PATH, 'output.log')
         self.logFile: typing.IO = None
 
+        pynvml.nvmlInit()
+        self.device_count = pynvml.nvmlDeviceGetCount()
         self.setupVars()
         self.setupWidgets()
 
@@ -213,8 +216,10 @@ class REGUIApp(ttk.Frame):
         self.comboTileSize.current(self.varintTileSizeIndex.get())
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
-        self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=-1, to=7, increment=1, width=12, textvariable=self.varintGPUID)
-        self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
+        self.ComboGPUID = ttk.Combobox(self.frameAdvancedConfigLeft, values=tuple(["-1: [auto]"] + [str(i) +": "+pynvml.nvmlDeviceGetName(pynvml.nvmlDeviceGetHandleByIndex(i)) for i in range(self.device_count)]), width=12)
+        self.ComboGPUID.current(int(self.varintGPUID.get()) + 1)
+        self.ComboGPUID.bind("<<ComboboxSelected>>", lambda x: self.varintGPUID.set(self.ComboGPUID.get().split(":")[0]))
+        self.ComboGPUID.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('LossyModeQuality')).pack(padx=10, pady=5, fill=tk.X)
         self.spinLossyQuality = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=100, increment=5, width=12, textvariable=self.varintLossyQuality)
         self.spinLossyQuality.set(self.varintLossyQuality.get())
@@ -462,6 +467,7 @@ if __name__ == '__main__':
 
     if not os.path.exists(define.RE_PATH):
         messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundRE'))
+        # https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/releases
         webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN/releases')
         sys.exit(0)
 
