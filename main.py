@@ -97,11 +97,6 @@ class REGUIApp(ttk.Frame):
 
         pynvml.nvmlInit()
         self.device_count = pynvml.nvmlDeviceGetCount()
-<<<<<<< HEAD
-
-=======
-        
->>>>>>> 4d72b2f3122b23185a161058b6d886312f1274ec
         self.setupVars()
         self.setupWidgets()
 
@@ -221,11 +216,7 @@ class REGUIApp(ttk.Frame):
         self.comboTileSize.current(self.varintTileSizeIndex.get())
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
         ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
-<<<<<<< HEAD
         self.ComboGPUID = ttk.Combobox(self.frameAdvancedConfigLeft, values=tuple(["-1: [auto]"] + [str(i) +": "+pynvml.nvmlDeviceGetName(pynvml.nvmlDeviceGetHandleByIndex(i)) for i in range(self.device_count)]), width=12)
-=======
-        self.ComboGPUID = ttk.Combobox(self.frameAdvancedConfigLeft, values=tuple(["-1 :[auto]"] + [str(i) +" :"+pynvml.nvmlDeviceGetName(pynvml.nvmlDeviceGetHandleByIndex(i)) for i in range(self.device_count)]), width=12)
->>>>>>> 4d72b2f3122b23185a161058b6d886312f1274ec
         self.ComboGPUID.current(int(self.varintGPUID.get()) + 1)
         self.ComboGPUID.bind("<<ComboboxSelected>>", lambda x: self.varintGPUID.set(self.ComboGPUID.get().split(":")[0]))
         self.ComboGPUID.pack(padx=10, pady=5, fill=tk.X)
