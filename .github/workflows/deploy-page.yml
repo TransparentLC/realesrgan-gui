@@ -1,0 +1,29 @@
+name: deploy-page
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: TransparentLC/realesrgan-gui-page
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          check-latest: true
+          cache: npm
+          cache-dependency-path: package.json
+      - name: Install npm dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
