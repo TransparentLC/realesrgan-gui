@@ -86,9 +86,12 @@ class REGUIApp(ttk.Frame):
             'LossyMode': False,
             'IgnoreError': False,
             'CustomCommand': '',
+            'AppLanguage': "en_US",
         })
         self.config['Config'] = {}
         self.config.read(define.APP_CONFIG_PATH)
+        i18n.set_current_language(self.config['Config'].get('AppLanguage'))
+        print(i18n.current_language)
 
         self.outputPathChanged = True
         self.logPath = os.path.join(define.APP_PATH, 'output.log')
@@ -127,6 +130,19 @@ class REGUIApp(ttk.Frame):
         self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
 
+        # StringVars for easily change all labels' strings
+        self.varstrLabelInputPath = tk.StringVar(value=i18n.getTranslatedString('Input'))
+        self.varstrLabelOutputPath = tk.StringVar(value=i18n.getTranslatedString('Output'))
+        self.varstrLabelOpenFileDialogue = tk.StringVar(value=i18n.getTranslatedString('OpenFileDialog'))
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString('UsedModel'))
+        self.varstrLabelResizeMode = tk.StringVar(value=i18n.getTranslatedString('ResizeModeRatio'))
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString())
+
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
@@ -137,23 +153,23 @@ class REGUIApp(ttk.Frame):
 
         self.frameBasicConfig = ttk.Frame(self.notebookConfig, padding=5)
         self.frameBasicConfig.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Input')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, textvariable=self.varstrLabelInputPath).pack(padx=10, pady=5, fill=tk.X)
         self.frameInputPath = ttk.Frame(self.frameBasicConfig)
         self.frameInputPath.columnconfigure(0, weight=1)
         self.frameInputPath.columnconfigure(1, weight=0)
         self.frameInputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryInputPath = ttk.Entry(self.frameInputPath, textvariable=self.varstrInputPath)
         self.entryInputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonInputPath = ttk.Button(self.frameInputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonInputPath_click)
+        self.buttonInputPath = ttk.Button(self.frameInputPath, textvariable=self.varstrLabelOpenFileDialogue, command=self.buttonInputPath_click)
         self.buttonInputPath.grid(row=0, column=1, padx=5)
-        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Output')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, textvariable=self.varstrLabelOutputPath).pack(padx=10, pady=5, fill=tk.X)
         self.frameOutputPath = ttk.Frame(self.frameBasicConfig)
         self.frameOutputPath.columnconfigure(0, weight=1)
         self.frameOutputPath.columnconfigure(1, weight=0)
         self.frameOutputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryOutputPath = ttk.Entry(self.frameOutputPath, textvariable=self.varstrOutputPath)
         self.entryOutputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonOutputPath = ttk.Button(self.frameOutputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonOutputPath_click)
+        self.buttonOutputPath = ttk.Button(self.frameOutputPath, textvariable=self.varstrLabelOpenFileDialogue, command=self.buttonOutputPath_click)
         self.buttonOutputPath.grid(row=0, column=1, padx=5)
         self.frameBasicConfigBottom = ttk.Frame(self.frameBasicConfig)
         self.frameBasicConfigBottom.columnconfigure(0, weight=0)
@@ -161,7 +177,7 @@ class REGUIApp(ttk.Frame):
         self.frameBasicConfigBottom.pack(fill=tk.X)
         self.frameModel = ttk.Frame(self.frameBasicConfigBottom)
         self.frameModel.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameModel, text=i18n.getTranslatedString('UsedModel')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameModel, textvariable=self.varstrLabelUsedModel).pack(padx=10, pady=5, fill=tk.X)
         self.comboModel = ttk.Combobox(self.frameModel, state='readonly', values=self.models, textvariable=self.varstrModel)
         if self.varstrModel.get() in self.models:
             self.comboModel.current(self.models.index(self.varstrModel.get()))
@@ -233,6 +249,10 @@ class REGUIApp(ttk.Frame):
         self.checkLossyMode.pack(padx=10, pady=5, fill=tk.X)
         self.checkIgnoreError = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableIgnoreError'), style='Switch.TCheckbutton', variable=self.varboolIgnoreError)
         self.checkIgnoreError.pack(padx=10, pady=5, fill=tk.X)
+        self.comboLanguage = ttk.Combobox(self.frameAdvancedConfigRight, state='readonly', values=tuple(i18n.locales_map.keys()))
+        self.comboLanguage.current(i18n.get_current_locale_display_name())
+        self.comboLanguage.pack(padx=10, pady=5, fill=tk.X)
+        ttk.Button(self.frameAdvancedConfigRight, text="test", command=lambda: i18n.change_current_lang("tr_TR", self.varstrLabelInputPath)).pack(padx=10, pady=5, fill=tk.X)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAbout.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -277,6 +297,7 @@ class REGUIApp(ttk.Frame):
             'OptimizeGIF': self.varboolOptimizeGIF.get(),
             'LossyMode': self.varboolLossyMode.get(),
             'CustomCommand': self.varstrCustomCommand.get(),
+            'AppLanguage': i18n.current_language
         }
         with open(define.APP_CONFIG_PATH, 'w', encoding='utf-8') as f:
             self.config.write(f)
