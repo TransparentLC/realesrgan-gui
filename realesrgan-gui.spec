@@ -14,6 +14,7 @@ a = Analysis(
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
+        'babel.numbers',
     ],
     hookspath=[
         'pyi-hooks',
