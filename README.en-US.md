@@ -107,7 +107,7 @@ In addition to the features supported by Real-ESRGAN-ncnn-vulkan, Real-ESRGAN GU
 | ![](https://user-images.githubusercontent.com/47057319/170270314-dce674be-e1d3-433f-a71f-763983b33e97.gif) | ![](https://user-images.githubusercontent.com/47057319/170273963-4b11551b-44e7-42f8-b0fd-5b2599087a95.gif) |
 
 * waifu2x-caffe samples are upscaled using `UpResNet10` and `UpPhoto` models with noise reduction level 3 and TTA enabled.
-* Real-ESRGAN samples are upscaled `using realesrgan-x4plus-anime` and `realesrgan-x4plus` models with TTA enabled.
+* Real-ESRGAN samples are upscaled using `realesrgan-x4plus-anime` and `realesrgan-x4plus` models with TTA enabled.
 * The original images are upscaled to 4x.
 * The displayed GIFs are lossy compressed to reduce the file size.
 
