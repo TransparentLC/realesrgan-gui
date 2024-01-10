@@ -18,19 +18,19 @@ all_locales = list(translation.keys())[1::]
 # Manually copied from babel because
 # babel has a huge (30mb) bundled data
 locales_map = {
-    'English (United Kingdom)': 'en_GB',
-    'English (United States)': 'en_US',
-    'Türkçe (Türkiye)': 'tr_TR',
-    'español (Argentina)': 'es_AR',
-    'español (Colombia)': 'es_CO',
-    'español (España)': 'es_ES',
-    'español (México)': 'es_MX',
-    'українська (Україна)': 'uk_UA',
     '中文 (简体, 中国)': 'zh_CN',
     '中文 (简体, 新加坡)': 'zh_SG',
-    '中文 (繁體, 台灣)': 'zh_TW',
+    '中文 (繁體字, 中國香港特別行政區)': 'zh_HK',
     '中文 (繁體字, 中國澳門特別行政區)': 'zh_MO',
-    '中文 (繁體字, 中國香港特別行政區)': 'zh_HK'
+    '中文 (繁體, 台灣)': 'zh_TW',
+    'English (United States)': 'en_US',
+    'English (United Kingdom)': 'en_GB',
+    'українська (Україна)': 'uk_UA',
+    'Türkçe (Türkiye)': 'tr_TR',
+    'español (España)': 'es_ES',
+    'español (México)': 'es_MX',
+    'español (Colombia)': 'es_CO',
+    'español (Argentina)': 'es_AR',
 }
 
 current_language = None

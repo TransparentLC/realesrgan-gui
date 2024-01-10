@@ -35,7 +35,7 @@ locales_map = {Locale.parse(key).get_display_name():key for key in all_locales}
 locales_map_str = "locales_map = {\n"
 
 for key, val in locales_map.items():
-    locales_map_str += f"{' ' * LOCALE_INDENT}'{key}': '{val}'\n"
+    locales_map_str += f"{' ' * LOCALE_INDENT}'{key}': '{val}',\n"
 locales_map_str += "}"
 
 print(locales_map_str)
