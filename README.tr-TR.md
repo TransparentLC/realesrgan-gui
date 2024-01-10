@@ -86,6 +86,8 @@ Real-ESRGAN-GUI, Real-ESRGAN-ncnn-vulkan'da halihazırda bulunanlar haricinde a�
     * Dil seçimi için `locale.getdefaultlocale` kullanılır.
     * Eğer sistem dilinde çeviri mevcut değilse otomatik olarak İngilizce seçilir.
     * [`i18n.ini`](https://github.com/TransparentLC/realesrgan-gui/blob/master/i18n.ini) dosyasını düzenleyerek çevirinizi ekleyebilir veya var olan çevirileri geliştirebilirsiniz. Her türlü katkınıza açığız!
+        * Dilinizi [`i18n.ini`](https://github.com/TransparentLC/realesrgan-gui/blob/master/i18n.ini)'ye ekledikten sonra [`generate_locales_map.py`](https://github.com/TransparentLC/realesrgan-gui/blob/master/generate_locales_map.py) dosyasını çalıştırarak sağlanan çıktıdaki `locales_map` değişkeini sonuna kadar kopyalayın. Daha sonra kopyaladığınız değişkeni [`i18n.py`](https://github.com/TransparentLC/realesrgan-gui/blob/master/i18n.py) dosyasındakiyle değiştirin. Eğer [`generate_locales_map.py`](https://github.com/TransparentLC/realesrgan-gui/blob/master/generate_locales_map.py) çalıştırmakta sıkıntı yaşadıysanız komut satırında `pip install -r requirements.txt` yaparak gereksinimleri yükledikten sonra tekrar deneyin.
+        * Eğer [`generate_locales_map.py`](https://github.com/TransparentLC/realesrgan-gui/blob/master/generate_locales_map.py) ile uğraşmak istemiyorsanız dil kodunuzu ve dilinizin görünürdeki ismini doğrudan [`i18n.py`](https://github.com/TransparentLC/realesrgan-gui/blob/master/i18n.py) dosyasının içindeki `locales_map` değişkenine kendi dilinizi ekleyebilirsiniz.
 
 ## Örnekler
 

@@ -13,7 +13,7 @@ a = Analysis(
         *collect_data_files('notifypy'),
     ],
     hiddenimports=[
-        'PIL._tkinter_finder',
+        'PIL._tkinter_finder'
     ],
     hookspath=[
         'pyi-hooks',

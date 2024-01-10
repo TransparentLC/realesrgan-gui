@@ -1,6 +1,7 @@
 import collections
 import configparser
 import ctypes
+import locale
 import os
 import re
 import sys
@@ -39,13 +40,10 @@ import task
 Image.MAX_IMAGE_PIXELS = None
 
 class REGUIApp(ttk.Frame):
-    def __init__(self, parent: tk.Tk):
+    def __init__(self, parent: tk.Tk, config: configparser.ConfigParser, modelFiles: set[str], models: list[str]):
         super().__init__(parent)
-        modelFiles = set(os.listdir(os.path.join(define.APP_PATH, 'models')))
-        self.models = sorted(
-            x for x in set(os.path.splitext(y)[0] for y in modelFiles)
-            if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
-        )
+        modelFiles = modelFiles
+        self.models = models
         for m in (
             'realesrgan-x4plus',
             'realesrgan-x4plus-anime',
@@ -70,25 +68,7 @@ class REGUIApp(ttk.Frame):
         )
         self.tileSize = (0, 32, 64, 128, 256, 512, 1024)
 
-        self.config = configparser.ConfigParser({
-            'ResizeMode': int(param.ResizeMode.RATIO),
-            'ResizeRatio': 4,
-            'ResizeWidth': 1024,
-            'ResizeHeight': 1024,
-            'Model': self.models[0],
-            'DownsampleIndex': 0,
-            'GPUID': -1,
-            'TileSizeIndex': 0,
-            'LossyQuality': 80,
-            'UseWebP': False,
-            'UseTTA': False,
-            'OptimizeGIF': False,
-            'LossyMode': False,
-            'IgnoreError': False,
-            'CustomCommand': '',
-        })
-        self.config['Config'] = {}
-        self.config.read(define.APP_CONFIG_PATH)
+        self.config = config
 
         self.outputPathChanged = True
         self.logPath = os.path.join(define.APP_PATH, 'output.log')
@@ -127,6 +107,33 @@ class REGUIApp(ttk.Frame):
         self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
 
+        # StringVars for easily change all labels' strings
+        self.varstrLabelInputPath = tk.StringVar(value=i18n.getTranslatedString('Input'))
+        self.varstrLabelOutputPath = tk.StringVar(value=i18n.getTranslatedString('Output'))
+        self.varstrLabelOpenFileDialogue = tk.StringVar(value=i18n.getTranslatedString('OpenFileDialog'))
+        self.varstrLabelUsedModel = tk.StringVar(value=i18n.getTranslatedString('UsedModel'))
+        self.varstrLabelResizeMode = tk.StringVar(value=i18n.getTranslatedString('ResizeMode'))
+        self.varstrLabelResizeModeRatio = tk.StringVar(value=i18n.getTranslatedString('ResizeModeRatio'))
+        self.varstrLabelResizeModeWidth = tk.StringVar(value=i18n.getTranslatedString('ResizeModeWidth'))
+        self.varstrLabelResizeModeHeight = tk.StringVar(value=i18n.getTranslatedString('ResizeModeHeight'))
+        self.varstrLabelStartProcessing = tk.StringVar(value=i18n.getTranslatedString('StartProcessing'))
+        self.varstrLabelDownsampleMode = tk.StringVar(value=i18n.getTranslatedString('DownsampleMode'))
+        self.varstrLabelTileSize = tk.StringVar(value=i18n.getTranslatedString('TileSize'))
+        self.varstrLabelTileSizeAuto = tk.StringVar(value=i18n.getTranslatedString('TileSizeAuto'))
+        self.varstrLabelUsedGPUID = tk.StringVar(value=i18n.getTranslatedString('UsedGPUID'))
+        self.varstrLabelLossyModeQuality = tk.StringVar(value=i18n.getTranslatedString('LossyModeQuality'))
+        self.varstrLabelCustomCommand = tk.StringVar(value=i18n.getTranslatedString('CustomCommand'))
+        self.varstrLabelPreferWebP = tk.StringVar(value=i18n.getTranslatedString('PreferWebP'))
+        self.varstrLabelEnableTTA = tk.StringVar(value=i18n.getTranslatedString('EnableTTA'))
+        self.varstrLabelGIFOptimizeTransparency = tk.StringVar(value=i18n.getTranslatedString('GIFOptimizeTransparency'))
+        self.varstrLabelEnableLossyMode = tk.StringVar(value=i18n.getTranslatedString('EnableLossyMode'))
+        self.varstrLabelEnableIgnoreError = tk.StringVar(value=i18n.getTranslatedString('EnableIgnoreError'))
+        self.varstrLabelViewREGUISource = tk.StringVar(value=i18n.getTranslatedString('ViewREGUISource'))
+        self.varstrLabelViewRESource = tk.StringVar(value=i18n.getTranslatedString('ViewRESource'))
+        self.varstrLabelViewAdditionalModel = tk.StringVar(value=i18n.getTranslatedString('ViewAdditionalModel'))
+        self.varstrLabelViewDonatePage = tk.StringVar(value=i18n.getTranslatedString('ViewDonatePage'))
+        self.varstrLabelFrameBasicConfig = tk.StringVar(value=i18n.getTranslatedString('FrameBasicConfig'))
+
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
@@ -137,23 +144,23 @@ class REGUIApp(ttk.Frame):
 
         self.frameBasicConfig = ttk.Frame(self.notebookConfig, padding=5)
         self.frameBasicConfig.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Input')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, textvariable=self.varstrLabelInputPath).pack(padx=10, pady=5, fill=tk.X)
         self.frameInputPath = ttk.Frame(self.frameBasicConfig)
         self.frameInputPath.columnconfigure(0, weight=1)
         self.frameInputPath.columnconfigure(1, weight=0)
         self.frameInputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryInputPath = ttk.Entry(self.frameInputPath, textvariable=self.varstrInputPath)
         self.entryInputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonInputPath = ttk.Button(self.frameInputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonInputPath_click)
+        self.buttonInputPath = ttk.Button(self.frameInputPath, textvariable=self.varstrLabelOpenFileDialogue, command=self.buttonInputPath_click)
         self.buttonInputPath.grid(row=0, column=1, padx=5)
-        ttk.Label(self.frameBasicConfig, text=i18n.getTranslatedString('Output')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameBasicConfig, textvariable=self.varstrLabelOutputPath).pack(padx=10, pady=5, fill=tk.X)
         self.frameOutputPath = ttk.Frame(self.frameBasicConfig)
         self.frameOutputPath.columnconfigure(0, weight=1)
         self.frameOutputPath.columnconfigure(1, weight=0)
         self.frameOutputPath.pack(padx=5, pady=5, fill=tk.X)
         self.entryOutputPath = ttk.Entry(self.frameOutputPath, textvariable=self.varstrOutputPath)
         self.entryOutputPath.grid(row=0, column=0, padx=5, sticky=tk.EW)
-        self.buttonOutputPath = ttk.Button(self.frameOutputPath, text=i18n.getTranslatedString('OpenFileDialog'), command=self.buttonOutputPath_click)
+        self.buttonOutputPath = ttk.Button(self.frameOutputPath, textvariable=self.varstrLabelOpenFileDialogue, command=self.buttonOutputPath_click)
         self.buttonOutputPath.grid(row=0, column=1, padx=5)
         self.frameBasicConfigBottom = ttk.Frame(self.frameBasicConfig)
         self.frameBasicConfigBottom.columnconfigure(0, weight=0)
@@ -161,7 +168,7 @@ class REGUIApp(ttk.Frame):
         self.frameBasicConfigBottom.pack(fill=tk.X)
         self.frameModel = ttk.Frame(self.frameBasicConfigBottom)
         self.frameModel.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameModel, text=i18n.getTranslatedString('UsedModel')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameModel, textvariable=self.varstrLabelUsedModel).pack(padx=10, pady=5, fill=tk.X)
         self.comboModel = ttk.Combobox(self.frameModel, state='readonly', values=self.models, textvariable=self.varstrModel)
         if self.varstrModel.get() in self.models:
             self.comboModel.current(self.models.index(self.varstrModel.get()))
@@ -171,20 +178,20 @@ class REGUIApp(ttk.Frame):
         self.comboModel.bind('<<ComboboxSelected>>', lambda e: e.widget.select_clear())
         self.frameResize = ttk.Frame(self.frameBasicConfigBottom)
         self.frameResize.grid(row=0, column=0, sticky=tk.NSEW)
-        ttk.Label(self.frameResize, text=i18n.getTranslatedString('ResizeMode')).grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky=tk.EW)
-        self.radioResizeRatio = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeRatio'), value=int(param.ResizeMode.RATIO), variable=self.varintResizeMode)
+        ttk.Label(self.frameResize, textvariable=self.varstrLabelResizeMode).grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky=tk.EW)
+        self.radioResizeRatio = ttk.Radiobutton(self.frameResize, textvariable=self.varstrLabelResizeModeRatio, value=int(param.ResizeMode.RATIO), variable=self.varintResizeMode)
         self.radioResizeRatio.grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeRatio = ttk.Spinbox(self.frameResize, from_=2, to=16, increment=1, width=12, textvariable=self.varintResizeRatio)
         self.spinResizeRatio.grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.radioResizeWidth = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeWidth'), value=int(param.ResizeMode.WIDTH), variable=self.varintResizeMode)
+        self.radioResizeWidth = ttk.Radiobutton(self.frameResize, textvariable=self.varstrLabelResizeModeWidth, value=int(param.ResizeMode.WIDTH), variable=self.varintResizeMode)
         self.radioResizeWidth.grid(row=2, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeWidth = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeWidth)
         self.spinResizeWidth.grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.radioResizeHeight = ttk.Radiobutton(self.frameResize, text=i18n.getTranslatedString('ResizeModeHeight'), value=int(param.ResizeMode.HEIGHT), variable=self.varintResizeMode)
+        self.radioResizeHeight = ttk.Radiobutton(self.frameResize, textvariable=self.varstrLabelResizeModeHeight, value=int(param.ResizeMode.HEIGHT), variable=self.varintResizeMode)
         self.radioResizeHeight.grid(row=3, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeHeight = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeHeight)
         self.spinResizeHeight.grid(row=3, column=1, padx=5, pady=5, sticky=tk.EW)
-        self.buttonProcess = ttk.Button(self.frameBasicConfigBottom, text=i18n.getTranslatedString('StartProcessing'), style='Accent.TButton', width=6, command=self.buttonProcess_click)
+        self.buttonProcess = ttk.Button(self.frameBasicConfigBottom, textvariable=self.varstrLabelStartProcessing, style='Accent.TButton', width=6, command=self.buttonProcess_click)
         self.buttonProcess.grid(row=0, column=1, padx=5, pady=5, sticky=tk.SE)
 
         self.frameAdvancedConfig = ttk.Frame(self.notebookConfig, padding=5)
@@ -203,36 +210,40 @@ class REGUIApp(ttk.Frame):
         self.frameAdvancedConfigLeftSubLeft.grid(row=0, column=0, sticky=tk.NSEW)
         self.frameAdvancedConfigLeftSubRight = ttk.Frame(self.frameAdvancedConfigLeftSub)
         self.frameAdvancedConfigLeftSubRight.grid(row=0, column=1, sticky=tk.NSEW)
-        ttk.Label(self.frameAdvancedConfigLeftSubLeft, text=i18n.getTranslatedString('DownsampleMode')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeftSubLeft, textvariable=self.varstrLabelDownsampleMode).pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample = ttk.Combobox(self.frameAdvancedConfigLeftSubLeft, state='readonly', values=tuple(x[0] for x in self.downsample), width=12)
         self.comboDownsample.current(self.varintDownsampleIndex.get())
         self.comboDownsample.pack(padx=10, pady=5, fill=tk.X)
         self.comboDownsample.bind('<<ComboboxSelected>>', self.comboDownsample_click)
-        ttk.Label(self.frameAdvancedConfigLeftSubRight, text=i18n.getTranslatedString('TileSize')).pack(padx=10, pady=5, fill=tk.X)
-        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeftSubRight, state='readonly', values=(i18n.getTranslatedString('TileSizeAuto'), *self.tileSize[1:]), width=12)
+        ttk.Label(self.frameAdvancedConfigLeftSubRight, textvariable=self.varstrLabelTileSize).pack(padx=10, pady=5, fill=tk.X)
+        self.comboTileSize = ttk.Combobox(self.frameAdvancedConfigLeftSubRight, state='readonly', values=(self.varstrLabelTileSizeAuto.get(), *self.tileSize[1:]), width=12)
         self.comboTileSize.current(self.varintTileSizeIndex.get())
         self.comboTileSize.pack(padx=10, pady=5, fill=tk.X)
-        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('UsedGPUID')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, textvariable=self.varstrLabelUsedGPUID).pack(padx=10, pady=5, fill=tk.X)
         self.spinGPUID = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=-1, to=7, increment=1, width=12, textvariable=self.varintGPUID)
         self.spinGPUID.pack(padx=10, pady=5, fill=tk.X)
-        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('LossyModeQuality')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, textvariable=self.varstrLabelLossyModeQuality).pack(padx=10, pady=5, fill=tk.X)
         self.spinLossyQuality = ttk.Spinbox(self.frameAdvancedConfigLeft, from_=0, to=100, increment=5, width=12, textvariable=self.varintLossyQuality)
         self.spinLossyQuality.set(self.varintLossyQuality.get())
         self.spinLossyQuality.pack(padx=10, pady=5, fill=tk.X)
         self.comboTileSize.bind('<<ComboboxSelected>>', self.comboTileSize_click)
-        ttk.Label(self.frameAdvancedConfigLeft, text=i18n.getTranslatedString('CustomCommand')).pack(padx=10, pady=5, fill=tk.X)
+        ttk.Label(self.frameAdvancedConfigLeft, textvariable=self.varstrLabelCustomCommand).pack(padx=10, pady=5, fill=tk.X)
         self.entryCustomCommand = ttk.Entry(self.frameAdvancedConfigLeft, textvariable=self.varstrCustomCommand)
         self.entryCustomCommand.pack(padx=10, pady=5, fill=tk.X)
-        self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('PreferWebP'), style='Switch.TCheckbutton', variable=self.varboolUseWebP)
+        self.checkUseWebP = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelPreferWebP, style='Switch.TCheckbutton', variable=self.varboolUseWebP)
         self.checkUseWebP.pack(padx=10, pady=5, fill=tk.X)
-        self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableTTA'), style='Switch.TCheckbutton', variable=self.varboolUseTTA)
+        self.checkUseTTA = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelEnableTTA, style='Switch.TCheckbutton', variable=self.varboolUseTTA)
         self.checkUseTTA.pack(padx=10, pady=5, fill=tk.X)
-        self.checkOptimizeGIF = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('GIFOptimizeTransparency'), style='Switch.TCheckbutton', variable=self.varboolOptimizeGIF)
+        self.checkOptimizeGIF = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelGIFOptimizeTransparency, style='Switch.TCheckbutton', variable=self.varboolOptimizeGIF)
         self.checkOptimizeGIF.pack(padx=10, pady=5, fill=tk.X)
-        self.checkLossyMode = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableLossyMode'), style='Switch.TCheckbutton', variable=self.varboolLossyMode)
+        self.checkLossyMode = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelEnableLossyMode, style='Switch.TCheckbutton', variable=self.varboolLossyMode)
         self.checkLossyMode.pack(padx=10, pady=5, fill=tk.X)
-        self.checkIgnoreError = ttk.Checkbutton(self.frameAdvancedConfigRight, text=i18n.getTranslatedString('EnableIgnoreError'), style='Switch.TCheckbutton', variable=self.varboolIgnoreError)
+        self.checkIgnoreError = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelEnableIgnoreError, style='Switch.TCheckbutton', variable=self.varboolIgnoreError)
         self.checkIgnoreError.pack(padx=10, pady=5, fill=tk.X)
+        self.comboLanguage = ttk.Combobox(self.frameAdvancedConfigRight, state='readonly', values=tuple(i18n.locales_map.keys()))
+        self.comboLanguage.current(i18n.get_current_locale_display_name())
+        self.comboLanguage.pack(padx=10, pady=5, fill=tk.X)
+        self.comboLanguage.bind('<<ComboboxSelected>>', self.change_app_lang)
 
         self.frameAbout = ttk.Frame(self.notebookConfig, padding=5)
         self.frameAbout.grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -247,10 +258,10 @@ class REGUIApp(ttk.Frame):
         ttk.Label(self.frameAboutContent, text='By TransparentLC' + (time.strftime("\nBuilt at %Y-%m-%d %H:%M:%S", time.localtime(define.BUILD_TIME)) if define.BUILD_TIME else ""), justify=tk.CENTER).pack()
         self.frameAboutBottom = ttk.Frame(self.frameAboutContent)
         self.frameAboutBottom.pack()
-        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewREGUISource'), command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewRESource'), command=lambda: webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan')).grid(row=0, column=1, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewAdditionalModel'), command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models')).grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.frameAboutBottom, text=i18n.getTranslatedString('ViewDonatePage'), command=lambda: webbrowser.open_new_tab('https://i.akarin.dev/donate/')).grid(row=1, column=1, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, textvariable=self.varstrLabelViewREGUISource, command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui')).grid(row=0, column=0, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, textvariable=self.varstrLabelViewRESource, command=lambda: webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan')).grid(row=0, column=1, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, textvariable=self.varstrLabelViewAdditionalModel, command=lambda: webbrowser.open_new_tab('https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models')).grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.frameAboutBottom, textvariable=self.varstrLabelViewDonatePage, command=lambda: webbrowser.open_new_tab('https://i.akarin.dev/donate/')).grid(row=1, column=1, padx=5, pady=5, sticky=tk.NSEW)
 
         self.notebookConfig.add(self.frameBasicConfig, text=i18n.getTranslatedString('FrameBasicConfig'))
         self.notebookConfig.add(self.frameAdvancedConfig, text=i18n.getTranslatedString('FrameAdvancedConfig'))
@@ -259,6 +270,45 @@ class REGUIApp(ttk.Frame):
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
         self.textOutput.configure(state=tk.DISABLED)
+
+    def change_app_lang(self, event: tk.Event):
+        lang = self.comboLanguage.get()
+        lang = i18n.locales_map[lang]
+        i18n.set_current_language(lang)
+
+        self.notebookConfig.tab(self.frameBasicConfig, text=i18n.getTranslatedString('FrameBasicConfig'))
+        self.notebookConfig.tab(self.frameAdvancedConfig, text=i18n.getTranslatedString('FrameAdvancedConfig'))
+        self.notebookConfig.tab(self.frameAbout, text=i18n.getTranslatedString('FrameAbout'))
+
+        self.varstrLabelInputPath.set(i18n.getTranslatedString('Input'))
+        self.varstrLabelOutputPath.set(i18n.getTranslatedString('Output'))
+        self.varstrLabelOpenFileDialogue.set(i18n.getTranslatedString('OpenFileDialog'))
+        self.varstrLabelUsedModel.set(i18n.getTranslatedString('UsedModel'))
+        self.varstrLabelResizeMode.set(i18n.getTranslatedString('ResizeMode'))
+        self.varstrLabelResizeModeRatio.set(i18n.getTranslatedString('ResizeModeRatio'))
+        self.varstrLabelResizeModeWidth.set(i18n.getTranslatedString('ResizeModeWidth'))
+        self.varstrLabelResizeModeHeight.set(i18n.getTranslatedString('ResizeModeHeight'))
+        self.varstrLabelStartProcessing.set(i18n.getTranslatedString('StartProcessing'))
+        self.varstrLabelDownsampleMode.set(i18n.getTranslatedString('DownsampleMode'))
+
+        self.varstrLabelTileSize.set(i18n.getTranslatedString('TileSize'))
+        self.varstrLabelTileSizeAuto.set(i18n.getTranslatedString('TileSizeAuto'))
+        self.comboTileSize['values'] = (self.varstrLabelTileSizeAuto.get(), *self.tileSize[1:])
+        self.comboTileSize.current(self.varintTileSizeIndex.get())
+
+        self.varstrLabelUsedGPUID.set(i18n.getTranslatedString('UsedGPUID'))
+        self.varstrLabelLossyModeQuality.set(i18n.getTranslatedString('LossyModeQuality'))
+        self.varstrLabelCustomCommand.set(i18n.getTranslatedString('CustomCommand'))
+        self.varstrLabelPreferWebP.set(i18n.getTranslatedString('PreferWebP'))
+        self.varstrLabelEnableTTA.set(value=i18n.getTranslatedString('EnableTTA'))
+        self.varstrLabelGIFOptimizeTransparency.set(i18n.getTranslatedString('GIFOptimizeTransparency'))
+        self.varstrLabelEnableLossyMode.set(i18n.getTranslatedString('EnableLossyMode'))
+        self.varstrLabelEnableIgnoreError.set(i18n.getTranslatedString('EnableIgnoreError'))
+        self.varstrLabelViewREGUISource.set(i18n.getTranslatedString('ViewREGUISource'))
+        self.varstrLabelViewRESource.set(i18n.getTranslatedString('ViewRESource'))
+        self.varstrLabelViewAdditionalModel.set(i18n.getTranslatedString('ViewAdditionalModel'))
+        self.varstrLabelViewDonatePage.set(i18n.getTranslatedString('ViewDonatePage'))
+        self.varstrLabelFrameBasicConfig.set(i18n.getTranslatedString('FrameBasicConfig'))
 
     def close(self):
         self.config['DEFAULT'] = {}
@@ -277,6 +327,7 @@ class REGUIApp(ttk.Frame):
             'OptimizeGIF': self.varboolOptimizeGIF.get(),
             'LossyMode': self.varboolLossyMode.get(),
             'CustomCommand': self.varstrCustomCommand.get(),
+            'AppLanguage': i18n.current_language
         }
         with open(define.APP_CONFIG_PATH, 'w', encoding='utf-8') as f:
             self.config.write(f)
@@ -455,12 +506,55 @@ class REGUIApp(ttk.Frame):
                 suffix = f'h{self.varintResizeHeight.get()}'
         return f'{base} ({self.models[self.comboModel.current()]} {suffix}){ext}'
 
+# Config and model paths are initialized before main frame
+# Because for the WarningNotFoundRE warning message app language
+# must be initialized and for that config must be initialized
+# and for that models variable needs to be set
+def init_config_and_model_paths() -> tuple[configparser.ConfigParser, set[str], list[str]]:
+    try:
+        modelFiles = set(os.listdir(os.path.join(define.APP_PATH, 'models')))
+        models = sorted(
+            x for x in set(os.path.splitext(y)[0] for y in modelFiles)
+            if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
+        )
+    except FileNotFoundError:
+        # in case of FileNotFoundError exception, return empty modelFiles and models.
+        # This does not change any behabiour because in this case
+        # we will be showing a warning message and terminate app
+        modelFiles = []
+        models = []
+
+    config = configparser.ConfigParser({
+            'ResizeMode': int(param.ResizeMode.RATIO),
+            'ResizeRatio': 4,
+            'ResizeWidth': 1024,
+            'ResizeHeight': 1024,
+            'Model': models[0] if models else "",
+            'DownsampleIndex': 0,
+            'GPUID': -1,
+            'TileSizeIndex': 0,
+            'LossyQuality': 80,
+            'UseWebP': False,
+            'UseTTA': False,
+            'OptimizeGIF': False,
+            'LossyMode': False,
+            'IgnoreError': False,
+            'CustomCommand': '',
+            'AppLanguage': locale.getdefaultlocale()[0],
+        })
+    config['Config'] = {}
+    config.read(define.APP_CONFIG_PATH)
+    i18n.set_current_language(config['Config'].get('AppLanguage'))
+    return config, modelFiles, models
+
 if __name__ == '__main__':
     os.chdir(define.APP_PATH)
     root = TkinterDnD.Tk(className=define.APP_TITLE)
     root.withdraw()
+    
+    config, modelFiles, models = init_config_and_model_paths()
 
-    if not os.path.exists(define.RE_PATH):
+    if not os.path.exists(define.RE_PATH) or not models:
         messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundRE'))
         webbrowser.open_new_tab('https://github.com/xinntao/Real-ESRGAN/releases')
         sys.exit(0)
@@ -501,7 +595,7 @@ if __name__ == '__main__':
         print(traceback.format_exc())
         changeTheme('Light')
 
-    app = REGUIApp(root)
+    app = REGUIApp(root, config, modelFiles, models)
     app.drop_target_register(DND_FILES)
     app.dnd_bind(
         '<<Drop>>',
