@@ -4,14 +4,20 @@
 # and replace the locales_map variable in i18n.py with the one 
 # printed by the program before submitting a PR. 
 
+# The created locales_map variable will be used for 
+# selecting languages in the 'advanced' tab of the application.
+
 # The reason Babel library is not included in the final packaged app
 # is that it increases the program's size by approximately 30mb due to locale data.
+
+
 from babel import Locale
 
 import configparser
 import os
 
 import define
+
 
 LOCALE_INDENT = 4
 
