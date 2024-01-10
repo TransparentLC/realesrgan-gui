@@ -3,7 +3,6 @@ import define
 import locale
 import os
 
-from babel import Locale
 
 translation: dict[str, configparser.SectionProxy] = {}
 translationRaw = configparser.ConfigParser()
@@ -16,8 +15,23 @@ translation['DEFAULT'].update(translation['en_US'])
 # List all locales without 'DEFAULT'
 all_locales = list(translation.keys())[1::]
 
-# Map all locale display names to locale codes
-locales_map = {Locale.parse(key).get_display_name():key for key in all_locales}
+# Manually copied from babel because
+# babel has a huge (30mb) bundled data
+locales_map = {
+    'English (United Kingdom)': 'en_GB',
+    'English (United States)': 'en_US',
+    'Türkçe (Türkiye)': 'tr_TR',
+    'español (Argentina)': 'es_AR',
+    'español (Colombia)': 'es_CO',
+    'español (España)': 'es_ES',
+    'español (México)': 'es_MX',
+    'українська (Україна)': 'uk_UA',
+    '中文 (简体, 中国)': 'zh_CN',
+    '中文 (简体, 新加坡)': 'zh_SG',
+    '中文 (繁體, 台灣)': 'zh_TW',
+    '中文 (繁體字, 中國澳門特別行政區)': 'zh_MO',
+    '中文 (繁體字, 中國香港特別行政區)': 'zh_HK'
+}
 
 current_language = None
 
