@@ -40,9 +40,8 @@ Image.MAX_IMAGE_PIXELS = None
 
 # 深色模式下，滚动条能否统一成深色呢？ · Issue #59 · TransparentLC/realesrgan-gui
 # https://github.com/TransparentLC/realesrgan-gui/issues/59
-# 从标准库的tkinter/scrolledtext.py复制而来
-# ttk没有ScrolledText，tk的ScrolledText使用的又是tk.Scrollbar，所以无法应用样式
-# 这里复制了一份，但是改成了使用ttk.Scrollbar
+# tk的ScrolledText使用的是tk.Scrollbar，无法应用样式
+# 这里从tkinter/scrolledtext.py复制了一份ScrolledText，但是改成了使用ttk.Scrollbar
 class ScrolledText(tk.Text):
     def __init__(self, master=None, **kw):
         self.frame = ttk.Frame(master)
@@ -297,7 +296,6 @@ class REGUIApp(ttk.Frame):
 
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
-        self.textOutput.insert(tk.END, ('TEST\n' * 128).strip())
         self.textOutput.configure(state=tk.DISABLED)
 
     def change_app_lang(self, event: tk.Event):
