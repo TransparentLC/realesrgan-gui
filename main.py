@@ -25,7 +25,6 @@ from PIL import ImageTk
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES
 from tkinterdnd2 import TkinterDnD
 
@@ -38,6 +37,35 @@ import task
 # https://github.com/TransparentLC/realesrgan-gui/issues/34
 # https://github.com/python-pillow/Pillow/blob/e3cca4298011a4e74d6f42b4cfe5a0610d3c79a9/src/PIL/Image.py#L3140
 Image.MAX_IMAGE_PIXELS = None
+
+# 深色模式下，滚动条能否统一成深色呢？ · Issue #59 · TransparentLC/realesrgan-gui
+# https://github.com/TransparentLC/realesrgan-gui/issues/59
+# 从标准库的tkinter/scrolledtext.py复制而来
+# ttk没有ScrolledText，tk的ScrolledText使用的又是tk.Scrollbar，所以无法应用样式
+# 这里复制了一份，但是改成了使用ttk.Scrollbar
+class ScrolledText(tk.Text):
+    def __init__(self, master=None, **kw):
+        self.frame = ttk.Frame(master)
+        self.vbar = ttk.Scrollbar(self.frame)
+        self.vbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        kw.update({'yscrollcommand': self.vbar.set})
+        tk.Text.__init__(self, self.frame, **kw)
+        self.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.vbar['command'] = self.yview
+
+        # Copy geometry methods of self.frame without overriding Text
+        # methods -- hack!
+        text_meths = vars(tk.Text).keys()
+        methods = vars(tk.Pack).keys() | vars(tk.Grid).keys() | vars(tk.Place).keys()
+        methods = methods.difference(text_meths)
+
+        for m in methods:
+            if m[0] != '_' and m != 'config' and m != 'configure':
+                setattr(self, m, getattr(self.frame, m))
+
+    def __str__(self):
+        return str(self.frame)
 
 class REGUIApp(ttk.Frame):
     def __init__(self, parent: tk.Tk, config: configparser.ConfigParser, modelFiles: set[str], models: list[str]):
@@ -269,6 +297,7 @@ class REGUIApp(ttk.Frame):
 
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
+        self.textOutput.insert(tk.END, ('TEST\n' * 128).strip())
         self.textOutput.configure(state=tk.DISABLED)
 
     def change_app_lang(self, event: tk.Event):
@@ -551,7 +580,7 @@ if __name__ == '__main__':
     os.chdir(define.APP_PATH)
     root = TkinterDnD.Tk(className=define.APP_TITLE)
     root.withdraw()
-    
+
     config, modelFiles, models = init_config_and_model_paths()
 
     if not os.path.exists(define.RE_PATH) or not models:
