@@ -303,7 +303,6 @@ def taskRunner(
             outputCallback(f'Task #{counter} completed in {round((te - ts) * 1000)}ms.\n')
             counter += 1
             pbar_value.set(counter / total_tasks * 100)
-            print(pbar_value.get())
         except Exception as ex:
             withError = True
             outputCallback(traceback.format_exc())
