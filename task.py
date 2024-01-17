@@ -14,6 +14,8 @@ from PIL import Image
 from PIL import ImageFilter
 from PIL import ImageSequence
 
+from tkinter import DoubleVar
+
 import define
 import param
 
@@ -285,9 +287,14 @@ def taskRunner(
     failCallback: typing.Callable[[Exception], None],
     finallyCallback: typing.Callable[[], None],
     ignoreError: bool,
+    pbar_value: DoubleVar,
 ) -> None:
+    # Reset progressbar
+    pbar_value.set(0.0)
+
     counter = 0
     withError = False
+    total_tasks = len(queue)
     while queue:
         try:
             ts = time.perf_counter()
@@ -295,6 +302,8 @@ def taskRunner(
             te = time.perf_counter()
             outputCallback(f'Task #{counter} completed in {round((te - ts) * 1000)}ms.\n')
             counter += 1
+            pbar_value.set(counter / total_tasks * 100)
+            print(pbar_value.get())
         except Exception as ex:
             withError = True
             outputCallback(traceback.format_exc())

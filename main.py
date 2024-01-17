@@ -161,6 +161,9 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelViewDonatePage = tk.StringVar(value=i18n.getTranslatedString('ViewDonatePage'))
         self.varstrLabelFrameBasicConfig = tk.StringVar(value=i18n.getTranslatedString('FrameBasicConfig'))
 
+        # ProgressBar value setter and getter
+        self.varfloatProgressBar = tk.DoubleVar(value=0.0)
+
     def setupWidgets(self):
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
@@ -293,6 +296,9 @@ class REGUIApp(ttk.Frame):
         self.notebookConfig.add(self.frameBasicConfig, text=i18n.getTranslatedString('FrameBasicConfig'))
         self.notebookConfig.add(self.frameAdvancedConfig, text=i18n.getTranslatedString('FrameAdvancedConfig'))
         self.notebookConfig.add(self.frameAbout, text=i18n.getTranslatedString('FrameAbout'))
+
+        self.progressBar = ttk.Progressbar(self, orient='horizontal', mode='determinate', variable=self.varfloatProgressBar)
+        self.progressBar.grid(row=2, column=0, padx=5, pady=5, sticky=tk.NSEW)
 
         self.textOutput = ScrolledText(self)
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
@@ -473,6 +479,7 @@ class REGUIApp(ttk.Frame):
                     failCallback,
                     lambda: (self.buttonProcess.config(state=tk.NORMAL), self.logFile.close()),
                     self.varboolIgnoreError.get(),
+                    self.varfloatProgressBar,
                 )
             )
             t.start()
