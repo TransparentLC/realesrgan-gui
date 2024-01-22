@@ -74,6 +74,7 @@ class RESpawnTask(AbstractTask):
         files = (self.inputPath, *(buildTempPath(outputExt) for _ in range(scalePass)))
         for i in range(len(files) - 1):
             inputPath, outputPath = files[i:(i + 2)]
+            alphaOverridePath = None
             cmd = (
                 define.RE_PATH,
                 '-v',
@@ -93,10 +94,19 @@ class RESpawnTask(AbstractTask):
             ) as p:
                 for line in p.stderr:
                     self.outputCallback(line)
+                    # 如果输入文件是有alpha通道的图片，但是输出扩展名又是JPG
+                    # Real-ESRGAN会强行给输出的文件名加上PNG的扩展名，导致后续处理找不到文件
+                    # 这里额外加了一个重命名为原来的输出文件名的操作
+                    # https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/blob/37026f49824c5cf84062e7c6a5dd71445dcf610f/src/main.cpp#L283
+                    if m := re.search(r'^image .+? has alpha channel ! .+? will output (.+?)$', line, re.M):
+                        alphaOverridePath = m.group(1)
             if p.returncode:
                 raise subprocess.CalledProcessError(p.returncode, cmd)
             if i > 0 or self.removeInput:
                 os.remove(inputPath)
+            if alphaOverridePath:
+                shutil.move(alphaOverridePath, outputPath)
+                self.outputCallback(f'Rename {alphaOverridePath} to {outputPath}\n')
 
         os.makedirs(os.path.split(self.outputPath)[0], exist_ok=True)
         if srcWidth == dstWidth and srcHeight == dstHeight:
@@ -234,6 +244,9 @@ class LossyCompressTask(AbstractTask):
                 case '.webp':
                     img.save(self.outputPath, quality=self.quality, method=6)
                 case '.jpg' | '.jpeg':
+                    if img.mode == 'RGBA':
+                        img = img.convert('RGB')
+                        self.outputCallback('Discarding alpha channel to compress the RGBA image to JPEG\n')
                     img.save(self.outputPath, quality=self.quality, optimize=True, progressive=True)
         if self.removeInput:
             os.remove(self.inputPath)
