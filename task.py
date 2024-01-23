@@ -31,11 +31,13 @@ class RESpawnTask(AbstractTask):
     def __init__(
         self,
         outputCallback: typing.Callable[[str], None],
+        progressValue: list[int | float],
         inputPath: str, outputPath: str,
         config: param.REConfigParams,
         removeInput: bool = False,
     ) -> None:
         super().__init__(outputCallback)
+        self.progressValue = progressValue
         self.inputPath = inputPath
         self.outputPath = outputPath
         self.config = config
@@ -43,6 +45,7 @@ class RESpawnTask(AbstractTask):
 
     def run(self) -> None:
         self.outputCallback(f'Using executable: {define.RE_PATH}\n')
+        self.progressValue[0] = 0
 
         with Image.open(self.inputPath) as img:
             srcWidth, srcHeight = img.size
@@ -93,13 +96,17 @@ class RESpawnTask(AbstractTask):
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
             ) as p:
                 for line in p.stderr:
-                    self.outputCallback(line)
                     # 如果输入文件是有alpha通道的图片，但是输出扩展名又是JPG
                     # Real-ESRGAN会强行给输出的文件名加上PNG的扩展名，导致后续处理找不到文件
                     # 这里额外加了一个重命名为原来的输出文件名的操作
                     # https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan/blob/37026f49824c5cf84062e7c6a5dd71445dcf610f/src/main.cpp#L283
                     if m := re.search(r'^image .+? has alpha channel ! .+? will output (.+?)$', line, re.M):
                         alphaOverridePath = m.group(1)
+                    elif m := re.search(r'(\d+[.,]\d+)%', line):
+                        self.progressValue[0] = (i + float(m.group(1).replace(',', '.')) / 100) / (len(files) - 1)
+                    elif m := re.search(r'^.+? -> .+? done$', line, re.M):
+                        self.progressValue[0] = (i + 1) / (len(files) - 1)
+                    self.outputCallback(line)
             if p.returncode:
                 raise subprocess.CalledProcessError(p.returncode, cmd)
             if i > 0 or self.removeInput:
@@ -120,6 +127,9 @@ class RESpawnTask(AbstractTask):
                 resized.save(self.outputPath)
                 resized.close()
             os.remove(files[-1])
+
+        self.progressValue[0] = 0
+        self.progressValue[1] += 1
 
 class MergeGIFTask(AbstractTask):
     def __init__(
@@ -178,12 +188,14 @@ class SplitGIFTask(AbstractTask):
     def __init__(
         self,
         outputCallback: typing.Callable[[str], None],
+        progressValue: list[int | float],
         inputPath: str, outputPath: str,
         config: param.REConfigParams,
         queue: collections.deque[AbstractTask],
         optimizeTransparency: bool,
     ) -> None:
         super().__init__(outputCallback)
+        self.progressValue = progressValue
         self.inputPath = inputPath
         self.outputPath = outputPath
         self.config = config
@@ -211,7 +223,9 @@ class SplitGIFTask(AbstractTask):
                 self.outputCallback(f'Frame #{len(frames)}: {frameSrcPath} -> {frameDstPath} Duration: {d}\n')
                 frames.append(frameDstPath)
                 durations.append(d)
-                tasks.append(RESpawnTask(self.outputCallback, frameSrcPath, frameDstPath, self.config, True))
+                tasks.append(RESpawnTask(self.outputCallback, self.progressValue, frameSrcPath, frameDstPath, self.config, True))
+                self.progressValue[2] += 1
+        self.progressValue[2] -= 1
         if self.config.customCommand:
             t = buildTempPath('.gif')
             tasks.append(MergeGIFTask(self.outputCallback, t, frames, durations, self.optimizeTransparency))

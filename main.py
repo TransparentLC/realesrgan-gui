@@ -100,6 +100,9 @@ class REGUIApp(ttk.Frame):
         self.outputPathChanged = True
         self.logPath = os.path.join(define.APP_PATH, 'output.log')
         self.logFile: typing.IO = None
+        # 当前的放大进度（0~1）/已放大的文件/总共要放大的文件
+        # self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
+        self.progressValue: list[int | float] = [0, 0, 1]
 
         self.setupVars()
         self.setupWidgets()
@@ -133,6 +136,7 @@ class REGUIApp(ttk.Frame):
         self.varboolIgnoreError = tk.BooleanVar(value=self.config['Config'].getboolean('IgnoreError'))
         self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
+        self.vardoubleProgress = tk.DoubleVar(value=0)
 
         # StringVars for easily change all labels' strings
         self.varstrLabelInputPath = tk.StringVar(value=i18n.getTranslatedString('Input'))
@@ -298,6 +302,9 @@ class REGUIApp(ttk.Frame):
         self.textOutput.grid(row=1, column=0, padx=5, pady=5, sticky=tk.NSEW)
         self.textOutput.configure(state=tk.DISABLED)
 
+        self.progressbar = ttk.Progressbar(self, orient='horizontal', mode='determinate', variable=self.vardoubleProgress)
+        self.progressbar.grid(row=2, column=0, padx=5, pady=5, sticky=tk.NSEW)
+
     def change_app_lang(self, event: tk.Event):
         lang = self.comboLanguage.get()
         lang = i18n.locales_map[lang]
@@ -399,7 +406,11 @@ class REGUIApp(ttk.Frame):
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
 
             queue = collections.deque()
+            self.vardoubleProgress.set(0)
             if os.path.isdir(inputPath):
+                self.progressValue[0] = 0
+                self.progressValue[1] = 0
+                self.progressValue[2] = 0
                 for curDir, dirs, files in os.walk(inputPath):
                     for f in files:
                         if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
@@ -407,34 +418,38 @@ class REGUIApp(ttk.Frame):
                         f = os.path.join(curDir, f)
                         g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
                         if os.path.splitext(f)[1].lower() == '.gif':
-                            queue.append(task.SplitGIFTask(self.writeToOutput, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                            queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
                         elif self.varstrCustomCommand.get().strip():
                             t = task.buildTempPath('.png')
-                            queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                             queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
                         elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
                             t = task.buildTempPath('.webp')
-                            queue.append(task.RESpawnTask(self.writeToOutput, f, t, initialConfigParams))
+                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                             queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
                         else:
                             if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
                                 g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
-                            queue.append(task.RESpawnTask(self.writeToOutput, f, g, initialConfigParams))
+                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams))
+                        self.progressValue[2] += 1
                 if not queue:
                     return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
             elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
+                self.progressValue[0] = 0
+                self.progressValue[1] = 0
+                self.progressValue[2] = 1
                 if os.path.splitext(inputPath)[1].lower() == '.gif':
-                    queue.append(task.SplitGIFTask(self.writeToOutput, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                    queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
                 elif self.varstrCustomCommand.get().strip():
                     t = task.buildTempPath('.png')
-                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
                     queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
                 elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
                     t = task.buildTempPath('.webp')
-                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, t, initialConfigParams))
+                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
                     queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
                 else:
-                    queue.append(task.RESpawnTask(self.writeToOutput, inputPath, outputPath, initialConfigParams))
+                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams))
             else:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
             self.buttonProcess.config(state=tk.DISABLED)
@@ -457,6 +472,7 @@ class REGUIApp(ttk.Frame):
                     else:
                         notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
                     notification.send(False)
+                    self.vardoubleProgress.set(100)
             def failCallback(ex: Exception):
                 if sys.platform != 'darwin':
                     notification.title = i18n.getTranslatedString('ToastFailedTitle')
@@ -492,6 +508,7 @@ class REGUIApp(ttk.Frame):
         yview = self.textOutput.yview()
         if yview[1] - yview[0] > .5 or yview[1] > .9:
             self.textOutput.see('end')
+        self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
 
     def getConfigParams(self) -> param.REConfigParams:
         resizeModeValue = 0
