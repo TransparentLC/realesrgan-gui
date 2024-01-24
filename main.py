@@ -103,6 +103,8 @@ class REGUIApp(ttk.Frame):
         # 当前的放大进度（0~1）/已放大的文件/总共要放大的文件
         # self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
         self.progressValue: list[int | float] = [0, 0, 1]
+        # 初始值/结束值/进度/after ID
+        self.progressAnimation: list[float | str] = [0, 0, 0, None]
 
         self.setupVars()
         self.setupWidgets()
@@ -405,8 +407,15 @@ class REGUIApp(ttk.Frame):
             if initialConfigParams.resizeMode == param.ResizeMode.RATIO and initialConfigParams.resizeModeValue == 1:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
 
-            queue = collections.deque()
             self.vardoubleProgress.set(0)
+            self.progressAnimation[0] = 0
+            self.progressAnimation[1] = 0
+            self.progressAnimation[2] = 0
+            if self.progressAnimation[3]:
+                self.progressbar.after_cancel(self.progressAnimation[3])
+                self.progressAnimation[3] = None
+
+            queue = collections.deque()
             if os.path.isdir(inputPath):
                 self.progressValue[0] = 0
                 self.progressValue[1] = 0
@@ -464,15 +473,18 @@ class REGUIApp(ttk.Frame):
                 )
             ts = time.perf_counter()
             def completeCallback(withError: bool):
+                te = time.perf_counter()
                 if sys.platform != 'darwin':
-                    te = time.perf_counter()
                     notification.title = i18n.getTranslatedString('ToastCompletedTitle')
                     if withError:
                         notification.message = i18n.getTranslatedString('ToastCompletedMessageWithError').format(self.logPath)
                     else:
                         notification.message = i18n.getTranslatedString('ToastCompletedMessage').format(outputPath, te - ts)
                     notification.send(False)
-                    self.vardoubleProgress.set(100)
+                if self.progressAnimation[3]:
+                    self.progressbar.after_cancel(self.progressAnimation[3])
+                    self.progressAnimation[3] = None
+                self.vardoubleProgress.set(100)
             def failCallback(ex: Exception):
                 if sys.platform != 'darwin':
                     notification.title = i18n.getTranslatedString('ToastFailedTitle')
@@ -508,7 +520,24 @@ class REGUIApp(ttk.Frame):
         yview = self.textOutput.yview()
         if yview[1] - yview[0] > .5 or yview[1] > .9:
             self.textOutput.see('end')
-        self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
+
+        # self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
+        progressFrom = self.vardoubleProgress.get()
+        progressTo = (self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100
+        if progressFrom != progressTo:
+            def anim():
+                self.vardoubleProgress.set(self.progressAnimation[0] + (self.progressAnimation[1] - self.progressAnimation[0]) * (lambda x: 1 - (1 - x) ** 3)(self.progressAnimation[2]))
+                self.progressAnimation[2] += 1 / 10
+                if self.progressAnimation[2] < 1:
+                    self.progressAnimation[3] = self.progressbar.after(10, anim)
+                else:
+                    self.progressAnimation[3] = None
+            if self.progressAnimation[3]:
+                self.progressbar.after_cancel(self.progressAnimation[3])
+            self.progressAnimation[0] = progressFrom
+            self.progressAnimation[1] = progressTo
+            self.progressAnimation[2] = 0
+            self.progressAnimation[3] = self.progressbar.after(10, anim)
 
     def getConfigParams(self) -> param.REConfigParams:
         resizeModeValue = 0
