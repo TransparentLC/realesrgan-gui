@@ -126,7 +126,8 @@ class RESpawnTask(AbstractTask):
                 resized: Image.Image = img.resize((dstWidth, dstHeight), self.config.downsample)
                 resized.save(self.outputPath)
                 resized.close()
-            os.remove(files[-1])
+            if scalePass:
+                os.remove(files[-1])
 
         self.progressValue[0] = 0
         self.progressValue[1] += 1
