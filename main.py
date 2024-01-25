@@ -526,14 +526,21 @@ class REGUIApp(ttk.Frame):
         progressTo = (self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100
         if progressFrom != progressTo:
             def anim():
+                if self.progressAnimation[3] is None:
+                    return
+                # print(f'Before anim {self.progressAnimation}')
                 self.vardoubleProgress.set(self.progressAnimation[0] + (self.progressAnimation[1] - self.progressAnimation[0]) * (lambda x: 1 - (1 - x) ** 3)(self.progressAnimation[2]))
                 self.progressAnimation[2] += 1 / 10
                 if self.progressAnimation[2] < 1:
                     self.progressAnimation[3] = self.progressbar.after(10, anim)
                 else:
                     self.progressAnimation[3] = None
+                # print(f'After anim  {self.progressAnimation}')
             if self.progressAnimation[3]:
-                self.progressbar.after_cancel(self.progressAnimation[3])
+                afterId = self.progressAnimation[3]
+                self.progressAnimation[3] = None
+                self.progressbar.after_cancel(afterId)
+                # print(f'Cancel {afterId}')
             self.progressAnimation[0] = progressFrom
             self.progressAnimation[1] = progressTo
             self.progressAnimation[2] = 0
