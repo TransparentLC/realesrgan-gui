@@ -25,9 +25,9 @@ jobs:
           - ubuntu-latest
           - macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
           check-latest: true
@@ -60,7 +60,7 @@ jobs:
             pyinstaller --clean --log-level WARN realesrgan-gui.spec
           fi
       - name: Upload result
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: realesrgan-gui-${{ runner.os }}
           path: dist
@@ -69,16 +69,16 @@ jobs:
     needs: build
     if: ${{ github.event.inputs.release }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: realesrgan-gui-Windows
           path: dist-Windows
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: realesrgan-gui-Linux
           path: dist-Linux
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: realesrgan-gui-macOS
           path: dist-macOS
