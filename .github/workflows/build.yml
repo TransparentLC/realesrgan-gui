@@ -119,10 +119,12 @@ jobs:
               cp ../../../../README.md README_gui.md
               cp ../../../../README.en-US.md README_gui.en-US.md
               cp ../../../../README.uk-UA.md README_gui.uk-UA.md
+              cp ../../../../README.tr-TR.md README_gui.tr-TR.md
             else
               cp ../README.md README_gui.md
               cp ../README.en-US.md README_gui.en-US.md
               cp ../README.uk-UA.md README_gui.uk-UA.md
+              cp ../README.tr-TR.md README_gui.tr-TR.md
             fi
 
             if [ $BUILD_OS == "Windows" ]; then
