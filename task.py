@@ -8,6 +8,7 @@ import shlex
 import shutil
 import tempfile
 import time
+import threading
 import traceback
 import typing
 from PIL import Image
@@ -308,6 +309,7 @@ class CustomCompressTask(AbstractTask):
 
 def taskRunner(
     queue: collections.deque[AbstractTask],
+    pauseEvent: threading.Event,
     outputCallback: typing.Callable[[str], None],
     completeCallback: typing.Callable[[bool], None],
     failCallback: typing.Callable[[Exception], None],
@@ -318,6 +320,7 @@ def taskRunner(
     withError = False
     while queue:
         try:
+            pauseEvent.wait()
             ts = time.perf_counter()
             queue.popleft().run()
             te = time.perf_counter()

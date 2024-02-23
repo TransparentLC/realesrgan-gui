@@ -105,6 +105,8 @@ class REGUIApp(ttk.Frame):
         self.progressValue: list[int | float] = [0, 0, 1]
         # 初始值/结束值/进度/after ID
         self.progressAnimation: list[float | str] = [0, 0, 0, None]
+        # 控制是否暂停
+        self.pauseEvent = threading.Event()
 
         self.setupVars()
         self.setupWidgets()
@@ -136,6 +138,8 @@ class REGUIApp(ttk.Frame):
         self.varboolOptimizeGIF = tk.BooleanVar(value=self.config['Config'].getboolean('OptimizeGIF'))
         self.varboolLossyMode = tk.BooleanVar(value=self.config['Config'].getboolean('LossyMode'))
         self.varboolIgnoreError = tk.BooleanVar(value=self.config['Config'].getboolean('IgnoreError'))
+        self.varboolProcessing = tk.BooleanVar(value=False)
+        self.varboolProcessingPaused = tk.BooleanVar(value=False)
         self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
         self.varintLossyQuality = tk.IntVar(value=self.config['Config'].getint('LossyQuality'))
         self.vardoubleProgress = tk.DoubleVar(value=0)
@@ -149,7 +153,7 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelResizeModeRatio = tk.StringVar(value=i18n.getTranslatedString('ResizeModeRatio'))
         self.varstrLabelResizeModeWidth = tk.StringVar(value=i18n.getTranslatedString('ResizeModeWidth'))
         self.varstrLabelResizeModeHeight = tk.StringVar(value=i18n.getTranslatedString('ResizeModeHeight'))
-        self.varstrLabelStartProcessing = tk.StringVar(value=i18n.getTranslatedString('StartProcessing'))
+        self.varstrLabelStartProcessing = tk.StringVar(value=i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
         self.varstrLabelDownsampleMode = tk.StringVar(value=i18n.getTranslatedString('DownsampleMode'))
         self.varstrLabelTileSize = tk.StringVar(value=i18n.getTranslatedString('TileSize'))
         self.varstrLabelTileSizeAuto = tk.StringVar(value=i18n.getTranslatedString('TileSizeAuto'))
@@ -324,7 +328,7 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelResizeModeRatio.set(i18n.getTranslatedString('ResizeModeRatio'))
         self.varstrLabelResizeModeWidth.set(i18n.getTranslatedString('ResizeModeWidth'))
         self.varstrLabelResizeModeHeight.set(i18n.getTranslatedString('ResizeModeHeight'))
-        self.varstrLabelStartProcessing.set(i18n.getTranslatedString('StartProcessing'))
+        self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
         self.varstrLabelDownsampleMode.set(i18n.getTranslatedString('DownsampleMode'))
 
         self.varstrLabelTileSize.set(i18n.getTranslatedString('TileSize'))
@@ -393,6 +397,17 @@ class REGUIApp(ttk.Frame):
         self.varintTileSizeIndex.set(self.comboTileSize.current())
 
     def buttonProcess_click(self):
+        if self.varboolProcessing.get():
+            if self.varboolProcessingPaused.get():
+                self.varboolProcessingPaused.set(False)
+                self.pauseEvent.set()
+            else:
+                self.varboolProcessingPaused.set(True)
+                self.pauseEvent.clear()
+                self.writeToOutput('Will pause after current task is completed.\n')
+            self.buttonProcess.config(style='' if self.varboolProcessing.get() and not self.varboolProcessingPaused.get() else 'Accent.TButton')
+            self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
+            return
         try:
             inputPath = self.varstrInputPath.get()
             outputPath = self.varstrOutputPath.get()
@@ -461,7 +476,11 @@ class REGUIApp(ttk.Frame):
                     queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams))
             else:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
-            self.buttonProcess.config(state=tk.DISABLED)
+            self.varboolProcessing.set(True)
+            self.varboolProcessingPaused.set(False)
+            self.pauseEvent.set()
+            self.buttonProcess.config(style='' if self.varboolProcessing.get() and not self.varboolProcessingPaused.get() else 'Accent.TButton')
+            self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
             self.textOutput.config(state=tk.NORMAL)
             self.textOutput.delete(1.0, tk.END)
             self.textOutput.config(state=tk.DISABLED)
@@ -496,10 +515,17 @@ class REGUIApp(ttk.Frame):
                 target=task.taskRunner,
                 args=(
                     queue,
+                    self.pauseEvent,
                     self.writeToOutput,
                     completeCallback,
                     failCallback,
-                    lambda: (self.buttonProcess.config(state=tk.NORMAL), self.logFile.close()),
+                    lambda: (
+                        self.varboolProcessing.set(False),
+                        self.pauseEvent.set(),
+                        self.buttonProcess.config(style='' if self.varboolProcessing.get() and not self.varboolProcessingPaused.get() else 'Accent.TButton'),
+                        self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing')),
+                        self.logFile.close(),
+                    ),
                     self.varboolIgnoreError.get(),
                 )
             )
