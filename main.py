@@ -67,9 +67,8 @@ class ScrolledText(tk.Text):
         return str(self.frame)
 
 class REGUIApp(ttk.Frame):
-    def __init__(self, parent: tk.Tk, config: configparser.ConfigParser, modelFiles: set[str], models: list[str]):
+    def __init__(self, parent: tk.Tk, config: configparser.ConfigParser, models: list[str]):
         super().__init__(parent)
-        modelFiles = modelFiles
         self.models = models
         for m in (
             'realesrgan-x4plus',
@@ -93,7 +92,7 @@ class REGUIApp(ttk.Frame):
             ('Box', Image.Resampling.BOX),
             ('Nearest', Image.Resampling.NEAREST),
         )
-        self.tileSize = (0, 32, 64, 128, 256, 512, 1024)
+        self.tileSize = (0, 32, 64, 128, 256, 512, 1024, 2048, 4096)
 
         self.config = config
 
@@ -110,6 +109,11 @@ class REGUIApp(ttk.Frame):
 
         self.setupVars()
         self.setupWidgets()
+
+        if self.config['Config'].get('ModelDir'):
+            self.writeToOutput(f"Using custom model dir: {self.config['Config'].get('ModelDir')}\n")
+        if self.config['Config'].get('Upscaler'):
+            self.writeToOutput(f"Using custom upscaler executable: {self.config['Config'].get('Upscaler')}\nThe executable (and models) may be incompatible with Real-ESRGAN-ncnn-vulkan. Use at your own risk!\n")
 
     def setupVars(self):
         def varstrOutputPathCallback(var: tk.IntVar | tk.StringVar, index: str, mode: str):
@@ -353,6 +357,8 @@ class REGUIApp(ttk.Frame):
     def close(self):
         self.config['DEFAULT'] = {}
         self.config['Config'] = {
+            'Upscaler': self.config['Config'].get('Upscaler') or '',
+            'ModelDir': self.config['Config'].get('ModelDir') or '',
             'ResizeMode': self.varintResizeMode.get(),
             'ResizeRatio': self.varintResizeRatio.get(),
             'ResizeWidth': self.varintResizeWidth.get(),
@@ -539,7 +545,8 @@ class REGUIApp(ttk.Frame):
         self.outputPathChanged = False
 
     def writeToOutput(self, s: str):
-        self.logFile.write(s)
+        if self.logFile:
+            self.logFile.write(s)
         self.textOutput.config(state=tk.NORMAL)
         self.textOutput.insert(tk.END, s)
         self.textOutput.config(state=tk.DISABLED)
@@ -617,8 +624,31 @@ class REGUIApp(ttk.Frame):
 # must be initialized and for that config must be initialized
 # and for that models variable needs to be set
 def init_config_and_model_paths() -> tuple[configparser.ConfigParser, set[str], list[str]]:
+    config = configparser.ConfigParser({
+        'Upscaler': '',
+        'ModelDir': '',
+        'ResizeMode': int(param.ResizeMode.RATIO),
+        'ResizeRatio': 4,
+        'ResizeWidth': 1024,
+        'ResizeHeight': 1024,
+        'Model': '',
+        'DownsampleIndex': 0,
+        'GPUID': -1,
+        'TileSizeIndex': 0,
+        'LossyQuality': 80,
+        'UseWebP': False,
+        'UseTTA': False,
+        'OptimizeGIF': False,
+        'LossyMode': False,
+        'IgnoreError': False,
+        'CustomCommand': '',
+        'AppLanguage': locale.getdefaultlocale()[0],
+    })
+    config['Config'] = {}
+    config.read(define.APP_CONFIG_PATH)
+
     try:
-        modelFiles = set(os.listdir(os.path.join(define.APP_PATH, 'models')))
+        modelFiles = set(os.listdir(config['Config'].get('ModelDir') or os.path.join(define.APP_PATH, 'models')))
         models = sorted(
             x for x in set(os.path.splitext(y)[0] for y in modelFiles)
             if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
@@ -627,38 +657,20 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, set[str], 
         # in case of FileNotFoundError exception, return empty modelFiles and models.
         # This does not change any behabiour because in this case
         # we will be showing a warning message and terminate app
-        modelFiles = []
         models = []
 
-    config = configparser.ConfigParser({
-            'ResizeMode': int(param.ResizeMode.RATIO),
-            'ResizeRatio': 4,
-            'ResizeWidth': 1024,
-            'ResizeHeight': 1024,
-            'Model': models[0] if models else "",
-            'DownsampleIndex': 0,
-            'GPUID': -1,
-            'TileSizeIndex': 0,
-            'LossyQuality': 80,
-            'UseWebP': False,
-            'UseTTA': False,
-            'OptimizeGIF': False,
-            'LossyMode': False,
-            'IgnoreError': False,
-            'CustomCommand': '',
-            'AppLanguage': locale.getdefaultlocale()[0],
-        })
-    config['Config'] = {}
-    config.read(define.APP_CONFIG_PATH)
+    if config['Config'].get('Upscaler'):
+        define.RE_PATH = config['Config'].get('Upscaler')
+
     i18n.set_current_language(config['Config'].get('AppLanguage'))
-    return config, modelFiles, models
+    return config, models
 
 if __name__ == '__main__':
     os.chdir(define.APP_PATH)
     root = TkinterDnD.Tk(className=define.APP_TITLE)
     root.withdraw()
 
-    config, modelFiles, models = init_config_and_model_paths()
+    config, models = init_config_and_model_paths()
 
     if not os.path.exists(define.RE_PATH) or not models:
         messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundRE'))
@@ -701,7 +713,7 @@ if __name__ == '__main__':
         print(traceback.format_exc())
         changeTheme('Light')
 
-    app = REGUIApp(root, config, modelFiles, models)
+    app = REGUIApp(root, config, models)
     app.drop_target_register(DND_FILES)
     app.dnd_bind(
         '<<Drop>>',
