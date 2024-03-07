@@ -10,7 +10,7 @@ a = Analysis(
         ('icon-256px.ico', '.'),
         ('icon-128px.png', '.'),
         # Windows下在任务栏显示进度条
-        *(('TaskbarLib.tlb', '.') if sys.platform == 'win32' else ()),
+        *((('TaskbarLib.tlb', '.'),) if sys.platform == 'win32' else ()),
         # macOS下通过app实现通知，打包时需要附带
         *collect_data_files('notifypy'),
     ],
