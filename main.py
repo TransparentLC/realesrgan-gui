@@ -108,7 +108,7 @@ class REGUIApp(ttk.Frame):
         match sys.platform:
             case 'win32':
                 import comtypes.client
-                comtypes.client.GetModule(os.path.join(define.APP_PATH, 'TaskbarLib.tlb'))
+                comtypes.client.GetModule(os.path.join(define.BASE_PATH, 'TaskbarLib.tlb'))
                 import comtypes.gen.TaskbarLib
                 self.progressNativeTaskbar = comtypes.client.CreateObject('{56FDF344-FD6D-11d0-958A-006097C9A090}', interface=comtypes.gen.TaskbarLib.ITaskbarList3)
                 self.progressNativeTaskbar.HrInit()
