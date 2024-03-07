@@ -104,6 +104,18 @@ class REGUIApp(ttk.Frame):
         self.progressValue: list[int | float] = [0, 0, 1]
         # 初始值/结束值/进度/after ID
         self.progressAnimation: list[float | str] = [0, 0, 0, None]
+        # 任务栏进度条
+        match sys.platform:
+            case 'win32':
+                import comtypes.client
+                comtypes.client.GetModule(os.path.join(define.APP_PATH, 'TaskbarLib.tlb'))
+                import comtypes.gen.TaskbarLib
+                self.progressNativeTaskbar = comtypes.client.CreateObject('{56FDF344-FD6D-11d0-958A-006097C9A090}', interface=comtypes.gen.TaskbarLib.ITaskbarList3)
+                self.progressNativeTaskbar.HrInit()
+                self.progressNativeTaskbar.ActivateTab(int(self.master.wm_frame(), 16))
+                self.progressNativeTaskbar.SetProgressState(int(self.master.wm_frame(), 16), 0) # TBPF_NOPROGRESS
+            case _:
+                self.progressNativeTaskbar = None
         # 控制是否暂停
         self.pauseEvent = threading.Event()
 
@@ -496,6 +508,11 @@ class REGUIApp(ttk.Frame):
                     default_notification_application_name=define.APP_TITLE,
                     default_notification_icon=os.path.join(define.BASE_PATH, 'icon-128px.png'),
                 )
+            match sys.platform:
+                case 'win32':
+                    self.progressNativeTaskbar.SetProgressState(int(self.master.wm_frame(), 16), 2) # TBPF_NORMAL
+                    # 初始进度应该是0，但是直接设为0没有效果，所以改成使用非常接近0的值
+                    self.progressNativeTaskbar.SetProgressValue(int(self.master.wm_frame(), 16), 1, 0xFFFFFFFF)
             ts = time.perf_counter()
             def completeCallback(withError: bool):
                 te = time.perf_counter()
@@ -531,6 +548,7 @@ class REGUIApp(ttk.Frame):
                         self.buttonProcess.config(style='' if self.varboolProcessing.get() and not self.varboolProcessingPaused.get() else 'Accent.TButton'),
                         self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing')),
                         self.logFile.close(),
+                        sys.platform == 'win32' and self.progressNativeTaskbar.SetProgressState(int(self.master.wm_frame(), 16), 0), # TBPF_NOPROGRESS
                     ),
                     self.varboolIgnoreError.get(),
                 )
@@ -578,6 +596,10 @@ class REGUIApp(ttk.Frame):
             self.progressAnimation[1] = progressTo
             self.progressAnimation[2] = 0
             self.progressAnimation[3] = self.progressbar.after(10, anim)
+            match sys.platform:
+                case 'win32':
+                    self.progressNativeTaskbar.SetProgressState(int(self.master.wm_frame(), 16), 2) # TBPF_NORMAL
+                    self.progressNativeTaskbar.SetProgressValue(int(self.master.wm_frame(), 16), round(progressTo), 100)
 
     def getConfigParams(self) -> param.REConfigParams:
         resizeModeValue = 0

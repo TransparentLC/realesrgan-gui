@@ -1,3 +1,4 @@
+comtypes == 1.*; sys_platform == 'win32'
 darkdetect == 0.8.*; sys_platform != 'darwin'
 darkdetect[macos-listener] == 0.8.*; sys_platform == 'darwin'
 notify-py == 0.3.*; sys_platform != 'darwin'
