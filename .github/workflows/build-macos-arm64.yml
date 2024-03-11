@@ -19,14 +19,12 @@ jobs:
         run: |
           pip install pyinstaller
           brew install openssl xz libxml2 bzip2 zlib
-          
-      - name: Install Xcode Command Line Tools
-        run: sudo xcode-select --install
 
       - name: Install osx-arm64-builder
         run: |
           git clone https://github.com/tpoechtrager/osxcross.git
           cd osxcross
+          find /Applications/Xcode.app/Contents/Developer/Platforms -name "*.sdk"
           cp -r /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ ./tarballs/
           UNATTENDED=1 ./build.sh
           echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
