@@ -26,8 +26,6 @@ jobs:
           cd osxcross
           find /Applications/Xcode.app/Contents/Developer/Platforms -name "*.sdk"
           ditto /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk tarballs/
-          ditto /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk tarballs/
-          ditto /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.sdk tarballs/
           UNATTENDED=1 ./build.sh
           echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
 
