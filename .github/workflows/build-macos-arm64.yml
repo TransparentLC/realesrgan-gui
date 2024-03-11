@@ -25,7 +25,7 @@ jobs:
           git clone https://github.com/tpoechtrager/osxcross.git
           cd osxcross
           find /Applications/Xcode.app/Contents/Developer/Platforms -name "*.sdk"
-          cp -rv /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk tarballs/
+          cp -r /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk tarballs/
           UNATTENDED=1 SDK_VERSION=13.1 ./build.sh
           echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
 
