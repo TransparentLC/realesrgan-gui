@@ -18,13 +18,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyinstaller
+          brew install patch openssl xz libxml2 bzip2 zlib
 
       - name: Install osx-arm64-builder
         run: |
           git clone https://github.com/tpoechtrager/osxcross.git
           cd osxcross
           UNATTENDED=1 ./build.sh
-          mv target /opt/osxcross
           echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
 
       - name: Build arm64 app
