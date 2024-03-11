@@ -26,14 +26,14 @@ jobs:
           cd osxcross
           find /Applications/Xcode.app/Contents/Developer/Platforms -name "*.sdk"
           ditto /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk tarballs/
-          UNATTENDED=1 ./build.sh
+          UNATTENDED=1 SDK_VERSION=13.1 ./build.sh
           echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
 
       - name: Build arm64 app
         run: |
           export CROSS_TRIPLE=x86_64-apple-darwin
           export BUILD_TRIPLE=aarch64-apple-darwin
-          export SDK_VERSION=11.3
+          export SDK_VERSION=13.1
           export MACOSX_DEPLOYMENT_TARGET=10.14
           export PKG_CONFIG_PATH=/opt/osxcross/lib/pkgconfig
           export CFLAGS="-arch $BUILD_TRIPLE -target $BUILD_TRIPLE -isysroot /opt/osxcross/target/SDK/MacOSX$SDK_VERSION.sdk -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET $CFLAGS"
