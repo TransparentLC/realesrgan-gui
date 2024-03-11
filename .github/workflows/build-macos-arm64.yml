@@ -1,0 +1,48 @@
+name: build-macos-arm64
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller
+
+      - name: Install osx-arm64-builder
+        run: |
+          git clone https://github.com/tpoechtrager/osxcross.git
+          cd osxcross
+          UNATTENDED=1 ./build.sh
+          mv target /opt/osxcross
+          echo 'export PATH="/opt/osxcross/bin:$PATH"' >> $GITHUB_ENV
+
+      - name: Build arm64 app
+        run: |
+          export CROSS_TRIPLE=x86_64-apple-darwin
+          export BUILD_TRIPLE=aarch64-apple-darwin
+          export SDK_VERSION=11.3
+          export MACOSX_DEPLOYMENT_TARGET=10.14
+          export PKG_CONFIG_PATH=/opt/osxcross/lib/pkgconfig
+          export CFLAGS="-arch $BUILD_TRIPLE -target $BUILD_TRIPLE -isysroot /opt/osxcross/target/SDK/MacOSX$SDK_VERSION.sdk -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET $CFLAGS"
+          export LDFLAGS="-arch $BUILD_TRIPLE -target $BUILD_TRIPLE -isysroot /opt/osxcross/target/SDK/MacOSX$SDK_VERSION.sdk -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET $LDFLAGS"
+          export CC=/opt/osxcross/bin/$CROSS_TRIPLE-clang
+          export CXX=/opt/osxcross/bin/$CROSS_TRIPLE-clang++
+          export MACOSX_DEPLOYMENT_TARGET=$SDK_VERSION
+          sh macos-build-script.sh
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: realesrgan-gui-macos-arm64
+          path: dist/*.app
