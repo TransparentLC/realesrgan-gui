@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyinstaller
-          brew install patch openssl xz libxml2 bzip2 zlib
+          brew install openssl xz libxml2 bzip2 zlib
 
       - name: Install osx-arm64-builder
         run: |
