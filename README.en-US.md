@@ -30,6 +30,11 @@ Quick Start：
 * ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) Download the latest `realesrgan-gui-ubuntu-bundled-v*.tar.xz` from Release, extract the archive then launch `realesrgan-gui`.
 * ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) Download the latest `realesrgan-gui-macos-appbundle-v*.tar.xz` from Release, extract the archive and run `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"`, `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"` and `xattr -cr "Real-ESRGAN GUI.app"` in terminal, then launch `Real-ESRGAN GUI`.
 
+> [!TIP]
+> Real-ESRGAN-ncnn-vulkan has not been updated for a while since April 2022. You can use another actively maintained fork [upscayl/upscayl-ncnn](https://github.com/upscayl/upscayl-ncnn) instead.
+>
+> Download the latest release and extract `upscayl-bin[.exe]` to the directory where Real-ESRGAN GUI's executable file is located. It will be used in priority.
+
 <details>
 
 <summary>Notes</summary>

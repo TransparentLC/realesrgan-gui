@@ -30,6 +30,11 @@
 * ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) 在 Release 中下载最新的 `realesrgan-gui-ubuntu-bundled-v*.tar.xz`，解压后打开 `realesrgan-gui` 即可使用。
 * ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) 在 Release 中下载最新的 `realesrgan-gui-macos-appbundle-v*.tar.xz`，解压后在终端中执行 `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"`、`chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"` 和 `xattr -cr "Real-ESRGAN GUI.app"`，打开 `Real-ESRGAN GUI` 即可使用。
 
+> [!TIP]
+> Real-ESRGAN-ncnn-vulkan 从 2022 年 4 月开始就没有更新了，可以使用 [upscayl/upscayl-ncnn](https://github.com/upscayl/upscayl-ncnn) 这个仍然在维护的分支作为替代。
+>
+> 下载最新的 Release 并将压缩包中的 `upscayl-bin[.exe]` 解压到 GUI 的主程序所在的目录，它将会被优先使用。
+
 <details>
 
 <summary>其它的运行方式和说明</summary>
@@ -54,7 +59,8 @@ curl -L https://raw.githubusercontent.com/TransparentLC/realesrgan-gui/master/ma
 ```
 打包好的应用在“下载”文件夹内，请手动拖拽应用到“应用程序”文件夹完成安装。
 
-> ⚠️ 由于我没有运行 macOS 的设备，因此可能无法处理和 macOS 相关的使用问题。
+> [!WARNING]
+> 由于我没有运行 macOS 的设备，因此可能无法处理和 macOS 相关的使用问题。
 
 ### 相关项目
 

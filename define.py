@@ -8,7 +8,12 @@ else:
 	BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 	APP_PATH = BASE_PATH
 
-RE_PATH = os.path.join(APP_PATH, 'realesrgan-ncnn-vulkan' + ('.exe' if os.name == 'nt' else ''))
+for executableName in (
+	'upscayl-bin',
+	'realesrgan-ncnn-vulkan',
+):
+	if os.path.exists(RE_PATH := os.path.join(APP_PATH, executableName + ('.exe' if os.name == 'nt' else ''))):
+		break
 APP_TITLE = 'Real-ESRGAN GUI'
 APP_CONFIG_PATH = os.path.join(APP_PATH, 'config.ini')
 BUILD_TIME: int = None
