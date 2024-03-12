@@ -62,7 +62,8 @@ sh Build-macOS-arm64.sh
 # 3. The built application is saved in "./realesrgan-gui/dist/Real-ESRGAN GUI.app".
 ```
 
-> ⚠️ Since I don't have any device running macOS, I may not be able to handle macOS-related issues.
+> [!WARNING]
+> Since I don't have any device running macOS, I may not be able to handle macOS-related issues.
 
 ### Related projects
 
