@@ -53,7 +53,8 @@
 
 1. 准备一台 Mac 设备，`intel` 芯片设备上打包得到`x86_64` 单架构应用，`apple` 芯片设备上打包得到`arm64` 单架构应用。
 2. 本项目最新commit的tk版本要求8.6，而Python 3.10自带tk版本是8.5，因此本地打包必须在`Python 3.11`环境下，打包前在终端输入`python3 -V`确认当前版本是否3.11
-3. 打开终端，在终端内运行下面的一键打包脚本命令，运行到 `pyinstaller` 打包环节，`sudo` 命令需要输入开机密码。
+3. 如果是通过brew安装python, 需要额外安装`brew install python-tk`
+4. 打开终端，在终端内运行下面的一键打包脚本命令，运行到 `pyinstaller` 打包环节，`sudo` 命令需要输入开机密码。
 ```shell
 curl -L https://raw.githubusercontent.com/TransparentLC/realesrgan-gui/master/macos-build-script.sh | bash
 ```
