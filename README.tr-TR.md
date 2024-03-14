@@ -31,6 +31,11 @@ Hızlı başlangıç:
 * ![Ubuntu 22.04+](https://img.shields.io/badge/Ubuntu-22.04+-e52?logo=ubuntu) `Release` bölümünden en son sürüm `realesrgan-gui-ubuntu-bundled-v*.tar.xz` dosyasını indirin, arşivi çıkarın ve `realesrgan-gui` uygulamasını çalıştırın.
 * ![macOS Monterey+](https://img.shields.io/badge/macOS-Monterey+-111?logo=apple) `Release` bölümünden en son sürüm `realesrgan-gui-macos-appbundle-v*.tar.xz` dosyasını indirin, arşivi çıkarın; terminalde `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"`, `chmod u+x "Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-ncnn-vulkan"` ve `xattr -cr "Real-ESRGAN GUI.app"` kodlarını yürütün, sonrasında `Real-ESRGAN GUI` uygulamasını çalıştırın.
 
+> [!TIP]
+> Real-ESRGAN-ncnn-vulkan, Nisan 2022'den beri güncelleme almamakta. Bunun yerine hâlâ destek alan[upscayl/upscayl-ncnn](https://github.com/upscayl/upscayl-ncnn) fork'unu kullanabilirsiniz.
+>
+> `upscayl-bin[.exe]` dosyasını Real-ESRGAN GUI'nin içine yerleştirdiğinizde öncelikli olarak kullanılacaktır.
+
 <details>
 
 <summary>Notlar</summary>
@@ -58,6 +63,7 @@ sh Build-macOS-arm64.sh
 # 3. Paketlenen uygulama "./realesrgan-gui/dist/Real-ESRGAN GUI.app" konumuna kaydedilecektir.
 ```
 
+> [!WARNING]
 > ⚠️ macOS kullanan herhangi bir cihazım olmadığından macOS ile ilişkili sorunları çözemeyebilirim.
 
 * Real-ESRGAN'ı Android'de kullanın: [tumuyan/RealSR-NCNN-Android](https://github.com/tumuyan/RealSR-NCNN-Android)
