@@ -189,7 +189,7 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 ### 为什么不使用（其他功能类似的 GUI）？
 
-Real-ESRGAN 的 GUI 当然不止一个，这里列出了其中的一部分，并且附上了我没有使用它们而且选择自己写一个 GUI 的理由。
+Real-ESRGAN 的 GUI 当然不止一个，这里列出了其中的一部分，并且附上了我没有使用它们而是选择自己写一个 GUI 的理由。
 
 #### [Waifu2x-Extension-GUI](https://github.com/AaronFeng753/Waifu2x-Extension-GUI) ![](https://img.shields.io/github/stars/AaronFeng753/Waifu2x-Extension-GUI)
 
