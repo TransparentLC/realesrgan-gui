@@ -12,6 +12,7 @@
 * [简体中文 (Simplified Chinese)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.md)
 * [English](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.en-US.md)
 * [Ukrainian (Українська)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.uk-UA.md) Translated by [@kirill0ermakov](https://github.com/kirill0ermakov)
+* [Türkçe (Turkish)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.tr-TR.md) Translated by [@NandeMD](https://github.com/NandeMD)
 
 </details>
 
@@ -45,6 +46,8 @@
 * 在其它的 Linux 发行版中可能也可以运行本项目，不过我没有进行测试。
 
 </details>
+
+如果你想要贡献 Real-ESRGAN GUI，请查看 [CONTRIBUTING.md](https://github.com/TransparentLC/realesrgan-gui/blob/master/CONTRIBUTING.md)。
 
 ### 一键打包 `arm64` 或 `x86_64` 单架构的 `Real-ESRGAN GUI.app`
 
@@ -184,6 +187,32 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 如果因为配置文件的问题导致程序不能运行的话，可以先尝试将配置文件删除。
 
+### 为什么不使用（其他功能类似的 GUI）？
+
+Real-ESRGAN 的 GUI 当然不止一个，这里列出了其中的一部分，并且附上了我没有使用它们而且选择自己写一个 GUI 的理由。
+
+#### [Waifu2x-Extension-GUI](https://github.com/AaronFeng753/Waifu2x-Extension-GUI) ![](https://img.shields.io/github/stars/AaronFeng753/Waifu2x-Extension-GUI)
+
+这是一个“全家桶”类型的工具箱，它不仅整合了用于图像放大的 waifu2x、Anime4k、Real-SR、SRMD、Real-ESRGAN、Real-CUGAN……还包含了用于视频插帧的 CAIN、DAIN、RIFE，以及 ffmpeg、ImageMagick、gifsicle、nircmd、wget 等辅助工具。只支持 Windows。
+
+不过，功能繁多也使它的界面和设定都变得非常复杂，但其中的大部分功能并不是我会用到的。在它是开源软件的时候我曾经是它的用户，但作者从 2021 年 5 月的 v3.41.01 开始[修改了 LICENSE](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/37a4b53d754bf58f740df0d9043f726c062efa71) 转为[闭源](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/38b13ed886f50d861798e8cad3cc056f04173415)，并会在每次启动和处理完成时显示购买高级版的广告。
+
+虽然我并不依赖那些高级版限定的功能，但这些改变还是使我产生了编写符合自己的需求的轻量级 GUI（也就是这个项目）的想法。
+
+#### [upscayl](https://github.com/upscayl/upscayl) ![](https://img.shields.io/github/stars/upscayl/upscayl)
+
+用 Electron 实现的 GUI，同样实现了跨平台。由于使用的是前端技术，界面和交互都很容易做得非常出色，甚至还有将原图和放大后的图片进行对比的功能。文档也非常详细。
+
+不过它仍然缺少了一些功能，例如处理 GIF、自定义后处理命令等。另外，它目前[还没有多语言支持](https://github.com/upscayl/upscayl/issues/91)。
+
+另外，因为它是使用 Electron 实现的，所以它的用户又要[多安装一个 Chromium 内核了](https://github.com/ShirasawaSama/CefDetector/raw/master/screenshot.png)😂 Upscayl 的大小约为 400 MB，相比之下 Real-ESRGAN GUI 仅有 10 MB 左右（Windows 版，排除 Real-ESRGAN-ncnn-vulkan 主程序和模型）。
+
+#### [tsukumijima/Real-ESRGAN-GUI](https://github.com/tsukumijima/Real-ESRGAN-GUI) ![](https://img.shields.io/github/stars/tsukumijima/Real-ESRGAN-GUI)、[net2cn/Real-ESRGAN_GUI](https://github.com/net2cn/Real-ESRGAN_GUI) ![](https://img.shields.io/github/stars/net2cn/Real-ESRGAN_GUI)、[upscale-rs](https://github.com/oloko64/upscale-rs) ![](https://img.shields.io/github/stars/oloko64/upscale-rs)、[Real-ESRGAN-EGUI](https://github.com/WGzeyu/Real-ESRGAN-EGUI) ![](https://img.shields.io/github/stars/WGzeyu/Real-ESRGAN-EGUI) ……
+
+这些 GUI 基本上都是对 CLI 参数的简单封装，没有多少额外的功能。
+
+不过，我很喜欢 tsukumijima/Real-ESRGAN-GUI 使用的 Material Design 风格。
+
 ## 借物表
 
 * [Pillow](https://github.com/python-pillow/Pillow)
@@ -195,4 +224,16 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 ## 致谢
 
-* 感谢 [@blacklein](https://github.com/blacklein) 和 [@hyrulelinks](https://github.com/hyrulelinks) 提供在 macOS 下使用这个 GUI 和打包为应用程序的帮助。
+感谢 [@blacklein](https://github.com/blacklein) 和 [@hyrulelinks](https://github.com/hyrulelinks) 提供在 macOS 下使用这个 GUI 和打包为应用程序的帮助，还有其他的贡献者们！
+
+[![Contributors](https://contrib.rocks/image?repo=TransparentLC/realesrgan-gui)](https://github.com/TransparentLC/realesrgan-gui/graphs/contributors)
+
+## Star history
+
+<a href="https://star-history.com/#TransparentLC/realesrgan-gui&Date">
+  <picture>
+    <source media="(prefers-color-scheme:dark)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme:light)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+  </picture>
+</a>

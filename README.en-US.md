@@ -12,6 +12,7 @@ A cross-platform GUI for image upscaler [Real-ESRGAN](https://github.com/xinntao
 * [简体中文 (Simplified Chinese)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.md)
 * [English](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.en-US.md)
 * [Ukrainian (Українська)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.uk-UA.md) Translated by [@kirill0ermakov](https://github.com/kirill0ermakov)
+* [Türkçe (Turkish)](https://github.com/TransparentLC/realesrgan-gui/blob/master/README.tr-TR.md) Translated by [@NandeMD](https://github.com/NandeMD) tarafından
 
 </details>
 
@@ -45,6 +46,8 @@ Quick Start：
 * It may be possible to run Real-ESRGAN GUI in other Linux distributions, but I have not tested it.
 
 </details>
+
+Please check out [CONTRIBUTING.md](https://github.com/TransparentLC/realesrgan-gui/blob/master/CONTRIBUTING.md) if you would like to contribute to Real-ESRGAN GUI.
 
 ### Build `Real-ESRGAN GUI.app` for Apple Silicon (`arm64`)
 
@@ -195,6 +198,32 @@ These model uses PyTorch's `pth` format, but Real-ESRGAN GUI (Real-ESRGAN-ncnn-v
 
 You can download some converted additional models from [here](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models).
 
+### Why not (other similar GUI)?
+
+Of course, there is more than one GUI for Real-ESRGAN. Here is a list of some, with reasons why I didn't use them and decided to build on my own.
+
+#### [Waifu2x-Extension-GUI](https://github.com/AaronFeng753/Waifu2x-Extension-GUI) ![](https://img.shields.io/github/stars/AaronFeng753/Waifu2x-Extension-GUI)
+
+This is an all-in-one toolbox that integrates tons of tools, including waifu2x, Anime4k, Real-SR, SRMD, Real-ESRGAN, Real-CUGAN ... for image upscaling and CAIN, DAIN, RIFE ... for video frame interpolation and other utils including ffmpeg, ImageMagick, gifsicle, nircmd, wget and more. Only supported on Windows.
+
+The rich feature set leads to a complex UI and configurations, however I only need a small number of its features. I used to be a user of it when it was open source, but then the author [modified LICENSE](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/) and [switched to closed source](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/38b13ed886f50d861798e8cad3cc056f04173415) since v3.41.01 in May 2021. Moreover, the advertisement of the premium version appears every time when it starts up and finishes processing.
+
+Although I don't rely on those premium-only features, the changes still encourages me to write another lightweight GUI that meets my needs.
+
+#### [upscayl](https://github.com/upscayl/upscayl) ![](https://img.shields.io/github/stars/upscayl/upscayl)
+
+Built with Electron, so it is also cross-platform. Benefiting from the power of front-end technologies, the UI and interaction are excellent and there is even a comparison slider between the original image and the upscaled image. The documentation is also very detailed.
+
+However, it still lacks some features such as handling GIFs, customizing post-processing commands, and [localization](https://github.com/upscayl/upscayl/issues/91).
+
+Since it is an Electron application, the users will have to [install yet another Chromium browser](https://github.com/ShirasawaSama/CefDetector/raw/master/screenshot.png)😂 The size of Upscayl is about 400 MB while Real-ESRGAN GUI is only about 10 MB (Windows version, excluding Real-ESRGAN-ncnn-vulkan's executable and models).
+
+#### [tsukumijima/Real-ESRGAN-GUI](https://github.com/tsukumijima/Real-ESRGAN-GUI) ![](https://img.shields.io/github/stars/tsukumijima/Real-ESRGAN-GUI)、[net2cn/Real-ESRGAN_GUI](https://github.com/net2cn/Real-ESRGAN_GUI) ![](https://img.shields.io/github/stars/net2cn/Real-ESRGAN_GUI)、[upscale-rs](https://github.com/oloko64/upscale-rs) ![](https://img.shields.io/github/stars/oloko64/upscale-rs)、[Real-ESRGAN-EGUI](https://github.com/WGzeyu/Real-ESRGAN-EGUI) ![](https://img.shields.io/github/stars/WGzeyu/Real-ESRGAN-EGUI) ……
+
+These GUIs are simple wrappers for the CLI parameters without any extra features.
+
+However, I like the Material Design used by tsukumijima/Real-ESRGAN-GUI.
+
 ## Open-source libraries used
 
 * [Pillow](https://github.com/python-pillow/Pillow)
@@ -206,4 +235,18 @@ You can download some converted additional models from [here](https://github.com
 
 ## Credits
 
-* Thanks [@blacklein](https://github.com/blacklein) and [@hyrulelinks](https://github.com/hyrulelinks) for offering helps on using and bundling this application in macOS.
+Thanks [@blacklein](https://github.com/blacklein) and [@hyrulelinks](https://github.com/hyrulelinks) for offering helps on using and bundling this application in macOS.
+
+And other contributors!
+
+[![Contributors](https://contrib.rocks/image?repo=TransparentLC/realesrgan-gui)](https://github.com/TransparentLC/realesrgan-gui/graphs/contributors)
+
+## Star history
+
+<a href="https://star-history.com/#TransparentLC/realesrgan-gui&Date">
+  <picture>
+    <source media="(prefers-color-scheme:dark)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme:light)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+  </picture>
+</a>
