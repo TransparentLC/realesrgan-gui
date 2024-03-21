@@ -47,6 +47,8 @@ Hızlı başlangıç:
 
 </details>
 
+Real-ESRGAN GUI'ye katkı yapmayı düşünüyorsanız lütfen [CONTRIBUTING.md](https://github.com/TransparentLC/realesrgan-gui/blob/master/CONTRIBUTING.md) dosyasına göz atın.
+
 ### Apple Silicon (`arm64`) için `Real-ESRGAN GUI.app` Derleme
 
 `arm64` derlemelerinin `universal2` derlemelerinden daha iyi performans gösterdiği test edilmiştir. Eğer Apple Silicon kullanıyorsanız kendinizin bir arm64 derlemesi yapmanız önerilir.
@@ -194,6 +196,32 @@ Belirtilen yerden indireceğiniz modeller, PyTorch'un `pth` formatını kullanı
 
 Ayrıca [buradan](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models) önceden dönüştürülmüş bazı ek modelleri indirebilirsiniz.
 
+### Neden diğer GUI'ler yerine bu?
+
+Real-ESRGAN için elbette birden fazla GUI bulunuyor. Aşağıda bunlardan birkaçını ve neden onları kullanmak yerine kendi GUI'mi yaratmayı tercih ettiğimi listeledim.
+
+#### [Waifu2x-Extension-GUI](https://github.com/AaronFeng753/Waifu2x-Extension-GUI) ![](https://img.shields.io/github/stars/AaronFeng753/Waifu2x-Extension-GUI)
+
+Görsel boyutu yükseltmek için Waifu2x, Anime4k, Real-SR, SRMD, Real-ESRGAN ve Real-CUGAN; video enterpolasyonu için CAIN, DAIN ve RIFE dahil ffmpeg, ImageMagick, gifsicle, nircmd, wget dahil tonlarca çeşitli aracı entegre eden, her şey dahil bir el çantası. Ancak sadece Windows üzerinde kullanılabilir.
+
+İçeriğinin bu denli zenginliği, arayüz ve konfigürasyonunun kafmaşıklığına yol açıyordu ancak özelliklerinin yalnız ufak bir kısmına ihtiyacım vardı. Hâlâ açık kayaklıyken şahsen bu uygulamayı kullanıyordum fakat yazarı, Mayıs 2021'de v3.41.02 ile birlikte [lisansını değiştirdi](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/) ve [kapalı kaynağa](https://github.com/AaronFeng753/Waifu2x-Extension-GUI/commit/38b13ed886f50d861798e8cad3cc056f04173415) geçiş yaptı. Ayrıca premium versiyonunun reklamı, uygulamayı her açtığınızda ve her işlem bitiminde karşınıza çıkıyor.
+
+Şahsen yalnızca premiumda sunulan özelliklerine ihtiyacım olmasa da üzerinde yapılan değişiklikler beni kendi ihtiyaçlarıma uyan, hafif bir GUI yazmaya itti.
+
+#### [upscayl](https://github.com/upscayl/upscayl) ![](https://img.shields.io/github/stars/upscayl/upscayl)
+
+Electron'la üretildiğinden çoklu platform desteğine sahip. Front-end teknolojilerinin gücünden yararlandığı için arayüzü ve kullanıcı etkileşimi harika. Hatta orijinal görselle yükseltilmiş görseli karşılaştırabildiğiniz bir özelliğe bile sahip. Ayrıca dokümantasyonu da fazlasıyla detaylı.
+
+Ancak GIF işlemleri, işleme sonraso özel komutlar ve [localization](https://github.com/upscayl/upscayl/issues/91) gibi bazı ek işlevlerden yoksun.
+
+En nihayetinde bir Electron uygulaması olduğundan kullanıcıları aynı zamanda [koca bir Chromium tarayıcısı](https://github.com/ShirasawaSama/CefDetector/raw/master/screenshot.png) indirmek zorunda. Upscayl'in dosya boyutu 400 MB civarlarındayken Real-ESRGAN GUI'ninki ise sadece yaklaşık 10 MB (Windows versiyonu için geçerli, Real-ESRGAN-ncnn-vulkan'ın modelleri ve dosyası hariç).
+
+#### [tsukumijima/Real-ESRGAN-GUI](https://github.com/tsukumijima/Real-ESRGAN-GUI) ![](https://img.shields.io/github/stars/tsukumijima/Real-ESRGAN-GUI)、[net2cn/Real-ESRGAN_GUI](https://github.com/net2cn/Real-ESRGAN_GUI) ![](https://img.shields.io/github/stars/net2cn/Real-ESRGAN_GUI)、[upscale-rs](https://github.com/oloko64/upscale-rs) ![](https://img.shields.io/github/stars/oloko64/upscale-rs)、[Real-ESRGAN-EGUI](https://github.com/WGzeyu/Real-ESRGAN-EGUI) ![](https://img.shields.io/github/stars/WGzeyu/Real-ESRGAN-EGUI) ……
+
+Bunlar, komut satırı parametrelerini sarani ek özelliklerden yoksun GUI'ler.
+
+Ancak tsukumijima/Real-ESRGAN-GUI'nin tasarımını sevdiğimi belirtmek isterim.
+
 ### Kullanılan açık kaynaklı kütüphaneler
 
 * [Pillow](https://github.com/python-pillow/Pillow)
@@ -205,4 +233,18 @@ Ayrıca [buradan](https://github.com/TransparentLC/realesrgan-gui/releases/tag/a
 
 ## Katkıda bulunanlar
 
-* [@blacklein](https://github.com/blacklein) ve [@hyrulelinks](https://github.com/hyrulelinks)'e bu uygulamayı macOS'te kullanma ve paketleme üzerindeki yardımları için teşekkürler.
+[@blacklein](https://github.com/blacklein) ve [@hyrulelinks](https://github.com/hyrulelinks)'e bu uygulamayı macOS'te kullanma ve paketleme üzerindeki yardımları için teşekkürler.
+
+Ayrıca katkıda bulunan diğer herkese minnettarız!
+
+[![Contributors](https://contrib.rocks/image?repo=TransparentLC/realesrgan-gui)](https://github.com/TransparentLC/realesrgan-gui/graphs/contributors)
+
+## Yıldız Tarihçesi
+
+<a href="https://star-history.com/#TransparentLC/realesrgan-gui&Date">
+  <picture>
+    <source media="(prefers-color-scheme:dark)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme:light)" srcset="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TransparentLC/realesrgan-gui&type=Date" />
+  </picture>
+</a>
