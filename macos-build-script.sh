@@ -70,14 +70,8 @@ download_asset() {
 
         # Perform additional actions based on the repo
         if [ "$repo" = "upscayl/upscayl-ncnn" ]; then
-            # Rename and set permissions
+            # Set permissions
             if [ -f "upscayl-bin" ]; then
-                # Rename file
-                echo "INFO: 🚀 Rename upscayl-bin to realesrgan-ncnn-vulkan..."
-                source_file="upscayl-bin"
-                target_file="realesrgan-ncnn-vulkan"
-                target_file_temp="realesrgan-ncnn-vulkan-temp"
-                mv $source_file $target_file
                 # Thin file
                 echo "INFO: 🚀 Thin fat files to single architecture..."
                 arch=$(uname -m)
