@@ -1,5 +1,5 @@
 # Ask user whether to use mirror_head
-read -p "Do you want to use mirror_head? (y/n): " use_mirror
+read -p "Do you want to use mirror site to clone repo? (y/n): " use_mirror
 if [ "$use_mirror" = "y" ]; then
     mirror_head="https://mirror.ghproxy.com/"
 else
@@ -81,10 +81,11 @@ download_asset() {
             # Thin file and set permissions
             if [ -f "upscayl-bin" ]; then
                 # Thin file
-                echo "INFO: 🚧 Thin fat files to single architecture..."
                 arch=$(uname -m)
                 echo "INFO: 💬 System architecture is $arch."
-                echo "INFO: 🚧 Extracting architecture specific libraries..."
+                echo "INFO: 🚧 Extracting architecture specific binary..."
+                target_file="upscayl-bin"
+                target_file_temp="upscayl-bin-temp"
                 if [ "$arch" = "arm64" ]; then
                     ditto --arch arm64 "$target_file" "$target_file_temp"
                 else
@@ -93,8 +94,8 @@ download_asset() {
                 rm -rf "$target_file"
                 mv "$target_file_temp" "$target_file"
                 # Add execute permission
-                echo "INFO: 🚧 Add execute permission to realesrgan-ncnn-vulkan..."
-                chmod u+x realesrgan-ncnn-vulkan
+                echo "INFO: 🚧 Setting execute permission to $target_file..."
+                chmod u+x $target_file
             fi
         elif [ "$repo" = "nihui/realsr-ncnn-vulkan" ]; then
             # Rename RealSR models
