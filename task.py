@@ -94,6 +94,7 @@ class RESpawnTask(AbstractTask):
                 cmd,
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
+                encoding='utf-8',
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
             ) as p:
                 for line in p.stderr:
@@ -298,6 +299,7 @@ class CustomCompressTask(AbstractTask):
             cmd,
             stderr=subprocess.PIPE,
             universal_newlines=True,
+            encoding='utf-8',
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
         ) as p:
             for line in p.stderr:
