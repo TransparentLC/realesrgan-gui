@@ -79,17 +79,38 @@ class RESpawnTask(AbstractTask):
         for i in range(len(files) - 1):
             inputPath, outputPath = files[i:(i + 2)]
             alphaOverridePath = None
-            cmd = (
-                define.RE_PATH,
-                '-v',
-                '-i', inputPath,
-                '-o', outputPath,
-                '-s', str(self.config.modelFactor),
-                '-t', str(self.config.tileSize),
-                '-n', self.config.model,
-                '-g', 'auto' if self.config.gpuID < 0 else str(self.config.gpuID),
-                ('-x' if self.config.useTTA else ''),
-            )
+            if os.path.splitext(os.path.split(define.RE_PATH)[1])[0] == 'realcugan-ncnn-vulkan':
+                model, modelFilename = self.config.model.split('#', 1)
+                denoiseLevel = {
+                    'conservative': -1,
+                    'no-denoise': 0,
+                    **{f'denoise{i}x': i for i in range(1, 4)},
+                }[modelFilename.split('-', 1)[1]]
+                cmd = (
+                    define.RE_PATH,
+                    '-v',
+                    '-i', inputPath,
+                    '-o', outputPath,
+                    '-s', str(self.config.modelFactor),
+                    '-t', str(self.config.tileSize),
+                    '-m', os.path.join(self.config.modelDir, model),
+                    '-n', str(denoiseLevel),
+                    '-g', 'auto' if self.config.gpuID < 0 else str(self.config.gpuID),
+                    '-c', '1', # accurate sync
+                    *(('-x', ) if self.config.useTTA else ()),
+                )
+            else:
+                cmd = (
+                    define.RE_PATH,
+                    '-v',
+                    '-i', inputPath,
+                    '-o', outputPath,
+                    '-s', str(self.config.modelFactor),
+                    '-t', str(self.config.tileSize),
+                    '-n', self.config.model,
+                    '-g', 'auto' if self.config.gpuID < 0 else str(self.config.gpuID),
+                    *(('-x', ) if self.config.useTTA else ()),
+                )
             with subprocess.Popen(
                 cmd,
                 stderr=subprocess.PIPE,

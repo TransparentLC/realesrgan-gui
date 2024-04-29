@@ -1,6 +1,7 @@
 import collections
 import configparser
 import ctypes
+import itertools
 import locale
 import os
 import re
@@ -613,6 +614,7 @@ class REGUIApp(ttk.Frame):
         return param.REConfigParams(
             self.varstrModel.get(),
             self.modelFactors[self.varstrModel.get()],
+            self.config['Config'].get('ModelDir') or os.path.join(define.APP_PATH, 'models'),
             self.varintResizeMode.get(),
             resizeModeValue,
             self.downsample[self.varintDownsampleIndex.get()][1],
@@ -645,7 +647,7 @@ class REGUIApp(ttk.Frame):
 # Because for the WarningNotFoundRE warning message app language
 # must be initialized and for that config must be initialized
 # and for that models variable needs to be set
-def init_config_and_model_paths() -> tuple[configparser.ConfigParser, set[str], list[str]]:
+def init_config_and_model_paths() -> tuple[configparser.ConfigParser, list[str]]:
     config = configparser.ConfigParser({
         'Upscaler': '',
         'ModelDir': '',
@@ -669,20 +671,39 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, set[str], 
     config['Config'] = {}
     config.read(define.APP_CONFIG_PATH)
 
+    if config['Config'].get('Upscaler'):
+        define.RE_PATH = config['Config'].get('Upscaler')
+
     try:
-        modelFiles = set(os.listdir(config['Config'].get('ModelDir') or os.path.join(define.APP_PATH, 'models')))
-        models = sorted(
-            x for x in set(os.path.splitext(y)[0] for y in modelFiles)
-            if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
-        )
+        modelDir = config['Config'].get('ModelDir') or os.path.join(define.APP_PATH, 'models')
+        if os.path.splitext(os.path.split(define.RE_PATH)[1])[0] == 'realcugan-ncnn-vulkan':
+            # 兼容Real-CUGAN的模型文件名格式
+            # https://github.com/nihui/realcugan-ncnn-vulkan/blob/395302c5c70f1bff604c974e92e0a87e45c9f9ee/src/main.cpp#L733
+            # -m model-path
+            # -s scale
+            # -n noise-level
+            # <model-path>/up<scale>x-conservative.{param,bin}
+            # <model-path>/up<scale>x-no-denoise.{param,bin}
+            # <model-path>/up<scale>x-denoise<noise-level>x.{param,bin}
+            models = []
+            for name, scale, noise in itertools.product(
+                sorted(x for x in os.listdir(modelDir) if os.path.isdir(os.path.join(modelDir, x))),
+                range(2, 5),
+                ('conservative', 'no-denoise', *(f'denoise{i}x' for i in range(1, 4))),
+            ):
+                if all(os.path.exists(os.path.join(modelDir, name, f'up{scale}x-{noise}.{ext}')) for ext in ('bin', 'param')):
+                    models.append(f'{name}#up{scale}x-{noise}')
+        else:
+            modelFiles = set(x for x in os.listdir(modelDir) if os.path.isfile(os.path.join(modelDir, x)))
+            models = sorted(
+                x for x in set(os.path.splitext(y)[0] for y in modelFiles)
+                if f'{x}.bin' in modelFiles and f'{x}.param' in modelFiles
+            )
     except FileNotFoundError:
         # in case of FileNotFoundError exception, return empty modelFiles and models.
         # This does not change any behabiour because in this case
         # we will be showing a warning message and terminate app
         models = []
-
-    if config['Config'].get('Upscaler'):
-        define.RE_PATH = config['Config'].get('Upscaler')
 
     i18n.set_current_language(config['Config'].get('AppLanguage'))
     return config, models

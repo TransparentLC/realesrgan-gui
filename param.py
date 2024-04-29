@@ -10,6 +10,7 @@ class ResizeMode(enum.IntEnum):
 class REConfigParams(typing.NamedTuple):
     model: str
     modelFactor: int
+    modelDir: str
     resizeMode: ResizeMode
     resizeModeValue: int
     downsample: 'Image._Resample'
