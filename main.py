@@ -672,7 +672,7 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, list[str]]
     config.read(define.APP_CONFIG_PATH)
 
     if config['Config'].get('Upscaler'):
-        define.RE_PATH = config['Config'].get('Upscaler')
+        define.RE_PATH = os.path.realpath(config['Config'].get('Upscaler'))
 
     try:
         modelDir = config['Config'].get('ModelDir') or os.path.join(define.APP_PATH, 'models')
