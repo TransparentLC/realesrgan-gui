@@ -8,13 +8,15 @@ import subprocess
 commit_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()
 version = "0.2.5." + commit_hash
 
-# 判断是否存在 upscayl-bin 文件
+bin = []
+
 if os.path.exists('upscayl-bin'):
-    # 存在 upscayl-bin，只需要打包 upscayl-bin
-    bin = [('upscayl-bin', '.')]
-else:
-    # 不存在 upscayl-bin，打包 realesrgan-ncnn-vulkan
-    bin = [('realesrgan-ncnn-vulkan', '.')]
+    bin.append(('upscayl-bin', '.'))
+elif os.path.exists('realesrgan-ncnn-vulkan'):
+    bin.append(('realesrgan-ncnn-vulkan', '.'))
+
+if os.path.exists('realcugan-ncnn-vulkan'):
+    bin.append(('realcugan-ncnn-vulkan', '.'))
 
 # PyInstaller分析脚本
 # 指定主入口文件
