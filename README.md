@@ -36,6 +36,9 @@
 >
 > 下载最新的 Release 并将压缩包中的 `upscayl-bin[.exe]` 解压到 GUI 的主程序所在的目录，它将会被优先使用。
 
+> [!TIP]
+> 你也可以在 Real-ESRGAN GUI 中使用 [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN) 进行放大！详细配置方法参见[这里](#我觉得-real-cugan-的放大效果比-real-esrgan-更好)。
+
 <details>
 
 <summary>其它的运行方式和说明</summary>
@@ -187,6 +190,16 @@ GIF 只支持最多 256 种 RGB 颜色的调色板并设定其中一种颜色为
 
 如果因为配置文件的问题导致程序不能运行的话，可以先尝试将配置文件删除。
 
+### 我觉得 Real-CUGAN 的放大效果比 Real-ESRGAN 更好
+
+有些用户是这么认为的，所以我决定添加对 Real-CUGAN 的支持。
+
+想要使用 Real-CUGAN 而不是 Real-ESRGAN 进行放大的话，请遵循以下步骤：
+
+* 下载 [Real-CUGAN-ncnn-vulkan](https://github.com/nihui/realcugan-ncnn-vulkan)
+* 在 `config.ini` 中将 `upscaler` 设定为 `realcugan-ncnn-vulkan[.exe]` 的路径
+* 将 Real-CUGAN 的模型（`models-{nose,pro,se}` 三个文件夹）放入 `models` 文件夹（或是 `config.ini` 的 `modeldir` 指定的目录）
+
 ### 为什么不使用（其他功能类似的 GUI）？
 
 Real-ESRGAN 的 GUI 当然不止一个，这里列出了其中的一部分，并且附上了我没有使用它们而是选择自己写一个 GUI 的理由。
@@ -211,7 +224,7 @@ Real-ESRGAN 的 GUI 当然不止一个，这里列出了其中的一部分，并
 
 这些 GUI 基本上都是对 CLI 参数的简单封装，没有多少额外的功能。
 
-不过，我很喜欢 tsukumijima/Real-ESRGAN-GUI 使用的 Material Design 风格。
+不过，我很喜欢 tsukumijima/Real-ESRGAN-GUI 使用的 Material Design 风格，它也支持 Real-CUGAN。
 
 ## 借物表
 

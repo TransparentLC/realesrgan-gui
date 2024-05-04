@@ -36,6 +36,9 @@ Quick Start：
 >
 > Download the latest release and extract `upscayl-bin[.exe]` to the directory where Real-ESRGAN GUI's executable file is located. It will be used in priority.
 
+> [!TIP]
+> You can alse use [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN) in Real-ESRGAN GUI for upscaling! See this [section](#) for details.
+
 <details>
 
 <summary>Notes</summary>
@@ -198,6 +201,16 @@ These model uses PyTorch's `pth` format, but Real-ESRGAN GUI (Real-ESRGAN-ncnn-v
 
 You can download some converted additional models from [here](https://github.com/TransparentLC/realesrgan-gui/releases/tag/additional-models).
 
+### I think Real-CUGAN performs better in upscaling than Real-ESRGAN
+
+Someone recommends it. So I added support for it.
+
+Follow these steps if you want to use Real-CUGAN instead of Real-ESRGAN:
+
+* Download [Real-CUGAN-ncnn-vulkan](https://github.com/nihui/realcugan-ncnn-vulkan).
+* Set `upscaler` in `config.ini` to the path of `realcugan-ncnn-vulkan[.exe]`.
+* Put Real-CUGAN's models (the `models-{nose,pro,se}` folders) into the `models` folder (or the directory specified by `modeldir` in `config.ini`).
+
 ### Why not (other similar GUI)?
 
 Of course, there is more than one GUI for Real-ESRGAN. Here is a list of some, with reasons why I didn't use them and decided to build on my own.
@@ -222,7 +235,7 @@ Since it is an Electron application, the users will have to [install yet another
 
 These GUIs are simple wrappers for the CLI parameters without any extra features.
 
-However, I like the Material Design used by tsukumijima/Real-ESRGAN-GUI.
+However, I like the Material Design used by tsukumijima/Real-ESRGAN-GUI. It also supports Real-CUGAN.
 
 ## Open-source libraries used
 
