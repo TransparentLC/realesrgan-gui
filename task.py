@@ -1,7 +1,7 @@
 import collections
-import secrets
 import subprocess
 import io
+import math
 import os
 import re
 import shlex
@@ -17,9 +17,6 @@ from PIL import ImageSequence
 
 import define
 import param
-
-def buildTempPath(ext: str) -> str:
-    return os.path.join(tempfile.gettempdir(), secrets.token_urlsafe(12) + ext)
 
 class AbstractTask:
     def __init__(self, outputCallback: typing.Callable[[str], None]) -> None:
@@ -52,7 +49,7 @@ class RESpawnTask(AbstractTask):
             srcWidth, srcHeight = img.size
             srcRatio = srcWidth / srcHeight
             if img.mode == 'P':
-                self.inputPath = buildTempPath('.png')
+                self.inputPath = tempfile.mktemp('.png')
                 img.convert('RGBA').save(self.inputPath)
                 self.removeInput = True
         match self.config.resizeMode:
@@ -65,6 +62,26 @@ class RESpawnTask(AbstractTask):
             case param.ResizeMode.HEIGHT:
                 dstHeight = self.config.resizeModeValue
                 dstWidth = round(dstHeight * srcRatio)
+        inputPathPreupscaled: str = None
+        if self.config.preupscale:
+            match self.config.resizeMode:
+                case param.ResizeMode.RATIO:
+                    scaleRatio = self.config.resizeModeValue
+                case param.ResizeMode.WIDTH:
+                    scaleRatio = self.config.resizeModeValue / srcWidth
+                case param.ResizeMode.HEIGHT:
+                    scaleRatio = self.config.resizeModeValue / srcHeight
+            frac, intg = math.modf(math.log(scaleRatio, self.config.modelFactor))
+            preWidth = math.ceil(dstWidth / (self.config.modelFactor ** intg))
+            preHeight = math.ceil(dstHeight / (self.config.modelFactor ** intg))
+            if frac < .5 and (srcWidth != preWidth or srcHeight != preHeight):
+                self.outputCallback(f'Pre-upscale from {srcWidth}x{srcHeight} to {preWidth}x{preHeight}.\n')
+                inputPathPreupscaled = tempfile.mktemp('.webp' if os.path.splitext(self.inputPath)[1] == '.webp' else '.png')
+                with Image.open(self.inputPath) as img:
+                    resized = img.resize((preWidth, preHeight), Image.LANCZOS)
+                    resized.save(inputPathPreupscaled, lossless=True)
+                    resized.close()
+                srcWidth, srcHeight = preWidth, preHeight
         scalePass = 0
         while srcWidth < dstWidth and srcHeight < dstHeight:
             scalePass += 1
@@ -75,7 +92,7 @@ class RESpawnTask(AbstractTask):
         # input -> temp0 -> output
         # input -> temp0 -> temp1 -> output
         outputExt = os.path.splitext(self.outputPath)[1]
-        files = (self.inputPath, *(buildTempPath(outputExt) for _ in range(scalePass)))
+        files = (inputPathPreupscaled or self.inputPath, *(tempfile.mktemp(outputExt) for _ in range(scalePass)))
         for i in range(len(files) - 1):
             inputPath, outputPath = files[i:(i + 2)]
             alphaOverridePath = None
@@ -132,7 +149,7 @@ class RESpawnTask(AbstractTask):
                     self.outputCallback(line)
             if p.returncode:
                 raise subprocess.CalledProcessError(p.returncode, cmd)
-            if i > 0 or self.removeInput:
+            if i > 0 or inputPath == inputPathPreupscaled or self.removeInput:
                 os.remove(inputPath)
             if alphaOverridePath:
                 shutil.move(alphaOverridePath, outputPath)
@@ -146,7 +163,7 @@ class RESpawnTask(AbstractTask):
         else:
             with Image.open(files[-1]) as img:
                 self.outputCallback(f'Downsample from {img.size[0]}x{img.size[1]} to {dstWidth}x{dstHeight}.\n')
-                resized: Image.Image = img.resize((dstWidth, dstHeight), self.config.downsample)
+                resized = img.resize((dstWidth, dstHeight), self.config.downsample)
                 resized.save(self.outputPath)
                 resized.close()
             if scalePass:
@@ -233,8 +250,8 @@ class SplitGIFTask(AbstractTask):
         with Image.open(self.inputPath) as img:
             for f in ImageSequence.Iterator(img):
                 f: Image.Image
-                frameSrcPath = buildTempPath('.png' if self.optimizeTransparency else '.webp')
-                frameDstPath = buildTempPath('.png' if self.optimizeTransparency else '.webp')
+                frameSrcPath = tempfile.mktemp('.png' if self.optimizeTransparency else '.webp')
+                frameDstPath = tempfile.mktemp('.png' if self.optimizeTransparency else '.webp')
                 d = f.info.get('duration', 0)
                 if self.optimizeTransparency:
                     f = f.convert('RGBA')
@@ -251,7 +268,7 @@ class SplitGIFTask(AbstractTask):
                 self.progressValue[2] += 1
         self.progressValue[2] -= 1
         if self.config.customCommand:
-            t = buildTempPath('.gif')
+            t = tempfile.mktemp('.gif')
             tasks.append(MergeGIFTask(self.outputCallback, t, frames, durations, self.optimizeTransparency))
             tasks.append(CustomCompressTask(self.outputCallback, t, self.outputPath, self.config.customCommand, True))
         else:

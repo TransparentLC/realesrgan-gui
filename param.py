@@ -17,4 +17,5 @@ class REConfigParams(typing.NamedTuple):
     tileSize: int
     gpuID: int
     useTTA: bool
+    preupscale: bool
     customCommand: str

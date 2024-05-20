@@ -155,6 +155,7 @@ class REGUIApp(ttk.Frame):
         self.varboolOptimizeGIF = tk.BooleanVar(value=self.config['Config'].getboolean('OptimizeGIF'))
         self.varboolLossyMode = tk.BooleanVar(value=self.config['Config'].getboolean('LossyMode'))
         self.varboolIgnoreError = tk.BooleanVar(value=self.config['Config'].getboolean('IgnoreError'))
+        self.varboolPreupscale = tk.BooleanVar(value=self.config['Config'].getboolean('Preupscale'))
         self.varboolProcessing = tk.BooleanVar(value=False)
         self.varboolProcessingPaused = tk.BooleanVar(value=False)
         self.varstrCustomCommand = tk.StringVar(value=self.config['Config'].get('CustomCommand'))
@@ -182,6 +183,7 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelGIFOptimizeTransparency = tk.StringVar(value=i18n.getTranslatedString('GIFOptimizeTransparency'))
         self.varstrLabelEnableLossyMode = tk.StringVar(value=i18n.getTranslatedString('EnableLossyMode'))
         self.varstrLabelEnableIgnoreError = tk.StringVar(value=i18n.getTranslatedString('EnableIgnoreError'))
+        self.varstrLabelEnablePreupscale = tk.StringVar(value=i18n.getTranslatedString('EnablePreupscale'))
         self.varstrLabelViewREGUISource = tk.StringVar(value=i18n.getTranslatedString('ViewREGUISource'))
         self.varstrLabelViewRESource = tk.StringVar(value=i18n.getTranslatedString('ViewRESource'))
         self.varstrLabelViewAdditionalModel = tk.StringVar(value=i18n.getTranslatedString('ViewAdditionalModel'))
@@ -294,6 +296,8 @@ class REGUIApp(ttk.Frame):
         self.checkLossyMode.pack(padx=10, pady=5, fill=tk.X)
         self.checkIgnoreError = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelEnableIgnoreError, style='Switch.TCheckbutton', variable=self.varboolIgnoreError)
         self.checkIgnoreError.pack(padx=10, pady=5, fill=tk.X)
+        self.checkPreupscale = ttk.Checkbutton(self.frameAdvancedConfigRight, textvariable=self.varstrLabelEnablePreupscale, style='Switch.TCheckbutton', variable=self.varboolPreupscale)
+        self.checkPreupscale.pack(padx=10, pady=5, fill=tk.X)
         self.comboLanguage = ttk.Combobox(self.frameAdvancedConfigRight, state='readonly', values=tuple(i18n.locales_map.keys()))
         self.comboLanguage.current(i18n.get_current_locale_display_name())
         self.comboLanguage.pack(padx=10, pady=5, fill=tk.X)
@@ -361,6 +365,7 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelGIFOptimizeTransparency.set(i18n.getTranslatedString('GIFOptimizeTransparency'))
         self.varstrLabelEnableLossyMode.set(i18n.getTranslatedString('EnableLossyMode'))
         self.varstrLabelEnableIgnoreError.set(i18n.getTranslatedString('EnableIgnoreError'))
+        self.varstrLabelEnablePreupscale.set(i18n.getTranslatedString('EnablePreupscale'))
         self.varstrLabelViewREGUISource.set(i18n.getTranslatedString('ViewREGUISource'))
         self.varstrLabelViewRESource.set(i18n.getTranslatedString('ViewRESource'))
         self.varstrLabelViewAdditionalModel.set(i18n.getTranslatedString('ViewAdditionalModel'))
@@ -385,6 +390,8 @@ class REGUIApp(ttk.Frame):
             'UseTTA': self.varboolUseTTA.get(),
             'OptimizeGIF': self.varboolOptimizeGIF.get(),
             'LossyMode': self.varboolLossyMode.get(),
+            'IgnoreError': self.varboolIgnoreError.get(),
+            'Preupscale': self.varboolPreupscale.get(),
             'CustomCommand': self.varstrCustomCommand.get(),
             'AppLanguage': i18n.current_language
         }
@@ -621,6 +628,7 @@ class REGUIApp(ttk.Frame):
             self.tileSize[self.varintTileSizeIndex.get()],
             self.varintGPUID.get(),
             self.varboolUseTTA.get(),
+            self.varboolPreupscale.get(),
             self.varstrCustomCommand.get().strip(),
         )
 
@@ -665,6 +673,7 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, list[str]]
         'OptimizeGIF': False,
         'LossyMode': False,
         'IgnoreError': False,
+        'Preupscale': False,
         'CustomCommand': '',
         'AppLanguage': locale.getdefaultlocale()[0],
     })
