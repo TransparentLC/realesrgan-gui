@@ -146,6 +146,10 @@ class REGUIApp(ttk.Frame):
         self.varintResizeWidth.trace_add('write', outputPathTraceCallback)
         self.varintResizeHeight = tk.IntVar(value=self.config['Config'].getint('ResizeHeight'))
         self.varintResizeHeight.trace_add('write', outputPathTraceCallback)
+        self.varintResizeLongestSide = tk.IntVar(value=self.config['Config'].getint('ResizeLongestSide'))
+        self.varintResizeLongestSide.trace_add('write', outputPathTraceCallback)
+        self.varintResizeShortestSide = tk.IntVar(value=self.config['Config'].getint('ResizeShortestSide'))
+        self.varintResizeShortestSide.trace_add('write', outputPathTraceCallback)
         self.varstrModel = tk.StringVar(value=self.config['Config'].get('Model'))
         self.varstrModel.trace_add('write', outputPathTraceCallback)
         self.varintDownsampleIndex = tk.IntVar(value=self.config['Config'].getint('DownsampleIndex'))
@@ -172,6 +176,8 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelResizeModeRatio = tk.StringVar(value=i18n.getTranslatedString('ResizeModeRatio'))
         self.varstrLabelResizeModeWidth = tk.StringVar(value=i18n.getTranslatedString('ResizeModeWidth'))
         self.varstrLabelResizeModeHeight = tk.StringVar(value=i18n.getTranslatedString('ResizeModeHeight'))
+        self.varstrLabelResizeModeLongestSide = tk.StringVar(value=i18n.getTranslatedString('ResizeModeLongestSide'))
+        self.varstrLabelResizeModeShortestSide = tk.StringVar(value=i18n.getTranslatedString('ResizeModeShortestSide'))
         self.varstrLabelStartProcessing = tk.StringVar(value=i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
         self.varstrLabelDownsampleMode = tk.StringVar(value=i18n.getTranslatedString('DownsampleMode'))
         self.varstrLabelTileSize = tk.StringVar(value=i18n.getTranslatedString('TileSize'))
@@ -248,6 +254,14 @@ class REGUIApp(ttk.Frame):
         self.radioResizeHeight.grid(row=3, column=0, padx=5, pady=5, sticky=tk.EW)
         self.spinResizeHeight = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeHeight)
         self.spinResizeHeight.grid(row=3, column=1, padx=5, pady=5, sticky=tk.EW)
+        self.radioResizeLongestSide = ttk.Radiobutton(self.frameResize, textvariable=self.varstrLabelResizeModeLongestSide, value=int(param.ResizeMode.LONGEST_SIDE), variable=self.varintResizeMode)
+        self.radioResizeLongestSide.grid(row=4, column=0, padx=5, pady=5, sticky=tk.EW)
+        self.spinResizeLongestSide = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeLongestSide)
+        self.spinResizeLongestSide.grid(row=4, column=1, padx=5, pady=5, sticky=tk.EW)
+        self.radioResizeShortestSide = ttk.Radiobutton(self.frameResize, textvariable=self.varstrLabelResizeModeShortestSide, value=int(param.ResizeMode.SHORTEST_SIDE), variable=self.varintResizeMode)
+        self.radioResizeShortestSide.grid(row=5, column=0, padx=5, pady=5, sticky=tk.EW)
+        self.spinResizeShortestSide = ttk.Spinbox(self.frameResize, from_=1, to=16383, increment=1, width=12, textvariable=self.varintResizeShortestSide)
+        self.spinResizeShortestSide.grid(row=5, column=1, padx=5, pady=5, sticky=tk.EW)
         self.buttonProcess = ttk.Button(self.frameBasicConfigBottom, textvariable=self.varstrLabelStartProcessing, style='Accent.TButton', width=6, command=self.buttonProcess_click)
         self.buttonProcess.grid(row=0, column=1, padx=5, pady=5, sticky=tk.SE)
 
@@ -350,6 +364,8 @@ class REGUIApp(ttk.Frame):
         self.varstrLabelResizeModeRatio.set(i18n.getTranslatedString('ResizeModeRatio'))
         self.varstrLabelResizeModeWidth.set(i18n.getTranslatedString('ResizeModeWidth'))
         self.varstrLabelResizeModeHeight.set(i18n.getTranslatedString('ResizeModeHeight'))
+        self.varstrLabelResizeModeLongestSide.set(i18n.getTranslatedString('ResizeModeLongestSide'))
+        self.varstrLabelResizeModeShortestSide.set(i18n.getTranslatedString('ResizeModeShortestSide'))
         self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
         self.varstrLabelDownsampleMode.set(i18n.getTranslatedString('DownsampleMode'))
 
@@ -382,6 +398,8 @@ class REGUIApp(ttk.Frame):
             'ResizeRatio': self.varintResizeRatio.get(),
             'ResizeWidth': self.varintResizeWidth.get(),
             'ResizeHeight': self.varintResizeHeight.get(),
+            'ResizeLongestSide': self.varintResizeLongestSide.get(),
+            'ResizeShortestSide': self.varintResizeShortestSide.get(),
             'Model': self.varstrModel.get(),
             'DownsampleIndex': self.varintDownsampleIndex.get(),
             'GPUID': self.varintGPUID.get(),
@@ -619,6 +637,10 @@ class REGUIApp(ttk.Frame):
                 resizeModeValue = self.varintResizeWidth.get()
             case param.ResizeMode.HEIGHT:
                 resizeModeValue = self.varintResizeHeight.get()
+            case param.ResizeMode.LONGEST_SIDE:
+                resizeModeValue = self.varintResizeLongestSide.get()
+            case param.ResizeMode.SHORTEST_SIDE:
+                resizeModeValue = self.varintResizeShortestSide.get()
         return param.REConfigParams(
             self.varstrModel.get(),
             self.modelFactors[self.varstrModel.get()],
@@ -650,6 +672,10 @@ class REGUIApp(ttk.Frame):
                 suffix = f'w{self.varintResizeWidth.get()}'
             case param.ResizeMode.HEIGHT:
                 suffix = f'h{self.varintResizeHeight.get()}'
+            case param.ResizeMode.LONGEST_SIDE:
+                suffix = f'l{self.varintResizeLongestSide.get()}'
+            case param.ResizeMode.SHORTEST_SIDE:
+                suffix = f's{self.varintResizeShortestSide.get()}'
         return f'{base} ({self.models[self.comboModel.current()]} {suffix}){ext}'
 
 # Config and model paths are initialized before main frame
@@ -664,6 +690,8 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, list[str]]
         'ResizeRatio': 4,
         'ResizeWidth': 1024,
         'ResizeHeight': 1024,
+        'ResizeLongestSide': 1024,
+        'ResizeShortestSide': 1024,
         'Model': '',
         'DownsampleIndex': 0,
         'GPUID': -1,
@@ -778,7 +806,7 @@ if __name__ == '__main__':
         root.destroy(),
     ))
 
-    initialSize = (720, 540)
+    initialSize = (720, 640)
     root.minsize(*initialSize)
     root.geometry('{}x{}+{}+{}'.format(
         *initialSize,

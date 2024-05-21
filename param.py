@@ -6,6 +6,8 @@ class ResizeMode(enum.IntEnum):
     RATIO = enum.auto()
     WIDTH = enum.auto()
     HEIGHT = enum.auto()
+    LONGEST_SIDE = enum.auto()
+    SHORTEST_SIDE = enum.auto()
 
 class REConfigParams(typing.NamedTuple):
     model: str

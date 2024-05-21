@@ -52,7 +52,18 @@ class RESpawnTask(AbstractTask):
                 self.inputPath = tempfile.mktemp('.png')
                 img.convert('RGBA').save(self.inputPath)
                 self.removeInput = True
-        match self.config.resizeMode:
+        resizeMode = self.config.resizeMode
+        if (
+            (resizeMode == param.ResizeMode.LONGEST_SIDE and srcWidth >= srcHeight)
+            or (resizeMode == param.ResizeMode.SHORTEST_SIDE and srcWidth <= srcHeight)
+        ):
+            resizeMode = param.ResizeMode.WIDTH
+        elif (
+            (resizeMode == param.ResizeMode.LONGEST_SIDE and srcHeight >= srcWidth)
+            or (resizeMode == param.ResizeMode.SHORTEST_SIDE and srcHeight <= srcWidth)
+        ):
+            resizeMode = param.ResizeMode.HEIGHT
+        match resizeMode:
             case param.ResizeMode.RATIO:
                 dstWidth = srcWidth * self.config.resizeModeValue
                 dstHeight = srcHeight * self.config.resizeModeValue
@@ -64,7 +75,7 @@ class RESpawnTask(AbstractTask):
                 dstWidth = round(dstHeight * srcRatio)
         inputPathPreupscaled: str = None
         if self.config.preupscale:
-            match self.config.resizeMode:
+            match resizeMode:
                 case param.ResizeMode.RATIO:
                     scaleRatio = self.config.resizeModeValue
                 case param.ResizeMode.WIDTH:
