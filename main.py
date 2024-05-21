@@ -6,6 +6,7 @@ import locale
 import os
 import re
 import sys
+import tempfile
 
 if sys.platform != 'darwin':
     import notifypy
@@ -470,11 +471,11 @@ class REGUIApp(ttk.Frame):
                         if os.path.splitext(f)[1].lower() == '.gif':
                             queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
                         elif self.varstrCustomCommand.get().strip():
-                            t = task.buildTempPath('.png')
+                            t = tempfile.mktemp('.png')
                             queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                             queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
                         elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                            t = task.buildTempPath('.webp')
+                            t = tempfile.mktemp('.webp')
                             queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                             queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
                         else:
@@ -491,11 +492,11 @@ class REGUIApp(ttk.Frame):
                 if os.path.splitext(inputPath)[1].lower() == '.gif':
                     queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
                 elif self.varstrCustomCommand.get().strip():
-                    t = task.buildTempPath('.png')
+                    t = tempfile.mktemp('.png')
                     queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
                     queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
                 elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                    t = task.buildTempPath('.webp')
+                    t = tempfile.mktemp('.webp')
                     queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
                     queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
                 else:
