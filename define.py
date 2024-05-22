@@ -11,6 +11,7 @@ else:
 for executableName in (
 	'upscayl-bin',
 	'realesrgan-ncnn-vulkan',
+	'realcugan-ncnn-vulkan',
 ):
 	if os.path.exists(RE_PATH := os.path.join(APP_PATH, executableName + ('.exe' if os.name == 'nt' else ''))):
 		break

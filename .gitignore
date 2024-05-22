@@ -146,6 +146,8 @@ realesrgan-ncnn-vulkan
 realesrgan-ncnn-vulkan.exe
 upscayl-bin
 upscayl-bin.exe
+realcugan-ncnn-vulkan
+realcugan-ncnn-vulkan.exe
 vcomp140.dll
 vcomp140d.dll
 
