@@ -101,6 +101,7 @@ class REGUIApp(ttk.Frame):
         self.outputPathChanged = True
         self.logPath = os.path.join(define.APP_PATH, 'output.log')
         self.logFile: typing.IO = None
+        self.tcl = TkinterDnD.tkinter.Tcl()
         # 当前的放大进度（0~1）/已放大的文件/总共要放大的文件
         # self.vardoubleProgress.set((self.progressValue[0] + self.progressValue[1]) / self.progressValue[2] * 100)
         self.progressValue: list[int | float] = [0, 0, 1]
@@ -134,7 +135,7 @@ class REGUIApp(ttk.Frame):
             self.outputPathChanged = True
         def outputPathTraceCallback(var: tk.IntVar | tk.StringVar, index: str, mode: str):
             if not self.outputPathChanged:
-                self.setInputPath(self.varstrInputPath.get())
+                self.setInputPath(tuple(p.strip() for p in self.varstrInputPath.get().split('|')))
         self.varstrInputPath = tk.StringVar()
         self.varstrOutputPath = tk.StringVar()
         self.varstrOutputPath.trace_add('write', varstrOutputPathCallback)
@@ -417,21 +418,30 @@ class REGUIApp(ttk.Frame):
         with open(define.APP_CONFIG_PATH, 'w', encoding='utf-8') as f:
             self.config.write(f)
 
+    def dndSplit(self, p: str) -> tuple[str, ...]:
+        self.tcl.call('set', 'x', p)
+        r = tuple(self.tcl.eval(f'lindex $x {i}') for i in range(int(self.tcl.eval('llength $x'))))
+        self.tcl.call('unset', 'x')
+        return r
+
     def buttonInputPath_click(self):
-        p = filedialog.askopenfilename(filetypes=(
-            ('Image files', ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff')),
-        ))
-        if not p:
+        if not (p := filedialog.askopenfilename(
+            filetypes=(
+                ('Image files', ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff')),
+            ),
+            multiple=True,
+        )):
             return
         self.setInputPath(p)
 
     def buttonOutputPath_click(self):
-        p = filedialog.askopenfilename(filetypes=(
-            ('Image files', ('.png', '.gif', '.webp')),
-        ))
-        if not p:
+        if not (p := filedialog.askopenfilename(
+            filetypes=(
+                ('Image files', ('.png', '.gif', '.webp')),
+            ),
+        )):
             return
-        self.varstrOutputPath.set(p)
+        self.varstrOutputPath.set((p,))
 
     def comboDownsample_click(self, event: tk.Event):
         self.comboDownsample.select_clear()
@@ -454,18 +464,65 @@ class REGUIApp(ttk.Frame):
             self.varstrLabelStartProcessing.set(i18n.getTranslatedString(('ContinueProcessing' if self.varboolProcessingPaused.get() else 'PauseProcessing') if self.varboolProcessing.get() else 'StartProcessing'))
             return
         try:
-            inputPath = self.varstrInputPath.get()
-            outputPath = self.varstrOutputPath.get()
-            if not inputPath or not outputPath:
+            inputPaths = tuple(p.strip() for p in self.varstrInputPath.get().split('|'))
+            outputPaths = tuple(p.strip() for p in self.varstrOutputPath.get().split('|'))
+            if not inputPaths or not outputPaths or len(inputPaths) != len(outputPaths):
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidPath'))
-            inputPath = os.path.normpath(inputPath)
-            outputPath = os.path.normpath(outputPath)
-            if not os.path.exists(inputPath):
-                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
 
             initialConfigParams = self.getConfigParams()
             if initialConfigParams.resizeMode == param.ResizeMode.RATIO and initialConfigParams.resizeModeValue == 1:
                 return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningResizeRatio'))
+
+            self.progressValue[0] = 0
+            self.progressValue[1] = 0
+            self.progressValue[2] = 0
+            queue = collections.deque()
+            for inputPath, outputPath in zip(inputPaths, outputPaths):
+                inputPath = os.path.normpath(inputPath)
+                outputPath = os.path.normpath(outputPath)
+                if not os.path.exists(inputPath):
+                    return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningNotFoundPath'))
+
+                if os.path.isdir(inputPath):
+                    for curDir, dirs, files in os.walk(inputPath):
+                        for f in files:
+                            if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
+                                continue
+                            f = os.path.join(curDir, f)
+                            g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
+                            if os.path.splitext(f)[1].lower() == '.gif':
+                                queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                            elif self.varstrCustomCommand.get().strip():
+                                t = tempfile.mktemp('.png')
+                                queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
+                                queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
+                            elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                                t = tempfile.mktemp('.webp')
+                                queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
+                                queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
+                            else:
+                                if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
+                                    g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
+                                queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams))
+                            self.progressValue[2] += 1
+                    if not queue:
+                        return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
+                elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
+                    self.progressValue[2] += 1
+                    if os.path.splitext(inputPath)[1].lower() == '.gif':
+                        queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
+                    elif self.varstrCustomCommand.get().strip():
+                        t = tempfile.mktemp('.png')
+                        queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
+                        queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
+                    elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                        t = tempfile.mktemp('.webp')
+                        queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
+                        queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
+                    else:
+                        queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams))
+                else:
+                    return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
 
             self.vardoubleProgress.set(0)
             self.progressAnimation[0] = 0
@@ -475,52 +532,6 @@ class REGUIApp(ttk.Frame):
                 self.progressbar.after_cancel(self.progressAnimation[3])
                 self.progressAnimation[3] = None
 
-            queue = collections.deque()
-            if os.path.isdir(inputPath):
-                self.progressValue[0] = 0
-                self.progressValue[1] = 0
-                self.progressValue[2] = 0
-                for curDir, dirs, files in os.walk(inputPath):
-                    for f in files:
-                        if os.path.splitext(f)[1].lower() not in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
-                            continue
-                        f = os.path.join(curDir, f)
-                        g = os.path.join(outputPath, f.removeprefix(inputPath + os.path.sep))
-                        if os.path.splitext(f)[1].lower() == '.gif':
-                            queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
-                        elif self.varstrCustomCommand.get().strip():
-                            t = tempfile.mktemp('.png')
-                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
-                            queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
-                        elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                            t = tempfile.mktemp('.webp')
-                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
-                            queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
-                        else:
-                            if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
-                                g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
-                            queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams))
-                        self.progressValue[2] += 1
-                if not queue:
-                    return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningEmptyFolder'))
-            elif os.path.splitext(inputPath)[1].lower() in {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.tif', '.tiff'}:
-                self.progressValue[0] = 0
-                self.progressValue[1] = 0
-                self.progressValue[2] = 1
-                if os.path.splitext(inputPath)[1].lower() == '.gif':
-                    queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
-                elif self.varstrCustomCommand.get().strip():
-                    t = tempfile.mktemp('.png')
-                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
-                    queue.append(task.CustomCompressTask(self.writeToOutput, t, outputPath, self.varstrCustomCommand.get().strip(), True))
-                elif self.varboolLossyMode.get() and os.path.splitext(outputPath)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
-                    t = tempfile.mktemp('.webp')
-                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, t, initialConfigParams))
-                    queue.append(task.LossyCompressTask(self.writeToOutput, t, outputPath, self.varintLossyQuality.get(), True))
-                else:
-                    queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, inputPath, outputPath, initialConfigParams))
-            else:
-                return messagebox.showwarning(define.APP_TITLE, i18n.getTranslatedString('WarningInvalidFormat'))
             self.varboolProcessing.set(True)
             self.varboolProcessingPaused.set(False)
             self.pauseEvent.set()
@@ -584,9 +595,9 @@ class REGUIApp(ttk.Frame):
         except Exception as ex:
             messagebox.showerror(define.APP_TITLE, traceback.format_exc())
 
-    def setInputPath(self, p: str):
-        self.varstrInputPath.set(p)
-        self.varstrOutputPath.set(self.getOutputPath(p))
+    def setInputPath(self, paths: tuple[str, ...]):
+        self.varstrInputPath.set(' | '.join(paths))
+        self.varstrOutputPath.set(self.getOutputPath(paths))
         self.outputPathChanged = False
 
     def writeToOutput(self, s: str):
@@ -655,28 +666,31 @@ class REGUIApp(ttk.Frame):
             self.varstrCustomCommand.get().strip(),
         )
 
-    def getOutputPath(self, p: str) -> str:
-        if os.path.isdir(p):
-            base, ext = p, ''
-        else:
-            base, ext = os.path.splitext(p)
-            if ext.lower() in {'.jpg', '.tif', '.tiff'} or self.varstrCustomCommand.get().strip():
-                ext = '.png'
-            if ext.lower() == '.png' and self.varboolUseWebP.get():
-                ext = '.webp'
-        suffix = ''
-        match self.varintResizeMode.get():
-            case param.ResizeMode.RATIO:
-                suffix = f'x{self.varintResizeRatio.get()}'
-            case param.ResizeMode.WIDTH:
-                suffix = f'w{self.varintResizeWidth.get()}'
-            case param.ResizeMode.HEIGHT:
-                suffix = f'h{self.varintResizeHeight.get()}'
-            case param.ResizeMode.LONGEST_SIDE:
-                suffix = f'l{self.varintResizeLongestSide.get()}'
-            case param.ResizeMode.SHORTEST_SIDE:
-                suffix = f's{self.varintResizeShortestSide.get()}'
-        return f'{base} ({self.models[self.comboModel.current()]} {suffix}){ext}'
+    def getOutputPath(self, paths: tuple[str, ...]) -> str:
+        r = []
+        for p in paths:
+            if os.path.isdir(p):
+                base, ext = p, ''
+            else:
+                base, ext = os.path.splitext(p)
+                if ext.lower() in {'.jpg', '.tif', '.tiff'} or self.varstrCustomCommand.get().strip():
+                    ext = '.png'
+                if ext.lower() == '.png' and self.varboolUseWebP.get():
+                    ext = '.webp'
+            suffix = ''
+            match self.varintResizeMode.get():
+                case param.ResizeMode.RATIO:
+                    suffix = f'x{self.varintResizeRatio.get()}'
+                case param.ResizeMode.WIDTH:
+                    suffix = f'w{self.varintResizeWidth.get()}'
+                case param.ResizeMode.HEIGHT:
+                    suffix = f'h{self.varintResizeHeight.get()}'
+                case param.ResizeMode.LONGEST_SIDE:
+                    suffix = f'l{self.varintResizeLongestSide.get()}'
+                case param.ResizeMode.SHORTEST_SIDE:
+                    suffix = f's{self.varintResizeShortestSide.get()}'
+            r.append(f'{base} ({self.models[self.comboModel.current()]} {suffix}){ext}')
+        return ' | '.join(r)
 
 # Config and model paths are initialized before main frame
 # Because for the WarningNotFoundRE warning message app language
@@ -798,7 +812,7 @@ if __name__ == '__main__':
     app.drop_target_register(DND_FILES)
     app.dnd_bind(
         '<<Drop>>',
-        lambda e: app.setInputPath(e.data[1:-1] if '{' == e.data[0] and '}' == e.data[-1] else e.data),
+        lambda e: app.setInputPath(app.dndSplit(e.data)),
     )
     app.pack(fill=tk.BOTH, expand=True)
     root.protocol('WM_DELETE_WINDOW', lambda: (
@@ -817,7 +831,7 @@ if __name__ == '__main__':
     # 最好用的一个 要是第一次通过拖放打开文件路径就好了 · Issue #45 · TransparentLC/realesrgan-gui
     # https://github.com/TransparentLC/realesrgan-gui/issues/45
     if len(sys.argv) > 1:
-        app.setInputPath(sys.argv[1])
+        app.setInputPath(sys.argv[1:])
 
     root.deiconify()
     root.mainloop()
