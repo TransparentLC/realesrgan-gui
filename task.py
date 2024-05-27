@@ -144,7 +144,7 @@ class RESpawnTask(AbstractTask):
                 cmd,
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
-                encoding='utf-8',
+                encoding='utf-8' if os.path.splitext(os.path.split(define.RE_PATH)[1])[0] == 'upscayl-bin' else None,
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
             ) as p:
                 for line in p.stderr:
