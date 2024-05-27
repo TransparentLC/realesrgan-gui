@@ -134,6 +134,7 @@ class RESpawnTask(AbstractTask):
                     '-i', inputPath,
                     '-o', outputPath,
                     '-s', str(self.config.modelFactor),
+                    *(('-z', str(self.config.modelFactor)) if os.path.splitext(os.path.split(define.RE_PATH)[1])[0] == 'upscayl-bin' else ()),
                     '-t', str(self.config.tileSize),
                     '-n', self.config.model,
                     '-g', 'auto' if self.config.gpuID < 0 else str(self.config.gpuID),
