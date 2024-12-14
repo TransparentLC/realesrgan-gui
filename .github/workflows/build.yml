@@ -55,7 +55,7 @@ jobs:
             chmod +x build-macos-app.sh
             sh build-macos-app.sh
             chmod u+x "dist/Real-ESRGAN GUI.app/Contents/MacOS/realesrgan-gui"
-            xattr -cr "dist/Real-ESRGAN GUI.app"
+            sudo xattr -cr "dist/Real-ESRGAN GUI.app"
           else
             pyinstaller --clean --log-level WARN realesrgan-gui.spec
           fi
