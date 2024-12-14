@@ -718,7 +718,7 @@ def init_config_and_model_paths() -> tuple[configparser.ConfigParser, list[str]]
         'IgnoreError': False,
         'Preupscale': False,
         'CustomCommand': '',
-        'AppLanguage': locale.getdefaultlocale()[0],
+        'AppLanguage': locale.getlocale()[0],
     })
     config['Config'] = {}
     config.read(define.APP_CONFIG_PATH)
