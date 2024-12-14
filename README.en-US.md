@@ -82,7 +82,7 @@ In addition to the features supported by Real-ESRGAN-ncnn-vulkan, Real-ESRGAN GU
 
 * Upscale to arbitrary size
     * Real-ESRGAN-ncnn-vulkan can only upscale the input image at a fixed 2-4x ratio (depending on the model chosen).
-    * Real-ESRGAN GUI uses Real-ESRGAN-ncnn-vulkan to upscale the input image  in multiple times, then downsamples the output image to the desired size  with general image scaling algorithms.
+    * Real-ESRGAN GUI uses Real-ESRGAN-ncnn-vulkan to upscale the input image in multiple times, then downsamples the output image to the desired size with general image scaling algorithms.
     * For example, to upscale a 640x360 image to 1600 in width with a 2x model, it will be upscaled twice to 1280x720 and 2560x1440 then downsampled to 1600x900.
     * Lanczos is used by default to downsample the image. Other algorithms are also available.
 * Upscale GIF images
