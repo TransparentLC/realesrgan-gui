@@ -35,10 +35,9 @@ locales_map = {
 
 current_language = None
 
-# 'locale.getdefaultlocale' is deprecated and slated for removal in Python 3.15
 def set_current_language(lang_in_conf: str):
     global current_language
-    locale_lang = locale.getlocale()[0]
+    locale_lang = locale.getdefaultlocale()[0]
 
     if lang_in_conf in all_locales:
         current_language = lang_in_conf
