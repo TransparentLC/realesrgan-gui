@@ -4,6 +4,6 @@ darkdetect[macos-listener] == 0.8.*; sys_platform == 'darwin'
 notify-py == 0.3.*; sys_platform != 'darwin'
 pillow >= 10.0.1, < 11.0.0
 # https://github.com/TransparentLC/realesrgan-gui/issues/18#issuecomment-1477203041
-tkinterdnd2-universal >= 1.7.3, < 2.0.0
+tkinterdnd2 >= 0.4.2
 # For locale names
 babel >= 2.14.0, < 3.0.0
