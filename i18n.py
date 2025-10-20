@@ -31,6 +31,7 @@ locales_map = {
     'español (México)': 'es_MX',
     'español (Colombia)': 'es_CO',
     'español (Argentina)': 'es_AR',
+    'français (France)': 'fr_FR',
 }
 
 current_language = None
