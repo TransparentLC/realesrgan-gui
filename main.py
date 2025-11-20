@@ -494,15 +494,16 @@ class REGUIApp(ttk.Frame):
                                 queue.append(task.SplitGIFTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams, queue, self.varboolOptimizeGIF.get()))
                             elif self.varstrCustomCommand.get().strip():
                                 t = tempfile.mktemp('.png')
+                                g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
                                 queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                                 queue.append(task.CustomCompressTask(self.writeToOutput, t, g, self.varstrCustomCommand.get().strip(), True))
-                            elif self.varboolLossyMode.get() and os.path.splitext(g)[1].lower() in {'.jpg', '.jpeg', '.webp'}:
+                            elif self.varboolLossyMode.get():
                                 t = tempfile.mktemp('.webp')
+                                g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.jpg')
                                 queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, t, initialConfigParams))
                                 queue.append(task.LossyCompressTask(self.writeToOutput, t, g, self.varintLossyQuality.get(), True))
                             else:
-                                if os.path.splitext(f)[1].lower() in {'.tif', '.tiff'}:
-                                    g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
+                                g = os.path.splitext(g)[0] + ('.webp' if self.varboolUseWebP.get() else '.png')
                                 queue.append(task.RESpawnTask(self.writeToOutput, self.progressValue, f, g, initialConfigParams))
                             self.progressValue[2] += 1
                     if not queue:
